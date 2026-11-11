@@ -48,6 +48,9 @@ jobs:
       - name: Rust toolchain pinned in rust-toolchain.toml (channel and components)
         run: rustup toolchain install && rustc --version
       - uses: Swatinem/rust-cache@v2
+      - name: Clippy on Windows (the lint job runs on Linux and never compiles #[cfg(windows)] code)
+        if: runner.os == 'Windows'
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
