@@ -1,0 +1,30 @@
+[package]
+name = "rv-timeline-gui"
+description = "RV Timeline desktop interface (Windows 10/11, also builds on Linux)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "rv-timeline-gui"
+path = "src/main.rs"
+
+[lib]
+name = "rv_timeline_gui"
+path = "src/lib.rs"
+
+[dependencies]
+rv-timeline-core.workspace = true
+eframe.workspace = true
+serde_json.workspace = true
+
+# Native file/folder pickers on Windows (no GTK/portal dependency elsewhere: a text field is used instead).
+[target.'cfg(windows)'.dependencies]
+rfd.workspace = true
+
+# Icon + version details in the Windows .exe (build.rs; does nothing on other platforms).
+[build-dependencies]
+winresource = "0.1"

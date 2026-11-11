@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="{{ lang }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ t.title_summary }} — {{ item.file_name }}</title><style>{{ css|safe }}</style></head>
+<body><div class="band"><div class="inner">{{ logo_svg|safe }}<div><div class="word">RAKVOR</div><div class="desc">{{ brand.descriptor }}</div></div></div></div>
+<main>
+<header>
+  <div><h1>{{ t.title_summary }}</h1><div>{{ item.file_name }}</div></div>
+  <div class="meta">{% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}{% if item.evidence_id %}<div>{{ t.evidence_id }}: {{ item.evidence_id }}</div>{% endif %}<div>{{ run.finished_utc }}</div></div>
+</header>
+
+<p class="status status-{{ item.status }}">{{ item.status_label }}</p>
+<p>{{ item.summary_text }}</p>
+
+<h2>{{ t.what_we_did }}</h2>
+<p>{{ t.method_text }}</p>
+
+<h2>{{ t.what_we_found }}</h2>
+{% if findings %}<ul>{% for f in findings %}<li><strong>{{ f.title }}.</strong> {{ f.shows }}</li>{% endfor %}</ul>{% else %}<p>{{ t.none }}</p>{% endif %}
+
+<h2>{{ t.fingerprint }}</h2>
+<p>{{ t.fingerprint_text }}</p>
+<p class="mono">{{ item.primary_algorithm }}: {{ item.primary_hash }}</p>
+
+<h2>{{ t.next_steps }}</h2>
+<p>{{ item.next_text }}</p>
+<footer><div class="tagline">{{ brand.tagline }}</div>{{ t.generated_by }} {{ tool.name }} {{ tool.version }} · {{ run.run_id }} · {% if signature.signed %}{{ t.signed_by }} {{ signature.by }} (PDF; {{ t.certificate_sha256 }} <span class="mono">{{ signature.certificate_sha256 }}</span>){% else %}{{ t.not_signed }}{% endif %}</footer>
+</main></body></html>

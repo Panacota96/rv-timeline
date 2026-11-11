@@ -1,0 +1,19 @@
+{
+  "forge_version": 1,
+  "profile": "rust",
+  "name": "rv-timeline",
+  "module": "rv_timeline",
+  "title": "RV Timeline",
+  "run_command": "scan",
+  "planned_command": "build",
+  "case_role": "analysis",
+  "created": "2026-11-11",
+  "cli_command": [
+    "cargo",
+    "run",
+    "-q",
+    "-p",
+    "rv-timeline-cli",
+    "--"
+  ]
+}

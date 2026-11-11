@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="{{ lang }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ t.title_technical }} — {{ item.file_name }}</title><style>{{ css|safe }}</style></head>
+<body><div class="band"><div class="inner">{{ logo_svg|safe }}<div><div class="word">RAKVOR</div><div class="desc">{{ brand.descriptor }}</div></div></div></div>
+<main>
+<header>
+  <div><h1>{{ t.title_technical }}</h1><div>{{ item.file_name }}</div></div>
+  <div class="meta">
+    <div>{{ t.run_id }}: <strong>{{ run.run_id }}</strong></div>
+    <div>{{ t.item }} #{{ item.index }}</div>
+    {% if item.evidence_id %}<div>{{ t.evidence_id }}: <strong>{{ item.evidence_id }}</strong></div>{% endif %}
+    {% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}
+  </div>
+</header>
+
+<div class="kv">
+  <div>{{ t.path }}</div><div class="mono">{{ item.path }}</div>
+  <div>{{ t.size }}</div><div>{{ item.size }}</div>
+  <div>{{ t.modified }}</div><div>{{ item.modified_utc }}</div>
+  <div>{{ t.extension }}</div><div>{{ item.extension_text }}</div>
+  <div>{{ t.detected_type }}</div><div>{{ item.detected_text }}</div>
+  <div>{{ t.status }}</div><div>{{ item.status_label }}</div>
+  {% if case %}<div>{{ t.case }}</div><div>{{ case.case_id }}</div>
+  <div>{{ t.evidence_id }}</div><div class="mono">{{ item.evidence_id or t.none }}</div>
+  <div>{{ t.case_registry }}</div><div>{{ item.case_status_label }}</div>
+  {% if item.intake_utc %}<div>{{ t.intake_date }}</div><div>{{ item.intake_utc }}</div>{% endif %}{% endif %}
+</div>
+
+<h2>{{ t.hashes }}</h2>
+<table><tr><th>{{ t.algorithms }}</th><th>Hex</th></tr>
+{% for h in hash_rows %}<tr><td>{{ h.algorithm }}</td><td class="mono">{{ h.value }}</td></tr>{% endfor %}
+</table>
+
+<h2>{{ t.findings }}</h2>
+{% if findings %}{% for f in findings %}
+<div class="finding">
+  <div><span class="badge sev-{{ f.severity }}">{{ f.severity_label }}</span> <strong>{{ f.title }}</strong> <span class="mono">{{ f.code }}</span></div>
+  <div class="kv"><div>{{ t.shows }}</div><div>{{ f.shows }}</div><div>{{ t.does_not_prove }}</div><div>{{ f.does_not_prove }}</div></div>
+</div>{% endfor %}{% else %}<p>{{ t.none }}</p>{% endif %}
+
+<h2>{{ t.method }}</h2>
+<p>{{ t.method_text }}</p>
+
+<h2>{{ t.audit }}</h2>
+<div class="kv">
+  <div>{{ t.audit_entries }}</div><div>#{{ item.audit_first_seq }} – #{{ item.audit_last_seq }}</div>
+  <div>{{ t.log_dir }}</div><div class="mono">{{ audit.log_dir }}</div>
+</div>
+
+<h2>{{ t.limitations }}</h2>
+<ul>{% for l in limitations %}<li>{{ l }}</li>{% endfor %}</ul>
+<footer><div class="tagline">{{ brand.tagline }}</div>{{ t.generated_by }} {{ tool.name }} {{ tool.version }} · {{ run.run_id }} · {% if signature.signed %}{{ t.signed_by }} {{ signature.by }} (PDF; {{ t.certificate_sha256 }} <span class="mono">{{ signature.certificate_sha256 }}</span>){% else %}{{ t.not_signed }}{% endif %}</footer>
+</main></body></html>

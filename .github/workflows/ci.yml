@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain pinned in rust-toolchain.toml (channel and components)
+        run: rustup toolchain install && rustc --version
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - name: Dependency advisories, licences and sources (cargo-deny; no GPL/AGPL/LGPL; see deny.toml)
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories licenses bans sources
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: actionlint
+        run: |
+          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
+          ./actionlint -color
+
+  test:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain pinned in rust-toolchain.toml (channel and components)
+        run: rustup toolchain install && rustc --version
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python helpers (independent verifiers + local test TSA/PKI for the trust tests)
+        run: pip install blake3 jsonschema pyhanko
+      - name: Unit and integration tests (includes docs/usage-cli.md drift check and trust tests)
+        shell: bash
+        env:
+          RV_TEST_PYTHON: python
+        run: |
+          set -o pipefail
+          # Failures are also surfaced as annotations (readable through the API without downloading logs).
+          if ! cargo test --workspace --locked 2>&1 | tee test.log; then
+            grep -E "panicked at|^---- |FAILED|^failures:|assertion|Error:|error:" test.log | head -40 | while IFS= read -r l; do echo "::error title=cargo test::${l}"; done
+            exit 1
+          fi
+      - name: Self-test of the hash implementations
+        run: cargo run --locked -q -p rv-timeline-cli -- self-test
+      - name: Sample run
+        shell: bash
+        run: cargo run --locked -q -p rv-timeline-cli -- scan -i examples/sample/evidence --hash sha256,blake3 --lang all --out ci-out --progress none --no-timestamp
+      - name: Cross-language verification (Python re-checks the chain, hashes and JSON schemas)
+        shell: bash
+        run: |
+          run=$(find ci-out/logs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
+          python tests/verify_chain.py "ci-out/logs/$run"
+          python tests/validate_reports.py "ci-out/reports/$run"
+      - name: Sample script (compares the tool's hashes.csv with expected_hashes.csv)
+        if: runner.os == 'Linux'
+        env:
+          RV_NO_TIMESTAMP: "1"
+          RV_SAMPLE_OUT: sample-out
+        run: |
+          cargo build --locked -q -p rv-timeline-cli
+          sh examples/sample/run.sh target/debug/rv-timeline
+      - name: Cross-profile golden case (written by the Python profile; tests/golden/regenerate.py)
+        shell: bash
+        run: |
+          for z in tests/golden/case-by-*.zip.b64; do
+            rm -rf golden-out && python tests/golden/unpack.py "$z" golden-out
+            cargo run --locked -q -p rv-timeline-cli -- verify-case golden-out/CASE-GOLDEN
+            for logs in golden-out/CASE-GOLDEN/runs/*/*/logs; do
+              cargo run --locked -q -p rv-timeline-cli -- verify-log "$logs"
+            done
+          done
+      - name: Real TSA smoke test (DigiCert; network-dependent, informative)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: bash
+        run: |
+          cargo run --locked -q -p rv-timeline-cli -- scan -i examples/sample/evidence --out tsa-out --progress none | tee tsa.txt
+          grep -q "timestamp: ok" tsa.txt
+          run=$(find tsa-out/logs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
+          cargo run --locked -q -p rv-timeline-cli -- verify-log "tsa-out/logs/$run"
+      - name: Build release binaries (Windows)
+        if: runner.os == 'Windows'
+        run: cargo build --release --locked -p rv-timeline-cli -p rv-timeline-gui
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: rv-timeline-windows-x64-${{ github.sha }}
+          path: |
+            target/release/rv-timeline.exe
+            target/release/rv-timeline-gui.exe
+          retention-days: 14

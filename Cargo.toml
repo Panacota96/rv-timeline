@@ -1,0 +1,54 @@
+[workspace]
+resolver = "3"
+members = ["src/core", "src/cli", "src/gui"]
+
+[workspace.package]
+# Crate version only — never bumped. The product version is version.txt (release-please), so Cargo.lock
+# does not change on release and `--locked` builds keep working.
+version = "0.1.0"
+edition = "2024"
+license = "LicenseRef-Rakvor-Audit"
+publish = false
+rust-version = "1.88"
+authors = ["Rakvor"]
+repository = "https://github.com/Panacota96/rv-timeline"
+
+[workspace.dependencies]
+rv-timeline-core = { path = "src/core" }
+md-5 = "0.11"
+sha1 = "0.11"
+sha2 = "0.11"
+sha3 = "0.12"
+blake3 = "1.8"
+digest = "0.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+minijinja = { version = "3", features = ["serde"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+walkdir = "2.5"
+clap = { version = "4.6", features = ["derive", "wrap_help", "env"] }
+indicatif = "0.18"
+ctrlc = "3.5"
+# Certificate password prompt without echo.
+rpassword = "7.4"
+eframe = { version = "0.37", default-features = false, features = ["default_fonts", "wgpu", "x11", "wayland"] }
+rfd = "0.17"
+# Trust: RFC 3161 timestamps + PDF signatures (RustCrypto, pure Rust; versions aligned on der 0.7)
+ureq = "3"
+p12-keystore = "0.4"
+cms = { version = "0.2", features = ["builder"] }
+x509-tsp = "0.1"
+x509-cert = { version = "0.2", features = ["builder"] }
+der = { version = "0.7", features = ["alloc", "oid"] }
+spki = "0.7"
+const-oid = { version = "0.9", features = ["db"] }
+rsa = { version = "0.9", features = ["sha2"] }
+sha2-legacy = { package = "sha2", version = "0.10" }
+tempfile = "3"
+assert_cmd = "2"
+predicates = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+# Symbols are kept (no strip, no UPX): packed or stripped binaries raise antivirus false positives.

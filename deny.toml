@@ -1,0 +1,54 @@
+# cargo-deny: licence allow-list and source policy (no GPL/AGPL/LGPL components: the tool is proprietary and
+# source-auditable). Run `cargo deny check`; CI runs it on every push (advisories, licences, bans, sources).
+[graph]
+all-features = true
+
+[licenses]
+confidence-threshold = 0.9
+allow = [
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "BSL-1.0",
+    "CC0-1.0",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
+    "MPL-2.0",
+    "CDLA-Permissive-2.0",
+    "0BSD",
+    # jpeg-encoder (re-encoding for ELA and JPEG ghosts): permissive; requires the IJG acknowledgement in NOTICE.
+    "IJG",
+]
+# The workspace's own crates carry the proprietary licence (LICENSE).
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
+# RustSec advisories. CI fails on any vulnerability, yanked crate or unmaintained crate not listed here; each
+# exception names the advisory, why it does not apply to how Rakvor uses the crate, and when it is revisited.
+[advisories]
+yanked = "deny"
+unmaintained = "workspace"
+ignore = [
+    # Marvin (rsa 0.9 timing side channel). rsa 0.9 comes in through cms 0.2 (no stable cms on rsa 0.10 yet) and
+    # signs report PDFs in trust.rs with the examiner's key. It is never used to decrypt; signing always goes
+    # through BlindedSigningKey (RSA blinding with OS randomness, the standard countermeasure); and the tool signs
+    # a handful of reports offline on the examiner's own machine, so there is no remote timing oracle.
+    # Revisit when a stable cms 0.3 (rsa 0.10) is out.
+    { id = "RUSTSEC-2023-0071", reason = "rsa 0.9 via cms 0.2; sign-only, blinded, offline; revisit with stable cms 0.3" },
+]

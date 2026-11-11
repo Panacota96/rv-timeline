@@ -1,0 +1,47 @@
+RAKVOR SOURCE-AUDITABLE LICENCE — DRAFT v0.1 (2026)
+
+>>> DRAFT FOR LEGAL REVIEW. Not reviewed by a lawyer. Do not give this licence to a customer, court or
+>>> third party until counsel (Colombia and France) has reviewed and approved it. Governing law, venue and
+>>> liability clauses below are placeholders.
+
+Copyright (c) 2026 Rakvor. All rights reserved.
+
+Software: RV Timeline (rv-timeline), including its source code, build scripts, tests, test data, documentation
+and the executables built from them (the "Software").
+
+1. Ownership. The Software is owned by Rakvor. No right is granted except as stated in this licence.
+
+2. Use by Rakvor. Rakvor and its personnel may use, modify and build the Software to perform forensic,
+   incident-response and security engagements. The Software is installed and run locally; it is not
+   distributed, sold or offered as a service to third parties.
+
+3. Audit right. A customer of Rakvor, a court, a party to proceedings in which results of the Software are
+   relied upon, and an expert appointed by any of them (each an "Auditor") may, for the sole purpose of
+   assessing the reliability of results produced by the Software in a specific matter:
+   a) receive and inspect the source code of the version identified in the report concerned;
+   b) build that version from source and compare the build with the published SHA256SUMS;
+   c) run the Software, its self-test and its test suite, including on their own test data;
+   d) quote limited extracts of the source code in expert reports and court filings for that matter.
+
+4. Restrictions. An Auditor may not: distribute, publish, sublicense, sell or lend the Software or any
+   part of it; use it for any purpose other than the audit in section 3; remove copyright or licence
+   notices; or use it to provide services to others. Copies made for the audit must be deleted or returned
+   when the matter ends, except where law or a court order requires their retention.
+
+5. Third-party components. The Software includes or loads third-party components under their own licences
+   (listed in NOTICE and the SBOM shipped with each release, e.g. PDFium under BSD-3-Clause, Rust crates and
+   Python packages under MIT/Apache-2.0/BSD). Those licences govern those components and are not limited by
+   this licence.
+
+6. No warranty. The Software is provided "as is", without warranty of any kind. Results are technical
+   signals interpreted by a qualified examiner; the Software does not issue legal conclusions. Every report
+   states the Software's known limitations.
+
+7. Liability. [PLACEHOLDER — to be drafted by counsel, consistent with the law of the engagement.]
+
+8. Confidentiality. Source code received under section 3 is confidential information of Rakvor.
+
+9. Governing law and venue. [PLACEHOLDER — e.g. Colombian law for engagements in Colombia, French law for
+   engagements in France; to be decided by counsel.]
+
+10. Contact. Requests for audit access: [PLACEHOLDER contact address].

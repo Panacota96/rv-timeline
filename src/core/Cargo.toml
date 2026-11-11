@@ -1,0 +1,41 @@
+[package]
+name = "rv-timeline-core"
+description = "RV Timeline core: evidence intake, dual hashing, audit chain, analysis and reports"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+build = "build.rs"
+
+[lib]
+name = "rv_timeline_core"
+path = "src/lib.rs"
+
+[dependencies]
+md-5.workspace = true
+sha1.workspace = true
+sha2.workspace = true
+sha3.workspace = true
+blake3.workspace = true
+digest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+minijinja.workspace = true
+chrono.workspace = true
+walkdir.workspace = true
+ureq.workspace = true
+p12-keystore.workspace = true
+cms.workspace = true
+x509-tsp.workspace = true
+x509-cert.workspace = true
+der.workspace = true
+spki.workspace = true
+const-oid.workspace = true
+rsa.workspace = true
+# `oid`: RSA PKCS#1 v1.5 verification of TSA tokens needs the digest OIDs.
+sha2-legacy = { workspace = true, features = ["oid"] }
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1,0 +1,10 @@
+RV Timeline
+Copyright 2026 Rakvor
+
+This product is licensed under the Rakvor Source-Auditable Licence (see LICENSE): local use by Rakvor,
+source inspection and rebuilding for audit by customers, courts and their experts, no redistribution.
+Third-party components below keep their own licences.
+
+It includes third-party open-source components; their names and exact versions are
+listed in the SBOM published with every release (sbom.cdx.json) and in each run's
+logs/<RUN-ID>/environment.json.

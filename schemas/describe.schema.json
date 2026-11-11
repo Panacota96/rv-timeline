@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rakvor.example/schemas/describe.schema.json",
+  "title": "Rakvor tool self-description (`<tool> describe --json`)",
+  "description": "What a Rakvor tool is, what it accepts and how to launch it. Read by RV Hub to discover tools, launch their GUIs on a case folder and suggest which tool fits a file. Identical in every Rakvor tool repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "tool",
+    "title",
+    "version",
+    "role",
+    "main_verb",
+    "accepts",
+    "case_formats",
+    "log_formats",
+    "cli_exe",
+    "gui_exe",
+    "exit_codes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rakvor.describe/1"
+    },
+    "tool": {
+      "description": "Tool id, also the CLI binary name without extension.",
+      "type": "string",
+      "pattern": "^rv-[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "title": {
+      "description": "Display name.",
+      "type": "string",
+      "pattern": "^RV [A-Za-z0-9 ]+$"
+    },
+    "version": {
+      "description": "Product version (version.txt).",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+    },
+    "role": {
+      "description": "What the tool does in a case: intake registers evidence, analysis examines registered evidence, conversion turns evidence into another format.",
+      "enum": [
+        "intake",
+        "analysis",
+        "conversion"
+      ]
+    },
+    "main_verb": {
+      "description": "The CLI command that does the tool's main work.",
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z]+)*$"
+    },
+    "accepts": {
+      "description": "Inputs the tool handles. A file is a candidate when its extension is listed or its first bytes match a signature. \"*\" means any file.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extensions",
+        "signatures"
+      ],
+      "properties": {
+        "extensions": {
+          "description": "Lower-case extensions without the dot, or the single value \"*\".",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(\\*|[a-z0-9]+)$"
+          }
+        },
+        "signatures": {
+          "description": "Content signatures: every part of `match` must be found at its offset. Empty when the tool recognises its inputs by extension and text sniffing only; \"*\" means any content.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "const": "*"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "format",
+                  "match"
+                ],
+                "properties": {
+                  "format": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-]+$"
+                  },
+                  "match": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "offset",
+                        "hex"
+                      ],
+                      "properties": {
+                        "offset": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "hex": {
+                          "type": "string",
+                          "pattern": "^([0-9a-f]{2})+$"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "case_formats": {
+      "description": "Case folder formats the tool reads and writes.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "rakvor.case/1"
+        ]
+      }
+    },
+    "log_formats": {
+      "description": "Log chains the tool writes: rakvor.audit/1 is <run>/logs/audit.jsonl, rakvor.review/1 is <run>/logs/review.jsonl.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "rakvor.audit/1",
+          "rakvor.review/1"
+        ]
+      },
+      "contains": {
+        "const": "rakvor.audit/1"
+      }
+    },
+    "cli_exe": {
+      "description": "Windows file name of the command-line executable.",
+      "type": "string",
+      "pattern": "^rv-[a-z0-9-]+\\.exe$"
+    },
+    "gui_exe": {
+      "description": "Windows file name of the desktop executable; it accepts --case-dir DIR and input paths.",
+      "type": "string",
+      "pattern": "^rv-[a-z0-9-]+-gui\\.exe$"
+    },
+    "exit_codes": {
+      "description": "Meaning of every CLI exit code.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "130"
+      ],
+      "properties": {
+        "0": {
+          "type": "string",
+          "minLength": 1
+        },
+        "1": {
+          "type": "string",
+          "minLength": 1
+        },
+        "2": {
+          "type": "string",
+          "minLength": 1
+        },
+        "3": {
+          "type": "string",
+          "minLength": 1
+        },
+        "130": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

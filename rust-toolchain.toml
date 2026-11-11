@@ -1,0 +1,6 @@
+# Pinned toolchain: local builds, CI and auditors rebuilding a release use the same compiler and clippy,
+# so lints do not drift and release binaries are reproducible. Bump deliberately (see docs/development.md).
+[toolchain]
+channel = "1.97.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

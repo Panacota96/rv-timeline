@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rakvor.example/schemas/item-summary.schema.json",
+  "title": "Rakvor item customer summary",
+  "type": "object",
+  "required": [
+    "schema",
+    "run_id",
+    "item",
+    "status",
+    "fingerprint",
+    "findings",
+    "text"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rakvor.item-summary/1"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "case_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "item": {
+      "type": "object",
+      "required": [
+        "index",
+        "file_name"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "file_name": {
+          "type": "string"
+        },
+        "evidence_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^E[0-9]{4,}$",
+          "description": "Case folder only: evidence id from the case registry (null when the run is not linked to a case or the item is not registered)."
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "attention",
+        "problem"
+      ]
+    },
+    "fingerprint": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": [
+            "md5",
+            "sha1",
+            "sha256",
+            "sha512",
+            "sha3-256",
+            "blake3"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32,128}$"
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "severity",
+          "params",
+          "text"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]+$"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "text": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "en",
+                "es",
+                "fr"
+              ]
+            },
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "title",
+                "shows",
+                "does_not_prove"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "shows": {
+                  "type": "string"
+                },
+                "does_not_prove": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "text": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "en",
+          "es",
+          "fr"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "status",
+          "summary",
+          "next_step"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "next_step": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

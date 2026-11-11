@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="{{ lang }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ custody.title }} — {{ item.file_name }}</title><style>{{ css|safe }}</style></head>
+<body><div class="band"><div class="inner">{{ logo_svg|safe }}<div><div class="word">RAKVOR</div><div class="desc">{{ brand.descriptor }}</div></div></div></div>
+<main>
+<header>
+  <div><h1>{{ custody.title }}</h1><div>{{ item.file_name }}</div></div>
+  <div class="meta">
+    <div>{{ t.jurisdiction }}: <strong>{{ custody.jurisdiction_label }}</strong></div>
+    <div>{{ t.run_id }}: {{ run.run_id }}</div>
+  </div>
+</header>
+<p class="note">{{ custody.basis }}</p>
+
+<div class="kv">
+  <div>{{ custody.case_label }}</div><div>{{ run.case_id or "" }}</div>
+  <div>{{ custody.evidence_id_label }}</div><div class="mono">{{ custody.evidence_id }}</div>
+  {% if custody.intake_utc %}<div>{{ custody.intake_date }}</div><div>{{ custody.intake_utc }}</div>{% endif %}
+  <div>{{ custody.description }}</div><div>{{ item.file_name }} · {{ item.size }} bytes · {{ item.detected_text }}</div>
+  <div>{{ custody.location }}</div><div class="mono">{{ item.path }}</div>
+</div>
+
+<h2>{{ custody.integrity }}</h2>
+<table><tr><th>{{ t.algorithms }}</th><th>Hex</th></tr>
+{% for h in hash_rows %}<tr><td>{{ h.algorithm }}</td><td class="mono">{{ h.value }}</td></tr>{% endfor %}
+</table>
+
+<h2>{{ custody.operations }}</h2>
+<p>{{ custody.operation_text }}</p>
+<div class="kv"><div>{{ custody.examiner }}</div><div>{{ run.actor }}</div></div>
+
+<h2>{{ custody.transfers }}</h2>
+<table class="blank"><tr><th>{{ custody.date_time }}</th><th>{{ custody.delivered_by }}</th><th>{{ custody.received_by }}</th><th>{{ custody.purpose }}</th><th>{{ custody.condition }}</th></tr>
+{% for r in custody.blank_rows %}<tr><td></td><td></td><td></td><td></td><td></td></tr>{% endfor %}
+</table>
+
+<h2>{{ custody.observations }}</h2>
+<table class="blank"><tr><td></td></tr><tr><td></td></tr></table>
+
+<div class="sign"><div>{{ custody.examiner }}: {{ run.actor }} — {{ custody.signature_line }}</div><div>{{ custody.received_by }} — {{ custody.signature_line }}</div></div>
+<footer><div class="tagline">{{ brand.tagline }}</div>{{ t.generated_by }} {{ tool.name }} {{ tool.version }} · {{ run.run_id }}</footer>
+</main></body></html>

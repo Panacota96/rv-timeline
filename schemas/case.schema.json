@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rakvor.example/schemas/case.schema.json",
+  "title": "Rakvor case folder descriptor (case.json)",
+  "type": "object",
+  "required": [
+    "schema",
+    "case_id",
+    "jurisdiction",
+    "created_utc",
+    "created_by"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rakvor.case/1"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jurisdiction": {
+      "enum": [
+        "co",
+        "fr"
+      ]
+    },
+    "created_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "object",
+      "required": [
+        "tool",
+        "version",
+        "run_id",
+        "actor"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

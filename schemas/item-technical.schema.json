@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rakvor.example/schemas/item-technical.schema.json",
+  "title": "Rakvor item technical review",
+  "type": "object",
+  "required": [
+    "schema",
+    "tool",
+    "run",
+    "item",
+    "hashes",
+    "findings",
+    "limitations",
+    "audit"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rakvor.item-technical/1"
+    },
+    "tool": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": [
+        "run_id",
+        "actor",
+        "frontend",
+        "algorithms",
+        "langs",
+        "started_utc",
+        "finished_utc",
+        "elapsed_ms",
+        "cancelled"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actor": {
+          "type": "string"
+        },
+        "frontend": {
+          "type": "string"
+        },
+        "algorithms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "md5",
+              "sha1",
+              "sha256",
+              "sha512",
+              "sha3-256",
+              "blake3"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "langs": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "en",
+              "es",
+              "fr"
+            ]
+          },
+          "minItems": 1
+        },
+        "started_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cancelled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": [
+        "index",
+        "path",
+        "file_name",
+        "size",
+        "status"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "path": {
+          "type": "string"
+        },
+        "file_name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "modified_utc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extension": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detected_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ok",
+            "attention",
+            "problem"
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^E[0-9]{4,}$",
+          "description": "Case folder only: evidence id from the case registry (null when the run is not linked to a case or the item is not registered)."
+        }
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": [
+          "md5",
+          "sha1",
+          "sha256",
+          "sha512",
+          "sha3-256",
+          "blake3"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{32,128}$"
+      },
+      "maxProperties": 2
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "severity",
+          "params",
+          "text"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]+$"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "text": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "en",
+                "es",
+                "fr"
+              ]
+            },
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "title",
+                "shows",
+                "does_not_prove"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "shows": {
+                  "type": "string"
+                },
+                "does_not_prove": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "audit": {
+      "type": "object",
+      "required": [
+        "first_seq",
+        "last_seq"
+      ],
+      "properties": {
+        "first_seq": {
+          "type": "integer"
+        },
+        "last_seq": {
+          "type": "integer"
+        }
+      }
+    },
+    "case": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Present when the run works in a shared case folder (--case-dir).",
+      "required": [
+        "case_id",
+        "role",
+        "case_dir",
+        "status",
+        "intake_utc"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "intake",
+            "analysis"
+          ]
+        },
+        "case_dir": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "registered",
+            "already_registered",
+            "verified",
+            "mismatch",
+            "not_in_registry",
+            null
+          ]
+        },
+        "intake_utc": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

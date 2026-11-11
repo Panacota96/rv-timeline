@@ -1,0 +1,30 @@
+{
+  "written_by": {
+    "profile": "python",
+    "version": "rv-timeline, version 0.1.0",
+    "commit": "87532d046a53a24ccf6106b9bb5f11e68e54d1e8"
+  },
+  "generated_utc": "2026-10-22T09:59:15Z",
+  "command": [
+    "scan",
+    "-i",
+    "<tmp>/evidence",
+    "--case-dir",
+    "<tmp>/CASE-GOLDEN",
+    "--case",
+    "CASE-GOLDEN",
+    "--jurisdiction",
+    "fr",
+    "--hash",
+    "sha256,md5",
+    "--lang",
+    "en",
+    "--actor",
+    "golden",
+    "--tsa-url",
+    "<test TSA>",
+    "--progress",
+    "none"
+  ],
+  "note": "Evidence paths in the registry point to a deleted temporary folder: verify-case checks the case without --rehash. The timestamp comes from the test TSA of tests/fake_tsa.py (not a trusted authority)."
+}

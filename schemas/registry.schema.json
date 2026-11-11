@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rakvor.example/schemas/registry.schema.json",
+  "title": "Rakvor case evidence registry (evidence/registry.json)",
+  "type": "object",
+  "required": [
+    "schema",
+    "items"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rakvor.registry/1"
+    },
+    "items": {
+      "type": "array",
+      "description": "Sorted by evidence id.",
+      "items": {
+        "type": "object",
+        "required": [
+          "evidence_id",
+          "path",
+          "size",
+          "hashes",
+          "registered_by",
+          "registered_utc"
+        ],
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "pattern": "^E[0-9]{4,}$"
+          },
+          "path": {
+            "type": "string",
+            "description": "Absolute, normalised path at intake."
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "hashes": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "propertyNames": {
+              "enum": [
+                "md5",
+                "sha1",
+                "sha256",
+                "sha512",
+                "sha3-256",
+                "blake3"
+              ]
+            },
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32,128}$"
+            }
+          },
+          "registered_by": {
+            "type": "object",
+            "required": [
+              "tool",
+              "version",
+              "run_id",
+              "audit_seq"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "run_id": {
+                "type": "string"
+              },
+              "audit_seq": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "registered_utc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}
