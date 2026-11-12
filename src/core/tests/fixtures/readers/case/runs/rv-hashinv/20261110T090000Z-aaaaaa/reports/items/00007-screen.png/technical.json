@@ -1,0 +1,22 @@
+{
+  "case": {
+    "case_id": "CASE-TL-1",
+    "intake_utc": "2026-11-10T09:00:07.000Z",
+    "role": "intake",
+    "status": "registered"
+  },
+  "hashes": {
+    "sha256": "a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7"
+  },
+  "item": {
+    "evidence_id": "E0007",
+    "file_name": "screen.png",
+    "index": 7,
+    "path": "D:\\evidence\\screen.png"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-hashinv",
+    "version": "0.4.1"
+  }
+}

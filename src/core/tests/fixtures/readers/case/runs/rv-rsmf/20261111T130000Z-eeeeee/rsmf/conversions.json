@@ -1,0 +1,11 @@
+{
+  "exports": [
+    {
+      "conversations": 1,
+      "events": 3,
+      "export": "chat.zip",
+      "item_index": 5,
+      "source": "whatsapp"
+    }
+  ]
+}

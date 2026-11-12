@@ -1,0 +1,44 @@
+[
+  {
+    "attachments": 0,
+    "conversation": "c1",
+    "event_id": "e-000001",
+    "export": "chat.zip",
+    "kind": "message",
+    "line": 1,
+    "line_end": 1,
+    "native_id": null,
+    "rsmf_file": "c1/2026-11-09.rsmf",
+    "source_file": "_chat.txt",
+    "source_time": "9/11/26, 18:00",
+    "utc": "2026-11-09T23:00:00Z"
+  },
+  {
+    "attachments": 1,
+    "conversation": "c1",
+    "event_id": "e-000002",
+    "export": "chat.zip",
+    "kind": "message",
+    "line": 2,
+    "line_end": 2,
+    "native_id": null,
+    "rsmf_file": "c1/2026-11-09.rsmf",
+    "source_file": "_chat.txt",
+    "source_time": "9/11/26, 18:05",
+    "utc": "2026-11-09T23:05:00Z"
+  },
+  {
+    "attachments": 0,
+    "conversation": "c1",
+    "event_id": "e-000003",
+    "export": "chat.zip",
+    "kind": "message",
+    "line": 3,
+    "line_end": 3,
+    "native_id": null,
+    "rsmf_file": "c1/2026-11-09.rsmf",
+    "source_file": "_chat.txt",
+    "source_time": "garbled",
+    "utc": null
+  }
+]

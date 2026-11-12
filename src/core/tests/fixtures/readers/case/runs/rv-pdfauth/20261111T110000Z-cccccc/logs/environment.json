@@ -1,0 +1,7 @@
+{
+  "os": "Windows 11",
+  "tool": {
+    "name": "rv-pdfauth",
+    "version": "0.4.1"
+  }
+}

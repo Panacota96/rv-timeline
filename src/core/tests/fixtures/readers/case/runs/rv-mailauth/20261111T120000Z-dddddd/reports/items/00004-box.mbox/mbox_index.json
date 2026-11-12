@@ -1,0 +1,19 @@
+{
+  "bytes": 2000,
+  "count": 2,
+  "mbox": "D:\\evidence\\box.mbox",
+  "messages": [
+    {
+      "from_line": "From sender@example.org Wed Nov 11 11:00:03 2026",
+      "id": "D:\\evidence\\box.mbox#1@0",
+      "n": 1,
+      "offset": 0
+    },
+    {
+      "from_line": "From sender@example.org Wed Nov 11 11:30:02 2026",
+      "id": "D:\\evidence\\box.mbox#2@900",
+      "n": 2,
+      "offset": 900
+    }
+  ]
+}
