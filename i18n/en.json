@@ -91,7 +91,50 @@
     "mismatched": "Different from the registry",
     "unregistered": "Not in the registry",
     "intake_date": "Registered at intake (UTC)",
-    "case_dir": "Case folder"
+    "case_dir": "Case folder",
+    "display_zone": "Display zone",
+    "time_utc": "UTC",
+    "time_display": "Display zone time",
+    "zone_unknown_short": "zone unknown, not converted",
+    "as_written": "as written, no zone",
+    "events": "Events",
+    "kind": "Kind",
+    "original": "Original value",
+    "source": "Source",
+    "tool_run": "Tool run",
+    "runs": "Tool runs",
+    "runs_verified": "Runs verified",
+    "runs_excluded": "Runs excluded",
+    "runs_skipped": "Runs not used",
+    "reason": "Reason",
+    "events_total": "Events in the timeline",
+    "events_filtered": "Events outside the window or tool filter",
+    "events_zone_unknown": "Events without a time zone",
+    "events_by_tool": "Events per tool",
+    "events_by_kind": "Events per kind",
+    "signals": "Signals",
+    "signals_by_severity": "Signals by severity",
+    "case_signals": "Signals about the case",
+    "timeline_file": "Timesketch file",
+    "events_more": "%{n} more events of this item are in timeline.jsonl.",
+    "events_cap_note": "Event limit reached: reading stopped at %{max} events.",
+    "run_status_verified": "Verified",
+    "run_status_excluded": "Excluded",
+    "skip_self": "timeline run (not a source)",
+    "skip_tool_filter": "not selected by the tool filter",
+    "window": "Time window (UTC)",
+    "all_tools": "all supported tools",
+    "tools_filter": "Tools",
+    "clock_skew": "Clock tolerance",
+    "tl_method_text": "The runs of the other Rakvor tools in the case folder were checked (audit chain, digests of their outputs) before any output was read. Each time they recorded was placed on one timeline in UTC, keeping its original wording and offset; times without a zone were flagged, never converted. The times were then compared across sources. Every action was written to a hash-chained audit log.",
+    "tl_summary_ok": "The timeline of this item shows no time signal under the checks applied.",
+    "tl_summary_attention": "The timeline of this item shows time signals that deserve a closer look.",
+    "tl_summary_problem": "The timeline of this item shows a time that contradicts its audited intake.",
+    "tl_next_ok": "No action needed for this item.",
+    "tl_next_attention": "Review the signals with the tool reports they cite before drawing conclusions.",
+    "tl_next_problem": "Have an examiner review the cited events and the intake record before relying on this item.",
+    "tl_item_span": "%{n} events from %{tools}, from %{first} to %{last} (UTC).",
+    "tl_item_none": "No event was read for this item."
   },
   "severity": {
     "high": "High",
@@ -141,11 +184,67 @@
       "does_not_prove": "Which version is the original or why the content changed."
     }
   },
+  "signals": {
+    "EXIF_AFTER_INTAKE": {
+      "title": "Photo taken after its intake (EXIF)",
+      "shows": "The photo's EXIF original time (%{exif}) is %{delta} later than its registration at intake (%{intake}), beyond the %{tolerance_s} s tolerance; zone in EXIF: %{zone}.",
+      "does_not_prove": "It does not prove the photo was replaced or edited: a wrong camera clock, a missing or wrong zone, or metadata rewritten by software produce the same result. Compare the hash with the registry and the camera's other images."
+    },
+    "MAIL_DATE_AFTER_FIRST_HOP": {
+      "title": "Message dated after its first relay",
+      "shows": "In message %{message}, the Date header (%{date}) is %{delta} later than the first Received hop (%{hop}), beyond the %{tolerance_s} s tolerance.",
+      "does_not_prove": "It does not prove the message was forged: the sender's clock, a delayed submission or a relay's clock can explain it. Check the other hops and the authentication results."
+    },
+    "PDF_REVISION_BEFORE_PREVIOUS": {
+      "title": "PDF revision dated before the previous one",
+      "shows": "Revision %{revision} is dated %{time}, %{delta} before revision %{previous} (%{previous_time}) that it updates.",
+      "does_not_prove": "It does not prove backdating: the signer's or editor's clock may be wrong. Read it with the content of the revisions and any trusted timestamp."
+    },
+    "FILE_MODIFIED_AFTER_INTAKE": {
+      "title": "File modified after its intake",
+      "shows": "A file-system modification time (%{modified}) is %{delta} after the intake registration (%{intake}); %{count} value(s) concerned.",
+      "does_not_prove": "It does not prove the content changed: copying, restoring or touching a file changes its times, not its content. The hash comparison with the registry tells whether the content is the same."
+    },
+    "EVENT_IN_FUTURE": {
+      "title": "Time later than the run that read it",
+      "shows": "%{count} time(s) (first: %{time}, %{kind}) are up to %{delta} later than the run %{run_id} that recorded them (reference: %{reference}).",
+      "does_not_prove": "It does not prove manipulation: a device clock set ahead, a wrong zone or a planned date written in the file produce the same result."
+    },
+    "CLOCK_SKEW_SUSPECTED": {
+      "title": "Possible clock offset between sources",
+      "shows": "For this item, %{tool_b} reports %{pairs} shared times about %{skew} (%{skew_s} s) apart from %{tool_a}, always in the same direction.",
+      "does_not_prove": "It does not tell which source is right, nor that either was altered: different zones, a copy made on another machine or a reader's interpretation can cause a constant offset."
+    },
+    "RUN_NOT_VERIFIED": {
+      "title": "Tool run left out of the timeline",
+      "shows": "The run %{run_id} of %{tool} %{version} (%{run_dir}) was not used: %{reason_text}. %{detail}",
+      "does_not_prove": "It does not prove the run's outputs were altered: the run may not have finished, or this version may not read that tool version. Its events are missing, so the timeline is incomplete for it."
+    },
+    "ZONE_UNKNOWN_EVENTS": {
+      "title": "Times without a time zone",
+      "shows": "%{count} time(s), from %{tools}, carry no time zone. They are placed as if written in UTC and shown as written, never converted.",
+      "does_not_prove": "It does not mean these times are wrong; their true instant may differ by up to 14 hours from where they are placed."
+    }
+  },
+  "exclusion": {
+    "chain_broken": "its audit chain is broken",
+    "digest_mismatch": "an output differs from the digest in its audit log",
+    "not_finished": "the run did not finish",
+    "unsupported_tool": "no reader exists for this tool",
+    "unsupported_version": "the reader does not support this tool version",
+    "unreadable": "its outputs could not be read"
+  },
   "limitations": {
     "SIGNATURE_TABLE_LIMITED": "Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as suspicious.",
     "TIMESTAMPS_FROM_FILESYSTEM": "Modification times come from the file system of the examined copy and may differ from the original source.",
     "CLEAN_RESULT_IS_NOT_AUTHENTICITY": "A result without findings does not prove that a file is authentic or unaltered before acquisition.",
-    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source."
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source.",
+    "TL_ZONE_UNKNOWN": "Times recorded without a time zone are placed as if they were UTC and shown as written; they are never converted, so their true instant may differ by up to 14 hours.",
+    "TL_CLOCK_SKEW": "Cross-source comparisons tolerate %{skew_s} s of difference; smaller disagreements between clocks are not reported.",
+    "TL_TOOL_OUTPUTS_ONLY": "In this version the only sources are the audited outputs of Rakvor tool runs in the case folder; times those tools did not extract (other logs, other devices) are not in the timeline.",
+    "TL_READER_VERSIONS": "Each reader supports the tool output versions it was written for; runs of other versions are left out and listed, never guessed.",
+    "TL_MAX_EVENTS": "Reading stopped at the event limit (%{max_events}); later events are neither in the timeline nor in the signals.",
+    "TL_CLEAN_IS_NOT_PROOF": "A timeline without signals does not prove that the times are true; it shows that the sources read agree within the tolerance."
   },
   "brand": {
     "descriptor": "FORENSICS | INCIDENT RESPONSE | SECURITY",

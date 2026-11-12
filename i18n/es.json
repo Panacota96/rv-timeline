@@ -91,7 +91,50 @@
     "mismatched": "Distintos del registro",
     "unregistered": "No registrados",
     "intake_date": "Registrado en la recepción (UTC)",
-    "case_dir": "Carpeta del caso"
+    "case_dir": "Carpeta del caso",
+    "display_zone": "Zona de visualización",
+    "time_utc": "UTC",
+    "time_display": "Hora en la zona de visualización",
+    "zone_unknown_short": "zona desconocida, no convertida",
+    "as_written": "tal como fue escrita, sin zona",
+    "events": "Eventos",
+    "kind": "Tipo",
+    "original": "Valor original",
+    "source": "Fuente",
+    "tool_run": "Ejecución",
+    "runs": "Ejecuciones de herramientas",
+    "runs_verified": "Ejecuciones verificadas",
+    "runs_excluded": "Ejecuciones excluidas",
+    "runs_skipped": "Ejecuciones no usadas",
+    "reason": "Motivo",
+    "events_total": "Eventos en la línea de tiempo",
+    "events_filtered": "Eventos fuera de la ventana o del filtro de herramientas",
+    "events_zone_unknown": "Eventos sin zona horaria",
+    "events_by_tool": "Eventos por herramienta",
+    "events_by_kind": "Eventos por tipo",
+    "signals": "Señales",
+    "signals_by_severity": "Señales por severidad",
+    "case_signals": "Señales sobre el caso",
+    "timeline_file": "Archivo Timesketch",
+    "events_more": "%{n} eventos más de este elemento están en timeline.jsonl.",
+    "events_cap_note": "Límite de eventos alcanzado: la lectura se detuvo en %{max} eventos.",
+    "run_status_verified": "Verificada",
+    "run_status_excluded": "Excluida",
+    "skip_self": "ejecución de línea de tiempo (no es una fuente)",
+    "skip_tool_filter": "no seleccionada por el filtro de herramientas",
+    "window": "Ventana de tiempo (UTC)",
+    "all_tools": "todas las herramientas admitidas",
+    "tools_filter": "Herramientas",
+    "clock_skew": "Tolerancia de reloj",
+    "tl_method_text": "Las ejecuciones de las demás herramientas Rakvor en la carpeta del caso se verificaron (cadena de auditoría, hashes de sus resultados) antes de leer cualquier resultado. Cada hora registrada se ubicó en una sola línea de tiempo en UTC, conservando su redacción y desfase originales; las horas sin zona se señalaron, nunca se convirtieron. Luego se compararon las horas entre fuentes. Cada acción quedó en un registro de auditoría encadenado por hash.",
+    "tl_summary_ok": "La línea de tiempo de este elemento no muestra señales de tiempo con las verificaciones aplicadas.",
+    "tl_summary_attention": "La línea de tiempo de este elemento muestra señales de tiempo que merecen una revisión.",
+    "tl_summary_problem": "La línea de tiempo de este elemento muestra una hora que contradice su ingreso auditado.",
+    "tl_next_ok": "No se requiere ninguna acción para este elemento.",
+    "tl_next_attention": "Revise las señales con los informes de herramienta que citan antes de sacar conclusiones.",
+    "tl_next_problem": "Haga que un perito revise los eventos citados y el registro de ingreso antes de basarse en este elemento.",
+    "tl_item_span": "%{n} eventos de %{tools}, del %{first} al %{last} (UTC).",
+    "tl_item_none": "No se leyó ningún evento para este elemento."
   },
   "severity": {
     "high": "Alta",
@@ -141,11 +184,67 @@
       "does_not_prove": "Cuál versión es la original ni por qué cambió el contenido."
     }
   },
+  "signals": {
+    "EXIF_AFTER_INTAKE": {
+      "title": "Foto tomada después de su ingreso (EXIF)",
+      "shows": "La hora EXIF original de la foto (%{exif}) es %{delta} posterior a su registro en el ingreso (%{intake}), más allá de la tolerancia de %{tolerance_s} s; zona en EXIF: %{zone}.",
+      "does_not_prove": "No prueba que la foto haya sido reemplazada o editada: un reloj de cámara errado, una zona ausente o errada, o metadatos reescritos por un programa producen el mismo resultado. Compare el hash con el registro y las demás imágenes de la cámara."
+    },
+    "MAIL_DATE_AFTER_FIRST_HOP": {
+      "title": "Mensaje fechado después de su primer relevo",
+      "shows": "En el mensaje %{message}, el encabezado Date (%{date}) es %{delta} posterior al primer salto Received (%{hop}), más allá de la tolerancia de %{tolerance_s} s.",
+      "does_not_prove": "No prueba que el mensaje sea falso: el reloj del remitente, un envío diferido o el reloj de un servidor pueden explicarlo. Revise los demás saltos y los resultados de autenticación."
+    },
+    "PDF_REVISION_BEFORE_PREVIOUS": {
+      "title": "Revisión PDF fechada antes de la anterior",
+      "shows": "La revisión %{revision} está fechada %{time}, %{delta} antes de la revisión %{previous} (%{previous_time}) que actualiza.",
+      "does_not_prove": "No prueba una antedatación: el reloj del firmante o del editor puede estar errado. Léalo junto con el contenido de las revisiones y cualquier sello de tiempo confiable."
+    },
+    "FILE_MODIFIED_AFTER_INTAKE": {
+      "title": "Archivo modificado después de su ingreso",
+      "shows": "Una hora de modificación del sistema de archivos (%{modified}) es %{delta} posterior al registro de ingreso (%{intake}); %{count} valor(es) en cuestión.",
+      "does_not_prove": "No prueba que el contenido haya cambiado: copiar, restaurar o tocar un archivo cambia sus horas, no su contenido. La comparación del hash con el registro indica si el contenido es el mismo."
+    },
+    "EVENT_IN_FUTURE": {
+      "title": "Hora posterior a la ejecución que la leyó",
+      "shows": "%{count} hora(s) (primera: %{time}, %{kind}) son hasta %{delta} posteriores a la ejecución %{run_id} que las registró (referencia: %{reference}).",
+      "does_not_prove": "No prueba una manipulación: un reloj de dispositivo adelantado, una zona errada o una fecha prevista escrita en el archivo producen el mismo resultado."
+    },
+    "CLOCK_SKEW_SUSPECTED": {
+      "title": "Posible desfase de reloj entre fuentes",
+      "shows": "Para este elemento, %{tool_b} reporta %{pairs} horas comunes separadas unos %{skew} (%{skew_s} s) de %{tool_a}, siempre en el mismo sentido.",
+      "does_not_prove": "No indica cuál fuente es correcta ni que alguna haya sido alterada: zonas distintas, una copia hecha en otra máquina o la interpretación de un lector pueden causar un desfase constante."
+    },
+    "RUN_NOT_VERIFIED": {
+      "title": "Ejecución dejada fuera de la línea de tiempo",
+      "shows": "La ejecución %{run_id} de %{tool} %{version} (%{run_dir}) no se usó: %{reason_text}. %{detail}",
+      "does_not_prove": "No prueba que los resultados de la ejecución hayan sido alterados: puede que no haya terminado, o que esta versión no lea esa versión de la herramienta. Sus eventos faltan, así que la línea de tiempo está incompleta para ella."
+    },
+    "ZONE_UNKNOWN_EVENTS": {
+      "title": "Horas sin zona horaria",
+      "shows": "%{count} hora(s), de %{tools}, no tienen zona horaria. Se ubican como si estuvieran escritas en UTC y se muestran tal como fueron escritas, nunca convertidas.",
+      "does_not_prove": "No significa que estas horas sean erradas; su instante real puede diferir hasta 14 horas del lugar donde se ubican."
+    }
+  },
+  "exclusion": {
+    "chain_broken": "su cadena de auditoría está rota",
+    "digest_mismatch": "un resultado difiere del hash de su registro de auditoría",
+    "not_finished": "la ejecución no terminó",
+    "unsupported_tool": "no existe lector para esta herramienta",
+    "unsupported_version": "el lector no admite esta versión de la herramienta",
+    "unreadable": "sus resultados no se pudieron leer"
+  },
   "limitations": {
     "SIGNATURE_TABLE_LIMITED": "La detección de tipo usa una tabla limitada de firmas comunes; los tipos desconocidos se reportan como desconocidos, no como sospechosos.",
     "TIMESTAMPS_FROM_FILESYSTEM": "Las fechas de modificación provienen del sistema de archivos de la copia examinada y pueden diferir de la fuente original.",
     "CLEAN_RESULT_IS_NOT_AUTHENTICITY": "Un resultado sin hallazgos no prueba que un archivo sea auténtico ni que no haya sido alterado antes de su adquisición.",
-    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "Un sello de tiempo confiable prueba que el log de auditoría existía en esta forma exacta en la hora indicada; no prueba que la copia examinada coincida con la fuente original."
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "Un sello de tiempo confiable prueba que el log de auditoría existía en esta forma exacta en la hora indicada; no prueba que la copia examinada coincida con la fuente original.",
+    "TL_ZONE_UNKNOWN": "Las horas registradas sin zona horaria se ubican como si fueran UTC y se muestran tal como fueron escritas; nunca se convierten, así que su instante real puede diferir hasta 14 horas.",
+    "TL_CLOCK_SKEW": "Las comparaciones entre fuentes toleran %{skew_s} s de diferencia; los desacuerdos menores entre relojes no se reportan.",
+    "TL_TOOL_OUTPUTS_ONLY": "En esta versión las únicas fuentes son los resultados auditados de las ejecuciones de herramientas Rakvor en la carpeta del caso; las horas que esas herramientas no extrajeron (otros registros, otros dispositivos) no están en la línea de tiempo.",
+    "TL_READER_VERSIONS": "Cada lector admite las versiones de resultados para las que fue escrito; las ejecuciones de otras versiones se dejan fuera y se listan, nunca se adivinan.",
+    "TL_MAX_EVENTS": "La lectura se detuvo en el límite de eventos (%{max_events}); los eventos siguientes no están en la línea de tiempo ni en las señales.",
+    "TL_CLEAN_IS_NOT_PROOF": "Una línea de tiempo sin señales no prueba que las horas sean verdaderas; muestra que las fuentes leídas concuerdan dentro de la tolerancia."
   },
   "brand": {
     "descriptor": "FORENSE | RESPUESTA A INCIDENTES | SEGURIDAD",
