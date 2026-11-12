@@ -49,6 +49,8 @@ ignore = [
     # signs report PDFs in trust.rs with the examiner's key. It is never used to decrypt; signing always goes
     # through BlindedSigningKey (RSA blinding with OS randomness, the standard countermeasure); and the tool signs
     # a handful of reports offline on the examiner's own machine, so there is no remote timing oracle.
-    # Revisit when a stable cms 0.3 (rsa 0.10) is out.
-    { id = "RUSTSEC-2023-0071", reason = "rsa 0.9 via cms 0.2; sign-only, blinded, offline; revisit with stable cms 0.3" },
+    # rv-mailauth also links rsa 0.9 through mail-auth 0.15 (rust-crypto), only to verify DKIM/ARC signatures with
+    # public keys; Marvin needs private-key operations, so verification is not affected.
+    # Revisit when a stable cms 0.3 (rsa 0.10) is out, and when mail-auth moves to rsa 0.10.
+    { id = "RUSTSEC-2023-0071", reason = "rsa 0.9 via cms 0.2 (sign-only, blinded, offline) and mail-auth 0.15 (verify-only); revisit with cms 0.3" },
 ]
