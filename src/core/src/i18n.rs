@@ -120,6 +120,17 @@ impl Catalog {
             .unwrap_or(code)
             .to_string()
     }
+
+    /// Label of a timeline event kind (`exif.original` → "Photo taken (EXIF DateTimeOriginal)"); the key itself
+    /// when the catalogue has none.
+    pub fn kind(&self, key: &str) -> String {
+        self.data["kind"][key].as_str().unwrap_or(key).to_string()
+    }
+
+    /// Whether the catalogue labels this event kind.
+    pub fn has_kind(&self, key: &str) -> bool {
+        self.data["kind"][key].is_string()
+    }
 }
 
 #[cfg(test)]
