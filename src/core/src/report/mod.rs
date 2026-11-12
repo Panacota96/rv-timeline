@@ -6,8 +6,10 @@
 pub mod pdf;
 
 use crate::analyzer::{Finding, Severity};
+use crate::engine::{self, DisplayZone};
 use crate::hash::{HashAlgo, hash_bytes};
 use crate::i18n::{Catalog, catalog};
+use crate::model::{RunRef, RunStatus, Signal, TimeEvent};
 use crate::time::human_duration;
 use minijinja::Environment;
 use pdf::Block;
@@ -27,6 +29,18 @@ pub const LIMITATIONS: [&str; 4] = [
     "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
     "TIMESTAMP_PROVES_EXISTENCE_ONLY",
 ];
+/// Limitations of a timeline run (rv-timeline's main verb), printed instead of [`LIMITATIONS`]; `TL_MAX_EVENTS`
+/// is added when the event limit was reached.
+pub const TIMELINE_LIMITATIONS: [&str; 6] = [
+    "TL_ZONE_UNKNOWN",
+    "TL_CLOCK_SKEW",
+    "TL_TOOL_OUTPUTS_ONLY",
+    "TL_READER_VERSIONS",
+    "TL_CLEAN_IS_NOT_PROOF",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY",
+];
+/// Rows of an item's events table in its reports; the complete list is in `timeline.jsonl`.
+pub const ITEM_EVENT_ROWS: usize = 200;
 pub const SCHEMA_CUSTODY: &str = "rakvor.item-custody/1";
 const BLANK_TRANSFER_ROWS: usize = 6;
 
@@ -57,6 +71,292 @@ pub struct RunInfo {
     pub timestamp: Value,
     /// Set when the run works in a shared case folder (`--case-dir`).
     pub case: Option<CaseInfo>,
+    /// Set for a timeline build: what was read, the display zone, the signals.
+    pub timeline: Option<TimelineInfo>,
+}
+
+/// A run found in the case folder but not used as a source (`self`, `tool_filter`, `max_events`).
+#[derive(Clone, Debug)]
+pub struct SkippedRun {
+    pub run: RunRef,
+    pub reason: String,
+}
+
+/// What a timeline build read and found, for the statistics report and the page headers.
+#[derive(Clone, Debug)]
+pub struct TimelineInfo {
+    pub zone: DisplayZone,
+    /// Every source run considered, verified or excluded (with its reason and event count).
+    pub runs: Vec<RunRef>,
+    pub skipped: Vec<SkippedRun>,
+    pub events: u64,
+    /// Events read but outside the window or the tool filter.
+    pub filtered_out: u64,
+    pub zone_unknown: u64,
+    pub by_tool: BTreeMap<String, u64>,
+    pub by_kind: BTreeMap<String, u64>,
+    /// All signals (item, run and case level).
+    pub signals: Vec<Signal>,
+    pub clock_skew_s: u64,
+    pub max_events: u64,
+    pub cap_reached: bool,
+    pub from_s: Option<i64>,
+    pub to_s: Option<i64>,
+    pub tools: Vec<String>,
+    /// `timeline.jsonl` relative to the report folder, when written.
+    pub timeline_file: Option<String>,
+    pub spilled_chunks: usize,
+}
+
+impl TimelineInfo {
+    pub fn limitations(&self) -> Vec<(&'static str, BTreeMap<String, String>)> {
+        let mut out: Vec<(&'static str, BTreeMap<String, String>)> = TIMELINE_LIMITATIONS
+            .iter()
+            .map(|c| {
+                let mut p = BTreeMap::new();
+                p.insert("skew_s".to_string(), self.clock_skew_s.to_string());
+                (*c, p)
+            })
+            .collect();
+        if self.cap_reached {
+            let mut p = BTreeMap::new();
+            p.insert("max_events".to_string(), self.max_events.to_string());
+            out.insert(0, ("TL_MAX_EVENTS", p));
+        }
+        out
+    }
+
+    pub fn verified(&self) -> usize {
+        self.runs
+            .iter()
+            .filter(|r| r.status == RunStatus::Verified)
+            .count()
+    }
+
+    pub fn excluded(&self) -> usize {
+        self.runs.len() - self.verified()
+    }
+}
+
+/// One evidence item's part of the timeline.
+#[derive(Clone, Debug, Default)]
+pub struct ItemTimeline {
+    /// The first [`ITEM_EVENT_ROWS`] events in timeline order.
+    pub events: Vec<TimeEvent>,
+    pub total: u64,
+    pub tools: Vec<String>,
+    pub first_s: Option<i64>,
+    pub last_s: Option<i64>,
+    /// The item's signals (also in the item's findings, worded from the `signals` catalogue).
+    pub signals: Vec<Signal>,
+}
+
+/// A timeline signal as a report finding (same code, severity and parameters).
+pub fn signal_finding(s: &Signal) -> Finding {
+    Finding {
+        code: s.code.clone(),
+        severity: sev(s.severity),
+        params: s.params.clone(),
+    }
+}
+
+fn sev(s: crate::model::Severity) -> Severity {
+    match s {
+        crate::model::Severity::Info => Severity::Info,
+        crate::model::Severity::Low => Severity::Low,
+        crate::model::Severity::Medium => Severity::Medium,
+        crate::model::Severity::High => Severity::High,
+    }
+}
+
+/// Signal parameters with the localised exclusion reason (`reason_text`).
+fn localized_params(c: &Catalog, params: &BTreeMap<String, String>) -> BTreeMap<String, String> {
+    let mut p = params.clone();
+    if let Some(r) = params.get("reason") {
+        p.insert(
+            "reason_text".into(),
+            c.text("exclusion", r).unwrap_or_else(|| r.clone()),
+        );
+    }
+    p
+}
+
+fn limitation_texts(c: &Catalog, run: &RunInfo) -> Vec<String> {
+    match &run.timeline {
+        Some(t) => t
+            .limitations()
+            .iter()
+            .map(|(code, p)| c.limitation_with(code, p))
+            .collect(),
+        None => LIMITATIONS.iter().map(|l| c.limitation(l)).collect(),
+    }
+}
+
+fn limitation_codes(run: &RunInfo) -> Value {
+    match &run.timeline {
+        Some(t) => json!(
+            t.limitations()
+                .iter()
+                .map(|(c, p)| json!({"code": c, "params": p}))
+                .collect::<Vec<_>>()
+        ),
+        None => json!(LIMITATIONS),
+    }
+}
+
+fn zone_time(run: &RunInfo, utc: &str) -> Option<String> {
+    let t = run.timeline.as_ref()?;
+    let s = engine::parse_rfc3339(utc)?;
+    Some(t.zone.format(s, 0, crate::model::Precision::Second))
+}
+
+fn event_row(c: &Catalog, zone: &DisplayZone, e: &TimeEvent) -> Value {
+    let unknown = e.zone == crate::model::ZoneInfo::Unknown;
+    let utc = if unknown {
+        format!("{} ({})", engine::utc_time(e), c.label("as_written"))
+    } else {
+        engine::utc_time(e)
+    };
+    json!({
+        "id": e.id, "utc": utc, "unknown": unknown,
+        "display": engine::display_time(e, zone).unwrap_or_else(|| c.label("zone_unknown_short")),
+        "kind": e.kind, "kind_label": engine::kind_label(c.lang, &e.kind), "original": e.original,
+        "sub": e.item.sub, "tool": e.source.tool, "run_id": e.source.run_id, "file": e.source.file,
+        "pointer": e.source.pointer,
+    })
+}
+
+fn signal_view(c: &Catalog, s: &Signal) -> Value {
+    let p = localized_params(c, &s.params);
+    let (title, shows, dnp) = c.signal(&s.code, &p);
+    let key = sev(s.severity).key();
+    json!({"code": s.code, "severity": key, "severity_label": c.severity(key), "title": title, "shows": shows,
+           "does_not_prove": dnp, "events_text": capped_list(&s.events, 6),
+           "evidence_id": s.item.as_ref().map(|i| i.evidence_id.clone()).unwrap_or_default()})
+}
+
+fn signal_json(s: &Signal, langs: &[String]) -> Value {
+    let texts: BTreeMap<String, Value> = langs
+        .iter()
+        .map(|l| {
+            let c = catalog(l);
+            let (title, shows, dnp) = c.signal(&s.code, &localized_params(c, &s.params));
+            (
+                l.clone(),
+                json!({"title": title, "shows": shows, "does_not_prove": dnp}),
+            )
+        })
+        .collect();
+    json!({"code": s.code, "severity": s.severity, "events": s.events, "item": s.item, "params": s.params, "text": texts})
+}
+
+fn severity_counts(signals: &[Signal]) -> BTreeMap<&'static str, u64> {
+    let mut m: BTreeMap<&'static str, u64> = ["high", "medium", "low", "info"]
+        .iter()
+        .map(|k| (*k, 0))
+        .collect();
+    for s in signals {
+        *m.entry(sev(s.severity).key()).or_default() += 1;
+    }
+    m
+}
+
+fn window_text(c: &Catalog, t: &TimelineInfo) -> String {
+    let f = |v: Option<i64>| {
+        v.map(|s| engine::fmt_utc(s, 0, crate::model::Precision::Second))
+            .unwrap_or_else(|| "\u{2026}".into())
+    };
+    if t.from_s.is_none() && t.to_s.is_none() {
+        c.label("none")
+    } else {
+        format!("{} \u{2013} {}", f(t.from_s), f(t.to_s))
+    }
+}
+
+fn timeline_view(c: &Catalog, t: &TimelineInfo) -> Value {
+    let runs: Vec<Value> = t.runs.iter().map(|r| {
+        let status = if r.status == RunStatus::Verified { "verified" } else { "excluded" };
+        let reason = r.exclusion.as_ref().map(|x| {
+            let l = c.text("exclusion", &x.reason).unwrap_or_else(|| x.reason.clone());
+            if x.detail.is_empty() { l } else { format!("{} ({})", l, x.detail) }
+        }).unwrap_or_default();
+        json!({"tool": r.tool, "version": r.tool_version, "run_id": r.run_id, "run_dir": r.run_dir, "status": status,
+               "status_label": c.label(&format!("run_status_{}", status)), "reason": reason, "events": r.events})
+    }).collect();
+    let skipped: Vec<Value> = t
+        .skipped
+        .iter()
+        .map(|s| {
+            json!({"tool": s.run.tool, "run_id": s.run.run_id,
+        "reason": c.label(&format!("skip_{}", s.reason))})
+        })
+        .collect();
+    let by_tool: Vec<Value> = t
+        .by_tool
+        .iter()
+        .map(|(k, n)| json!({"name": k, "count": n}))
+        .collect();
+    let by_kind: Vec<Value> = t
+        .by_kind
+        .iter()
+        .map(|(k, n)| json!({"kind": k, "name": engine::kind_label(c.lang, k), "count": n}))
+        .collect();
+    let sev_rows: Vec<Value> = ["high", "medium", "low", "info"]
+        .iter()
+        .map(|k| json!({"key": k, "label": c.severity(k), "count": severity_counts(&t.signals)[k]}))
+        .collect();
+    let case_signals: Vec<Value> = t
+        .signals
+        .iter()
+        .filter(|s| s.item.is_none())
+        .map(|s| signal_view(c, s))
+        .collect();
+    let mut cap = BTreeMap::new();
+    cap.insert("max".to_string(), t.max_events.to_string());
+    json!({
+        "zone": t.zone.name(), "runs": runs, "skipped": skipped, "by_tool": by_tool, "by_kind": by_kind,
+        "severity_rows": sev_rows, "case_signals": case_signals, "events": t.events, "filtered_out": t.filtered_out,
+        "zone_unknown": t.zone_unknown, "verified": t.verified(), "excluded": t.excluded(),
+        "cap_note": if t.cap_reached { crate::i18n::fill(&c.label("events_cap_note"), &cap) } else { String::new() },
+        "timeline_file": t.timeline_file, "window_text": window_text(c, t),
+        "tools_text": if t.tools.is_empty() { c.label("all_tools") } else { t.tools.join(", ") },
+        "clock_skew_text": format!("{} s", t.clock_skew_s), "signal_count": t.signals.len(),
+    })
+}
+
+fn timeline_json(t: &TimelineInfo, langs: &[String]) -> Value {
+    json!({
+        "display_zone": t.zone.name(), "clock_skew_s": t.clock_skew_s, "max_events": t.max_events,
+        "max_events_reached": t.cap_reached, "from_s": t.from_s, "to_s": t.to_s, "tools": t.tools,
+        "runs": t.runs, "skipped": t.skipped.iter().map(|s| json!({"tool": s.run.tool, "version": s.run.tool_version,
+            "run_id": s.run.run_id, "run_dir": s.run.run_dir, "reason": s.reason})).collect::<Vec<_>>(),
+        "runs_verified": t.verified(), "runs_excluded": t.excluded(),
+        "events": t.events, "events_filtered_out": t.filtered_out, "events_zone_unknown": t.zone_unknown,
+        "events_by_tool": t.by_tool, "events_by_kind": t.by_kind,
+        "signals_by_severity": severity_counts(&t.signals),
+        "signals": t.signals.iter().map(|s| signal_json(s, langs)).collect::<Vec<_>>(),
+        "timeline_file": t.timeline_file, "sort_spilled_chunks": t.spilled_chunks,
+    })
+}
+
+fn item_timeline_text(c: &Catalog, tl: &ItemTimeline) -> String {
+    match (tl.first_s, tl.last_s) {
+        (Some(a), Some(b)) if tl.total > 0 => {
+            let mut p = BTreeMap::new();
+            p.insert("n".to_string(), tl.total.to_string());
+            p.insert("tools".to_string(), tl.tools.join(", "));
+            p.insert(
+                "first".to_string(),
+                engine::fmt_utc(a, 0, crate::model::Precision::Second),
+            );
+            p.insert(
+                "last".to_string(),
+                engine::fmt_utc(b, 0, crate::model::Precision::Second),
+            );
+            crate::i18n::fill(&c.label("tl_item_span"), &p)
+        }
+        _ => c.label("tl_item_none"),
+    }
 }
 
 /// Counts of how the run's items relate to the case registry.
@@ -107,6 +407,8 @@ pub struct ItemResult {
     /// registered | already_registered | verified | mismatch | not_in_registry
     pub case_status: Option<String>,
     pub intake_utc: Option<String>,
+    /// Timeline build only: the item's events and signals.
+    pub timeline: Option<ItemTimeline>,
 }
 
 impl ItemResult {
@@ -195,7 +497,7 @@ pub fn render_html(template: &str, ctx: &Value) -> Result<String, String> {
 }
 
 fn finding_view(c: &Catalog, f: &Finding) -> Value {
-    let (title, shows, dnp) = c.finding(&f.code, &f.params);
+    let (title, shows, dnp) = c.finding(&f.code, &localized_params(c, &f.params));
     json!({"code": f.code, "severity": f.severity.key(), "severity_label": c.severity(f.severity.key()), "title": title, "shows": shows, "does_not_prove": dnp})
 }
 
@@ -207,28 +509,30 @@ fn run_view(c: &Catalog, run: &RunInfo) -> Value {
         "algorithms_text": run.algorithms.iter().map(|a| a.name()).collect::<Vec<_>>().join(" + "),
         "cancelled": run.cancelled,
         "lang": c.lang,
+        "started_display": zone_time(run, &run.started_utc),
+        "finished_display": zone_time(run, &run.finished_utc),
     })
 }
 
 fn base(c: &Catalog, run: &RunInfo) -> serde_json::Map<String, Value> {
     let mut m = serde_json::Map::new();
     m.insert("lang".into(), json!(c.lang));
-    m.insert("t".into(), c.labels().clone());
+    let mut t = c.labels().clone();
+    if run.timeline.is_some() {
+        t["method_text"] = json!(c.label("tl_method_text"));
+    }
+    m.insert("t".into(), t);
+    m.insert(
+        "zone".into(),
+        json!(run.timeline.as_ref().map(|t| t.zone.name())),
+    );
     m.insert("css".into(), json!(CSS));
     m.insert(
         "tool".into(),
         json!({"name": run.tool_name, "version": run.tool_version}),
     );
     m.insert("run".into(), run_view(c, run));
-    m.insert(
-        "limitations".into(),
-        json!(
-            LIMITATIONS
-                .iter()
-                .map(|l| c.limitation(l))
-                .collect::<Vec<_>>()
-        ),
-    );
+    m.insert("limitations".into(), json!(limitation_texts(c, run)));
     m.insert("brand".into(), c.brand().clone());
     m.insert("logo_svg".into(), json!(LOGO_SVG));
     m.insert(
@@ -353,6 +657,13 @@ pub fn statistics_context(
     m.insert("item_rows".into(), json!(item_rows));
     m.insert("case".into(), case_view(run));
     m.insert(
+        "timeline".into(),
+        run.timeline
+            .as_ref()
+            .map(|t| timeline_view(c, t))
+            .unwrap_or(Value::Null),
+    );
+    m.insert(
         "audit".into(),
         json!({"head": audit.head, "entries": audit.entries, "log_dir": audit.log_dir}),
     );
@@ -369,6 +680,7 @@ fn case_view(run: &RunInfo) -> Value {
 
 fn item_view(c: &Catalog, it: &ItemResult) -> Value {
     let status = it.status();
+    let pre = if it.timeline.is_some() { "tl_" } else { "" };
     let (alg, hash) = it
         .hashes
         .first()
@@ -380,7 +692,9 @@ fn item_view(c: &Catalog, it: &ItemResult) -> Value {
         "extension_text": it.extension.clone().map(|e| format!(".{}", e)).unwrap_or_else(|| c.label("none")),
         "detected_text": it.detected_type.clone().unwrap_or_else(|| c.label("unknown")),
         "status": status, "status_label": c.label(&format!("status_{}", status)),
-        "summary_text": c.label(&format!("summary_{}", status)), "next_text": c.label(&format!("next_{}", status)),
+        "summary_text": c.label(&format!("{}summary_{}", pre, status)), "next_text": c.label(&format!("{}next_{}", pre, status)),
+        "timeline": it.timeline.is_some(),
+        "timeline_text": it.timeline.as_ref().map(|t| item_timeline_text(c, t)),
         "primary_algorithm": alg, "primary_hash": hash,
         "audit_first_seq": it.audit_first_seq, "audit_last_seq": it.audit_last_seq,
         "evidence_id": it.evidence_id, "intake_utc": it.intake_utc, "case_status": it.case_status,
@@ -411,6 +725,27 @@ pub fn item_context(lang: &str, run: &RunInfo, it: &ItemResult, audit: &AuditRef
                 .collect::<Vec<_>>()
         ),
     );
+    if let (Some(tl), Some(t)) = (&it.timeline, &run.timeline) {
+        let rows: Vec<Value> = tl
+            .events
+            .iter()
+            .take(ITEM_EVENT_ROWS)
+            .map(|e| event_row(c, &t.zone, e))
+            .collect();
+        let more = tl.total.saturating_sub(rows.len() as u64);
+        let mut p = BTreeMap::new();
+        p.insert("n".to_string(), more.to_string());
+        m.insert("events".into(), json!(rows));
+        m.insert("events_total".into(), json!(tl.total));
+        m.insert(
+            "events_more".into(),
+            json!(if more > 0 {
+                crate::i18n::fill(&c.label("events_more"), &p)
+            } else {
+                String::new()
+            }),
+        );
+    }
     m.insert(
         "audit".into(),
         json!({"head": audit.head, "entries": audit.entries, "log_dir": audit.log_dir}),
@@ -428,7 +763,9 @@ fn findings_json(it: &ItemResult, langs: &[String]) -> Value {
                 let texts: BTreeMap<String, Value> = langs
                     .iter()
                     .map(|l| {
-                        let (title, shows, dnp) = catalog(l).finding(&f.code, &f.params);
+                        let c = catalog(l);
+                        let (title, shows, dnp) =
+                            c.finding(&f.code, &localized_params(c, &f.params));
                         (
                             l.clone(),
                             json!({"title": title, "shows": shows, "does_not_prove": dnp}),
@@ -482,7 +819,8 @@ pub fn statistics_json(
         "case": run.case.as_ref().map(|c| c.to_json()),
         "items": items.iter().map(|it| json!({"index": it.index, "evidence_id": it.evidence_id, "path": it.path.display().to_string(), "size": it.size, "status": it.status(),
               "findings": it.findings.iter().map(|f| f.code.clone()).collect::<Vec<_>>(), "report_folder": format!("items/{}", it.folder())})).collect::<Vec<_>>(),
-        "limitations": LIMITATIONS,
+        "limitations": limitation_codes(run),
+        "timeline": run.timeline.as_ref().map(|t| timeline_json(t, &run.langs)),
         "audit": {"head": audit.head, "entries": audit.entries, "log_dir": audit.log_dir},
         "timestamp": if run.timestamp.is_object() { run.timestamp.clone() } else { json!({"status": "off"}) },
     })
@@ -500,7 +838,15 @@ pub fn technical_json(run: &RunInfo, it: &ItemResult) -> Value {
                  "status": it.case_status, "intake_utc": it.intake_utc})),
         "hashes": it.hashes.iter().map(|(a, h)| (a.name().to_string(), json!(h))).collect::<serde_json::Map<_, _>>(),
         "findings": findings_json(it, &run.langs),
-        "limitations": LIMITATIONS,
+        "timeline": it.timeline.as_ref().map(|tl| json!({
+            "display_zone": run.timeline.as_ref().map(|t| t.zone.name()),
+            "events_total": tl.total, "events_listed": tl.events.len().min(ITEM_EVENT_ROWS),
+            "first_utc": tl.first_s.map(|s| engine::fmt_utc(s, 0, crate::model::Precision::Second)),
+            "last_utc": tl.last_s.map(|s| engine::fmt_utc(s, 0, crate::model::Precision::Second)),
+            "tools": tl.tools, "events": tl.events.iter().take(ITEM_EVENT_ROWS).collect::<Vec<_>>(),
+            "signals": tl.signals.iter().map(|s| signal_json(s, &run.langs)).collect::<Vec<_>>(),
+        })),
+        "limitations": limitation_codes(run),
         "audit": {"first_seq": it.audit_first_seq, "last_seq": it.audit_last_seq},
     })
 }
@@ -511,7 +857,9 @@ pub fn summary_json(run: &RunInfo, it: &ItemResult) -> Value {
         .iter()
         .map(|l| {
             let c = catalog(l);
-            (l.clone(), json!({"status": c.label(&format!("status_{}", it.status())), "summary": c.label(&format!("summary_{}", it.status())), "next_step": c.label(&format!("next_{}", it.status()))}))
+            let pre = if it.timeline.is_some() { "tl_" } else { "" };
+            (l.clone(), json!({"status": c.label(&format!("status_{}", it.status())), "summary": c.label(&format!("{}summary_{}", pre, it.status())), "next_step": c.label(&format!("{}next_{}", pre, it.status())),
+                               "timeline": it.timeline.as_ref().map(|t| item_timeline_text(c, t))}))
         })
         .collect();
     json!({
@@ -568,13 +916,21 @@ fn signature_row(ctx: &Value) -> (String, String) {
 
 /// Renders blocks with the Rakvor band, footer and tagline; signs when the run has a certificate.
 fn finish(ctx: &Value, title: &str, blocks: &[Block], run: &RunInfo) -> Result<Vec<u8>, String> {
-    let footer = format!(
+    let mut footer = format!(
         "{} {} {} \u{00B7} {}",
         s(ctx, "t.generated_by"),
         s(ctx, "tool.name"),
         s(ctx, "tool.version"),
         s(ctx, "run.run_id")
     );
+    if ctx["zone"].is_string() {
+        footer = format!(
+            "{} \u{00B7} {}: {}",
+            footer,
+            s(ctx, "t.display_zone"),
+            s(ctx, "zone")
+        );
+    }
     let producer = format!("{} {}", s(ctx, "tool.name"), s(ctx, "tool.version"));
     let (page, of, descriptor, tagline) = (
         s(ctx, "t.page"),
@@ -609,6 +965,9 @@ pub fn statistics_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
     );
     if ctx["run"]["cancelled"].as_bool() == Some(true) {
         b.push(Block::Note(t("cancelled_note")));
+    }
+    if ctx["timeline"].is_object() {
+        return statistics_pdf_timeline(ctx, run, b);
     }
     let mut kv = vec![(
         t("tool"),
@@ -734,6 +1093,181 @@ pub fn statistics_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
     finish(ctx, &t("title_statistics"), &b, run)
 }
 
+fn with_display(ctx: &Value, utc: &str, display: &str) -> String {
+    let d = s(ctx, display);
+    if d.is_empty() {
+        s(ctx, utc)
+    } else {
+        format!("{} \u{00B7} {}", s(ctx, utc), d)
+    }
+}
+
+fn signal_blocks(b: &mut Vec<Block>, ctx: &Value, list: &[Value]) {
+    let t = |k: &str| s(ctx, &format!("t.{}", k));
+    if list.is_empty() {
+        b.push(Block::Para(t("none")));
+    }
+    for x in list {
+        b.push(Block::Finding {
+            badge: s(x, "severity_label"),
+            title: format!("{}  ({})", s(x, "title"), s(x, "code")),
+            rows: vec![
+                (t("shows"), s(x, "shows")),
+                (t("does_not_prove"), s(x, "does_not_prove")),
+            ],
+        });
+    }
+}
+
+fn statistics_pdf_timeline(
+    ctx: &Value,
+    run: &RunInfo,
+    mut b: Vec<Block>,
+) -> Result<Vec<u8>, String> {
+    let t = |k: &str| s(ctx, &format!("t.{}", k));
+    let mut kv = vec![(
+        t("tool"),
+        format!("{} {}", s(ctx, "tool.name"), s(ctx, "tool.version")),
+    )];
+    if !s(ctx, "run.case_id").is_empty() {
+        kv.push((t("case"), s(ctx, "run.case_id")));
+    }
+    kv.push((t("display_zone"), s(ctx, "zone")));
+    kv.push((t("actor"), s(ctx, "run.actor")));
+    kv.push((
+        t("started"),
+        with_display(ctx, "run.started_utc", "run.started_display"),
+    ));
+    kv.push((
+        t("finished"),
+        with_display(ctx, "run.finished_utc", "run.finished_display"),
+    ));
+    for (k, p) in [
+        ("duration", "run.duration_text"),
+        ("frontend", "run.frontend"),
+        ("algorithms", "run.algorithms_text"),
+        ("runs_verified", "timeline.verified"),
+        ("runs_excluded", "timeline.excluded"),
+        ("events_total", "timeline.events"),
+        ("events_filtered", "timeline.filtered_out"),
+        ("events_zone_unknown", "timeline.zone_unknown"),
+        ("signals", "timeline.signal_count"),
+        ("items", "totals.items"),
+        ("window", "timeline.window_text"),
+        ("tools_filter", "timeline.tools_text"),
+        ("clock_skew", "timeline.clock_skew_text"),
+        ("timeline_file", "timeline.timeline_file"),
+    ] {
+        kv.push((t(k), s(ctx, p)));
+    }
+    b.push(Block::Kv(kv));
+    if !s(ctx, "timeline.cap_note").is_empty() {
+        b.push(Block::Note(s(ctx, "timeline.cap_note")));
+    }
+    let tl = &ctx["timeline"];
+    b.push(Block::Heading(t("runs")));
+    b.push(Block::Kv(
+        arr(tl, "runs")
+            .iter()
+            .map(|r| {
+                let mut v = format!(
+                    "{} \u{00B7} {} {}",
+                    s(r, "status_label"),
+                    s(r, "events"),
+                    t("events").to_lowercase()
+                );
+                if !s(r, "reason").is_empty() {
+                    v = format!("{} \u{00B7} {}", v, s(r, "reason"));
+                }
+                (
+                    format!("{} {}  {}", s(r, "tool"), s(r, "version"), s(r, "run_id")),
+                    v,
+                )
+            })
+            .collect(),
+    ));
+    let skipped = arr(tl, "skipped");
+    if !skipped.is_empty() {
+        b.push(Block::Heading(t("runs_skipped")));
+        b.push(Block::Kv(
+            skipped
+                .iter()
+                .map(|r| {
+                    (
+                        format!("{}  {}", s(r, "tool"), s(r, "run_id")),
+                        s(r, "reason"),
+                    )
+                })
+                .collect(),
+        ));
+    }
+    for (head, key) in [("events_by_tool", "by_tool"), ("events_by_kind", "by_kind")] {
+        b.push(Block::Heading(t(head)));
+        let rows = arr(tl, key);
+        if rows.is_empty() {
+            b.push(Block::Para(t("none")));
+        } else {
+            b.push(Block::Kv(
+                rows.iter().map(|r| (s(r, "name"), s(r, "count"))).collect(),
+            ));
+        }
+    }
+    b.push(Block::Heading(t("signals_by_severity")));
+    b.push(Block::Kv(
+        arr(tl, "severity_rows")
+            .iter()
+            .map(|r| (s(r, "label"), s(r, "count")))
+            .collect(),
+    ));
+    b.push(Block::Heading(t("case_signals")));
+    signal_blocks(&mut b, ctx, arr(tl, "case_signals"));
+    b.push(Block::Heading(t("items")));
+    b.push(Block::Kv(
+        arr(ctx, "item_rows")
+            .iter()
+            .map(|r| {
+                (
+                    format!(
+                        "#{}  {}  {}",
+                        s(r, "index"),
+                        s(r, "evidence_id"),
+                        s(r, "file_name")
+                    ),
+                    format!(
+                        "{} \u{00B7} {} {}",
+                        s(r, "status_label"),
+                        s(r, "finding_count"),
+                        t("signals").to_lowercase()
+                    ),
+                )
+            })
+            .collect(),
+    ));
+    b.push(Block::Heading(t("limitations")));
+    for l in arr(ctx, "limitations") {
+        b.push(Block::Bullet(l.as_str().unwrap_or_default().into()));
+    }
+    b.push(Block::Heading(t("timestamp")));
+    let mut ts_rows = vec![(t("status"), s(ctx, "timestamp.status_label"))];
+    if !s(ctx, "timestamp.tsa").is_empty() {
+        ts_rows.push((t("tsa"), s(ctx, "timestamp.tsa")));
+    }
+    if !s(ctx, "timestamp.gen_time").is_empty() {
+        ts_rows.push((t("gen_time"), s(ctx, "timestamp.gen_time")));
+        ts_rows.push((t("covers"), format!("#{}", s(ctx, "timestamp.covers_seq"))));
+        ts_rows.push((t("audit_head"), s(ctx, "timestamp.head")));
+    }
+    ts_rows.push(signature_row(ctx));
+    b.push(Block::Kv(ts_rows));
+    b.push(Block::Heading(t("audit")));
+    b.push(Block::Kv(vec![
+        (t("audit_head"), s(ctx, "audit.head")),
+        (t("audit_entries"), s(ctx, "audit.entries")),
+        (t("log_dir"), s(ctx, "audit.log_dir")),
+    ]));
+    finish(ctx, &t("title_statistics"), &b, run)
+}
+
 pub fn technical_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
     let t = |k: &str| s(ctx, &format!("t.{}", k));
     let mut b = header(
@@ -748,14 +1282,25 @@ pub fn technical_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
             s(ctx, "run.run_id")
         ),
     );
-    let mut rows = vec![
-        (t("path"), s(ctx, "item.path")),
-        (t("size"), s(ctx, "item.size")),
-        (t("modified"), s(ctx, "item.modified_utc")),
-        (t("extension"), s(ctx, "item.extension_text")),
-        (t("detected_type"), s(ctx, "item.detected_text")),
-        (t("status"), s(ctx, "item.status_label")),
-    ];
+    let timeline = ctx["item"]["timeline"].as_bool() == Some(true);
+    let mut rows = if timeline {
+        vec![
+            (t("path"), s(ctx, "item.path")),
+            (t("size"), s(ctx, "item.size")),
+            (t("status"), s(ctx, "item.status_label")),
+            (t("display_zone"), s(ctx, "zone")),
+            (t("events"), s(ctx, "item.timeline_text")),
+        ]
+    } else {
+        vec![
+            (t("path"), s(ctx, "item.path")),
+            (t("size"), s(ctx, "item.size")),
+            (t("modified"), s(ctx, "item.modified_utc")),
+            (t("extension"), s(ctx, "item.extension_text")),
+            (t("detected_type"), s(ctx, "item.detected_text")),
+            (t("status"), s(ctx, "item.status_label")),
+        ]
+    };
     if ctx["case"].is_object() {
         rows.push((t("case"), s(ctx, "case.case_id")));
         rows.push((
@@ -793,6 +1338,36 @@ pub fn technical_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
                 (t("does_not_prove"), s(x, "does_not_prove")),
             ],
         });
+    }
+    if timeline {
+        b.push(Block::Heading(t("events")));
+        let ev = arr(ctx, "events");
+        if ev.is_empty() {
+            b.push(Block::Para(t("none")));
+        } else {
+            b.push(Block::Kv(
+                ev.iter()
+                    .map(|e| {
+                        let mut v = format!(
+                            "{} \u{00B7} {}: {} ({}, {}",
+                            s(e, "display"),
+                            s(e, "kind_label"),
+                            s(e, "original"),
+                            s(e, "tool"),
+                            s(e, "file")
+                        );
+                        if !s(e, "pointer").is_empty() {
+                            v = format!("{} {}", v, s(e, "pointer"));
+                        }
+                        v.push(')');
+                        (s(e, "utc"), v)
+                    })
+                    .collect(),
+            ));
+        }
+        if !s(ctx, "events_more").is_empty() {
+            b.push(Block::Note(s(ctx, "events_more")));
+        }
     }
     b.push(Block::Heading(t("method")));
     b.push(Block::Para(t("method_text")));
@@ -833,6 +1408,9 @@ pub fn summary_pdf(ctx: &Value, run: &RunInfo) -> Result<Vec<u8>, String> {
     let mut b = header(ctx, "title_summary", sub);
     b.push(Block::Status(s(ctx, "item.status_label")));
     b.push(Block::Para(s(ctx, "item.summary_text")));
+    if !s(ctx, "item.timeline_text").is_empty() {
+        b.push(Block::Para(s(ctx, "item.timeline_text")));
+    }
     b.push(Block::Heading(t("what_we_did")));
     b.push(Block::Para(t("method_text")));
     b.push(Block::Heading(t("what_we_found")));

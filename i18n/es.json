@@ -134,7 +134,8 @@
     "tl_next_attention": "Revise las señales con los informes de herramienta que citan antes de sacar conclusiones.",
     "tl_next_problem": "Haga que un perito revise los eventos citados y el registro de ingreso antes de basarse en este elemento.",
     "tl_item_span": "%{n} eventos de %{tools}, del %{first} al %{last} (UTC).",
-    "tl_item_none": "No se leyó ningún evento para este elemento."
+    "tl_item_none": "No se leyó ningún evento para este elemento.",
+    "skip_max_events": "no leída: límite de eventos alcanzado"
   },
   "severity": {
     "high": "Alta",

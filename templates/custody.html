@@ -8,6 +8,7 @@
   <div class="meta">
     <div>{{ t.jurisdiction }}: <strong>{{ custody.jurisdiction_label }}</strong></div>
     <div>{{ t.run_id }}: {{ run.run_id }}</div>
+    {% if zone %}<div>{{ t.display_zone }}: <strong>{{ zone }}</strong></div>{% endif %}
   </div>
 </header>
 <p class="note">{{ custody.basis }}</p>

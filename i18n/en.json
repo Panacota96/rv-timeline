@@ -134,7 +134,8 @@
     "tl_next_attention": "Review the signals with the tool reports they cite before drawing conclusions.",
     "tl_next_problem": "Have an examiner review the cited events and the intake record before relying on this item.",
     "tl_item_span": "%{n} events from %{tools}, from %{first} to %{last} (UTC).",
-    "tl_item_none": "No event was read for this item."
+    "tl_item_none": "No event was read for this item.",
+    "skip_max_events": "not read: event limit reached"
   },
   "severity": {
     "high": "High",

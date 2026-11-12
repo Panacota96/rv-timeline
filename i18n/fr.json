@@ -134,7 +134,8 @@
     "tl_next_attention": "Examinez les signaux avec les rapports d'outils qu'ils citent avant de conclure.",
     "tl_next_problem": "Faites examiner les événements cités et l'enregistrement d'intégration par un expert avant de vous fonder sur cet élément.",
     "tl_item_span": "%{n} événements de %{tools}, du %{first} au %{last} (UTC).",
-    "tl_item_none": "Aucun événement n'a été lu pour cet élément."
+    "tl_item_none": "Aucun événement n'a été lu pour cet élément.",
+    "skip_max_events": "non lue : limite d'événements atteinte"
   },
   "severity": {
     "high": "Élevée",
