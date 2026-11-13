@@ -3409,6 +3409,7 @@ name = "rv-timeline-gui"
 version = "0.1.0"
 dependencies = [
  "eframe",
+ "png",
  "rfd",
  "rv-timeline-core",
  "serde_json",
