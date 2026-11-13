@@ -543,7 +543,13 @@ timeline build of the sample case:
 OK  67 entries, chain intact: …/runs/rv-timeline/20261113T131620Z-d8af51/logs\audit.jsonl
     truncation: the final entry #67 is anchored by the case log (run_finished)
     review log: none
+    outputs: 409 verified of 409 recorded (md5, sha256)
 ```
+
+The `outputs:` line is the re-hash of every file the log says the build wrote (`timeline.jsonl`, reports,
+`hashes.csv`, `environment.json`) with every recorded algorithm ([outputs.rs](../src/core/src/outputs.rs), shared
+byte-identical by every Rakvor tool); an edited, deleted or replaced file is a problem (exit 3). `verify-case` does
+the same for every run of the case.
 
 The review log (`review.jsonl`) is a second chain whose first entry carries `anchor_seq`/`anchor_hash` = the run's
 `run_finished` entry: viewing after the run cannot be added to the closed audit chain, and an edited review log, or

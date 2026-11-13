@@ -50,7 +50,11 @@ flowchart LR
 
 **Shared code.** `src/core/src/trust.rs` is byte-identical in rv-hub, rv-hashinv, rv-rsmf, rv-certcheck,
 rv-imgauth, rv-pdfauth, rv-mailauth, rv-timeline and the forge template; the installer AppId table in
-`src/cli/tests/packaging.rs` and the `deny.toml` policy are shared too. Change all copies in one go and compare
+`src/cli/tests/packaging.rs` and the `deny.toml` policy are shared too, and so is `src/core/src/outputs.rs` (re-hash
+of the outputs an audit log records, used by `verify-log` and `verify-case`; it depends only on `crate::hash` and
+`serde_json`). The readers keep their own digest check (`readers/mod.rs`, `check_file`): it returns the bytes it
+verified to the reader, checks only the files readers parse and ignores unsafe recorded paths, which the sample
+case's ground truth relies on. Change all copies in one go and compare
 their SHA-256; never edit them here alone.
 
 ## 3. Everyday commands

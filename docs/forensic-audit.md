@@ -35,7 +35,7 @@ Editing a value changes that entry's hash; deleting or re-ordering breaks `seq` 
 Verify with either implementation:
 
 ```bash
-rv-timeline verify-log <CASE>/runs/rv-timeline/<RUN-ID>/logs          # exit 0 intact, 3 broken or truncated
+rv-timeline verify-log <CASE>/runs/rv-timeline/<RUN-ID>/logs          # exit 0 intact, 3 broken, truncated or an output changed
 python tests/verify_chain.py <CASE>/runs/rv-timeline/<RUN-ID>/logs   # independent re-implementation (chain + hashes.csv)
 ```
 
@@ -71,6 +71,42 @@ entry. (For comparison, a standalone run of another tool timestamps the head **b
 record `verify-log` prints `truncation not detectable without a timestamp or case record` (exit 0: nothing
 contradicts the log, but nothing vouches for its length). Deleting the timestamp files **and** the entries that
 refer to them is detectable only through the case log or a head kept elsewhere.
+
+### Recorded outputs: the files the log vouches for
+
+The chain proves that the *digests* recorded in the log are unchanged, not that the files they describe still
+have them. `verify-log` (and `verify-case`, for every run of the case) therefore re-hashes every output file the log
+records and compares it with every digest recorded for it ([src/core/src/outputs.rs](../src/core/src/outputs.rs),
+shared byte-identical by every Rakvor tool):
+
+```mermaid
+flowchart LR
+    A["audit.jsonl (chain intact)"] --> R["recorded files<br/>path → digests; the latest entry wins"]
+    R --> S{"safe relative path,<br/>inside the run folder?"}
+    S -- no --> X["problem: rejected, not read"]
+    S -- yes --> E{"exists, regular file?"}
+    E -- no --> M["problem: missing / replaced"]
+    E -- yes --> H{"every recorded<br/>digest equal?"}
+    H -- no --> C["problem: changed (named, both digests)"]
+    H -- yes --> V["verified"]
+```
+
+| Entry | File (run folder `<CASE>/runs/rv-timeline/<RUN-ID>`) |
+| --- | --- |
+| `environment_recorded`, `hash_register_written` | `logs/environment.json`, `logs/hashes.csv` |
+| `timeline_written` | `<folder>/timeline.jsonl` (`folder` is run-relative: `reports`) |
+| `item_reports_written` | `reports/<folder>/<file>` for every file of the item |
+| `statistics_report_written` | `reports/statistics.json` and every `statistics.<LANG>.html/.pdf` |
+| `timestamp_obtained` | not re-hashed here: the token is checked by the timestamp verification below |
+
+The run folder is the boundary: a recorded path that is absolute, contains `..`, a drive, `\` or `:`, or resolves
+outside the run folder through a symlink or junction is rejected and never read. Output:
+`outputs: N verified of M recorded (algorithms)`, then any file not re-hashed with the reason. Files the run never
+recorded (added to the folder later) and `review.jsonl` (verified by its own chain) are not re-hashed.
+
+This is the check of a run's **own** outputs. The check `build` applies to the runs it reads (rule 9 in
+[theory.md](theory.md), `digest_mismatch`) is separate and narrower on purpose: it re-hashes only the
+machine-readable outputs a reader parses (`.json`, `.csv`, `.jsonl`) and returns their bytes to the reader.
 
 ## Trusted timestamp (RFC 3161)
 
@@ -185,7 +221,7 @@ flowchart LR
 
 | 27037 principle / activity | How RV Timeline supports it |
 | --- | --- |
-| Auditability (5.3.2) | Every action logged with actor, UTC time and chain hash; every run's status and reason; `verify-log` checks the chain and its end against the timestamp and the case log |
+| Auditability (5.3.2) | Every action logged with actor, UTC time and chain hash; every run's status and reason; `verify-log` checks the chain and its end against the timestamp and the case log, and re-hashes every output the log records |
 | Repeatability (5.3.3) | `environment.json` and `run_started` record the tool, dependency versions and every option; same case and options → same `timeline.jsonl` bytes |
 | Reproducibility (5.3.4) | Independent verifier (`tests/verify_chain.py`); the sample's ground truth derived by an independent script ([examples/sample](../examples/sample/README.md)) |
 | Justifiability (5.3.5) | Every signal states what it shows and what it does **not** prove; limitations in every report |
