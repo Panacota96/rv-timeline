@@ -141,6 +141,33 @@ fn safe_run_dir(rel: &str) -> bool {
         && p.components().count() == 3
 }
 
+/// An output path recorded in an audit log, accepted only when it is relative, uses forward slashes, has no `..`,
+/// root, drive or empty component, and no `:` (drive letters, NTFS alternate streams).
+fn safe_rel(rel: &str) -> bool {
+    !rel.is_empty()
+        && !rel.contains(['\\', ':'])
+        && rel
+            .split('/')
+            .all(|c| !c.is_empty() && c != "." && c != "..")
+        && Path::new(rel)
+            .components()
+            .all(|c| matches!(c, Component::Normal(_)))
+}
+
+/// `path` resolved (symlinks followed) when it stays inside `root` (already canonical); a symlink or junction
+/// that leads out of the case folder is refused.
+fn contained(root: &Path, path: &Path) -> Result<PathBuf, String> {
+    let real = std::fs::canonicalize(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    if real.starts_with(root) {
+        Ok(real)
+    } else {
+        Err(format!(
+            "{}: resolves outside the case folder (symlink or junction), not read",
+            path.display()
+        ))
+    }
+}
+
 /// Entries of a JSON Lines file with their 1-based line numbers.
 type Entries = Vec<(usize, Map<String, Value>)>;
 
@@ -417,6 +444,8 @@ pub struct RunItem {
 pub struct RunData {
     pub run: RunRef,
     pub dir: PathBuf,
+    /// The run folder with symlinks resolved; every file read must stay below it.
+    pub root: PathBuf,
     pub audit: Vec<(usize, Map<String, Value>)>,
     pub audit_sha256: String,
     /// Output path relative to the run folder → {algorithm: hex}.
@@ -465,7 +494,7 @@ fn recorded_outputs(e: &Map<String, Value>) -> Vec<(String, BTreeMap<String, Str
         }
         _ => {}
     }
-    out.retain(|(p, h)| !h.is_empty() && !p.split('/').any(|c| c == ".." || c.is_empty()));
+    out.retain(|(p, h)| !h.is_empty() && safe_rel(p));
     out
 }
 
@@ -479,6 +508,11 @@ impl RunData {
             ));
         }
         let dir = case_dir.join(&run.run_dir);
+        // The run folder (and every file read below it) must resolve inside the case folder.
+        let case_root = std::fs::canonicalize(case_dir)
+            .map_err(|e| err("unreadable", format!("{}: {e}", case_dir.display())))?;
+        let root = contained(&case_root, &dir).map_err(|e| err("unreadable", e))?;
+        contained(&root, &dir.join("logs/audit.jsonl")).map_err(|e| err("unreadable", e))?;
         let (audit, bytes) = read_jsonl(&dir.join("logs/audit.jsonl")).map_err(|e| {
             if dir.join("logs/audit.jsonl").is_file() {
                 err("chain_broken", format!("logs/audit.jsonl {e}"))
@@ -537,6 +571,7 @@ impl RunData {
         Ok(RunData {
             run: run.clone(),
             dir,
+            root,
             audit,
             audit_sha256: hash_bytes(&bytes, HashAlgo::Sha256),
             digests,
@@ -554,8 +589,19 @@ impl RunData {
                 format!("{rel}: not recorded in logs/audit.jsonl"),
             )
         })?;
-        let bytes = std::fs::read(self.dir.join(rel))
-            .map_err(|e| err("unreadable", format!("{rel}: {e}")))?;
+        if !safe_rel(rel) {
+            return Err(err(
+                "unreadable",
+                format!("{rel}: not a path inside the run folder"),
+            ));
+        }
+        let path = contained(&self.root, &self.dir.join(rel)).map_err(|_| {
+            err(
+                "unreadable",
+                format!("{rel}: resolves outside the run folder (symlink), not read"),
+            )
+        })?;
+        let bytes = std::fs::read(path).map_err(|e| err("unreadable", format!("{rel}: {e}")))?;
         let mut checked = false;
         for (algo, want) in rec {
             if let Some(a) = HashAlgo::parse(algo) {
@@ -863,5 +909,32 @@ mod tests {
         ] {
             assert!(!safe_run_dir(bad), "{bad}");
         }
+    }
+
+    #[test]
+    fn recorded_outputs_must_stay_in_the_run_folder() {
+        assert!(safe_rel("reports/items/00001-a.jpg/technical.json"));
+        for bad in [
+            "",
+            "../x.json",
+            "reports/../../x.json",
+            "reports//x.json",
+            "reports/./x.json",
+            "/etc/passwd",
+            "C:/Windows/win.ini",
+            "reports/..\\..\\x.json",
+            "rsmf/\\\\server\\share\\x",
+            "reports/x.json:stream",
+        ] {
+            assert!(!safe_rel(bad), "{bad}");
+        }
+        let e = Map::from_iter([
+            ("action".to_string(), Value::from("output_written")),
+            (
+                "details".to_string(),
+                serde_json::json!({"file": "..\\..\\..\\outside\\x.json", "sha256": "00"}),
+            ),
+        ]);
+        assert!(recorded_outputs(&e).is_empty());
     }
 }
