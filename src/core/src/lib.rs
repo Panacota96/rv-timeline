@@ -20,6 +20,7 @@ pub mod input;
 pub mod model;
 pub mod readers;
 pub mod report;
+pub mod review;
 pub mod run;
 pub mod time;
 pub mod trust;
