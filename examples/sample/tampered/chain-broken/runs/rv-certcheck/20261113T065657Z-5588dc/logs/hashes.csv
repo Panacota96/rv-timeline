@@ -1,0 +1,9 @@
+index,path,size,sha256,md5,status,error
+1,R:\evidence\certs\data.tsr,2557,1b504e1928137748678b47aab45f9ab46442c5e5fb4e9dac3c0133497a5db022,e807df196b2529da959ac0285cd20f45,ok,
+2,R:\evidence\certs\data.txt,44,f328a2c36dab3f9a3b173d38fd6cc9fe9614cbe1fc3bf0af8117d5d05b4fc7c7,08a9622e46838803c91cac404b20de24,ok,
+3,R:\evidence\certs\intermediate.crl,458,888c2e483ad86a072a759a3bdd58dd0242d0302394ac04d0acc309d1c4651e9e,a015a8a50a11e5cc5081a4e4bcd88d4b,ok,
+4,R:\evidence\certs\intermediate.crt,1330,ae452532cb82f69f375673eab1e3a3f374b004429d940cf9552821a92f2e9c7c,643abde945484b9d7a6b464c6dd3bd31,attention,
+5,R:\evidence\certs\leaf-expired.crt,1574,346e22485a3cb93677fa1262bd12c5870f9d656d4737004018c34c8bcf18e0c9,efebfe58df5781bd87e2eb96df0b1595,problem,
+6,R:\evidence\certs\leaf-revoked.crt,1574,7a16fdab1650af5675aa07f5d92d0704d18da6f87d8e76d2ff5d8b2f044e8f19,464eff643bd286cf0b215b6521e1ae7c,problem,
+7,R:\evidence\certs\leaf.crt,1566,c6b8c40685e81a82cdebccebd28d3505a738d1c9020b512a1a3430e704ae4950,d5dd34512fd99dcc81bbbe39e192e3ef,ok,
+8,R:\evidence\certs\tsa.crt,1261,3159fd24ec2405866a88cda9728442102876a482038cfe0fdf24b1482799712c,9fa8837d2e1780e53530f72a6c6b68db,ok,

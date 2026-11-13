@@ -1,0 +1,85 @@
+{
+  "audit": {
+    "first_seq": 14,
+    "last_seq": 17
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T06:56:39.690Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "certificates": {
+    "certificates": 0,
+    "codes": [],
+    "errors": [],
+    "kind": "crl",
+    "online_fetches": [],
+    "verdicts": []
+  },
+  "findings": [],
+  "hashes": {
+    "md5": "a015a8a50a11e5cc5081a4e4bcd88d4b",
+    "sha256": "888c2e483ad86a072a759a3bdd58dd0242d0302394ac04d0acc309d1c4651e9e"
+  },
+  "item": {
+    "detected_type": "X.509 certificate revocation list",
+    "error": null,
+    "evidence_id": "E0003",
+    "extension": "crl",
+    "file_name": "intermediate.crl",
+    "index": 3,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\certs\\intermediate.crl",
+    "size": 458,
+    "status": "ok"
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "outputs": [
+    {
+      "bytes": 323,
+      "hashes": {
+        "md5": "b60e89e44b885642f7d8eb1c32f31ad6",
+        "sha256": "30becaaf290f3e0574bc4a86d836ed7246f25b4362f5503bbad2145471630afa"
+      },
+      "kind": "chain",
+      "rel_path": "chain.json"
+    }
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 142,
+    "finished_utc": "2026-11-13T06:56:57.965Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065657Z-5588dc",
+    "started_utc": "2026-11-13T06:56:57.822Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  }
+}

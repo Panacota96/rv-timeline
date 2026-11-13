@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59"
+  },
+  "item": {
+    "evidence_id": "E0015",
+    "file_name": "01-clean-rsa.eml",
+    "index": 15
+  },
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "CERT_REVOKED",
+      "params": {
+        "depth": "0",
+        "reason": "keyCompromise",
+        "revoked_at": "2026-02-01T00:00:00Z",
+        "serial": "2004",
+        "source": "item:3",
+        "subject": "C=CO, O=Rakvor Lab, CN=revoked.lab.rakvor.test"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "That the holder did anything wrong (revocation also follows routine changes such as a superseded key) or that signatures made before 2026-02-01T00:00:00Z are invalid.",
+          "shows": "C=CO, O=Rakvor Lab, CN=revoked.lab.rakvor.test (serial 2004) is listed as revoked since 2026-02-01T00:00:00Z, reason keyCompromise, according to item:3.",
+          "title": "Certificate revoked"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "7a16fdab1650af5675aa07f5d92d0704d18da6f87d8e76d2ff5d8b2f044e8f19"
+  },
+  "item": {
+    "evidence_id": "E0006",
+    "file_name": "leaf-revoked.crt",
+    "index": 6
+  },
+  "run_id": "20261113T065657Z-5588dc",
+  "schema": "rakvor.item-summary/1",
+  "status": "problem",
+  "text": {
+    "en": {
+      "next_step": "Do not rely on this file until the examiner has explained the problem.",
+      "status": "Problem found",
+      "summary": "The file could not be fully examined or shows a serious problem."
+    }
+  }
+}

@@ -1,0 +1,5 @@
+index,path,size,sha256,md5,status,error
+1,R:\evidence\pdf\backdated-revision.pdf,3613,e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f,e7aedb4ea7ff49b02133b26285c29b28,attention,
+2,R:\evidence\pdf\edited-incremental.pdf,3613,2ada8845654ce455968242d3aa211e26339943fa82cb69e07f610915485d93b0,b28a97d821a22ccdf5726426c16b8fed,attention,
+3,R:\evidence\pdf\original.pdf,1648,7446db6b551798dc8389da3e84e90bc5caf40c3008b71fc19e56afd13164c743,8d2b5163663d6eaf0ff751d364efe5d6,ok,
+4,R:\evidence\pdf\signed-then-modified.pdf,11980,a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3,6f259789b37be1219f161c23960fd169,problem,

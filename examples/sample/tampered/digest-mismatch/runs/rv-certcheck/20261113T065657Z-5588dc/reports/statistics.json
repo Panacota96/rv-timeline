@@ -1,0 +1,179 @@
+{
+  "audit": {
+    "entries": 65,
+    "head": "2bdbd92787827a71d02584c4001b94fef58d5774bccd7203b92f9f0959879c19",
+    "log_dir": "R:\\case\\runs\\rv-certcheck\\20261113T065657Z-5588dc\\logs"
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "counts": {
+      "added": 0,
+      "mismatched": 0,
+      "registered": 0,
+      "unregistered": 0,
+      "verified": 8
+    },
+    "role": "analysis"
+  },
+  "duplicate_groups": [],
+  "findings_by_code": {
+    "CERT_CHAIN_VALID": 4,
+    "CERT_EXPIRED_AT_DATE": 1,
+    "CERT_REVOKED": 1,
+    "CRYPTO_INPUT_NOT_RECOGNISED": 1,
+    "REVOCATION_UNKNOWN": 1,
+    "TIMESTAMP_TOKEN_VALID": 1
+  },
+  "findings_by_severity": {
+    "high": 2,
+    "info": 6,
+    "low": 0,
+    "medium": 1
+  },
+  "items": [
+    {
+      "evidence_id": "E0001",
+      "findings": [
+        "TIMESTAMP_TOKEN_VALID",
+        "CERT_CHAIN_VALID"
+      ],
+      "index": 1,
+      "path": "R:\\evidence\\certs\\data.tsr",
+      "report_folder": "items/00001-data.tsr",
+      "size": 2557,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0002",
+      "findings": [
+        "CRYPTO_INPUT_NOT_RECOGNISED"
+      ],
+      "index": 2,
+      "path": "R:\\evidence\\certs\\data.txt",
+      "report_folder": "items/00002-data.txt",
+      "size": 44,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0003",
+      "findings": [],
+      "index": 3,
+      "path": "R:\\evidence\\certs\\intermediate.crl",
+      "report_folder": "items/00003-intermediate.crl",
+      "size": 458,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0004",
+      "findings": [
+        "CERT_CHAIN_VALID",
+        "REVOCATION_UNKNOWN"
+      ],
+      "index": 4,
+      "path": "R:\\evidence\\certs\\intermediate.crt",
+      "report_folder": "items/00004-intermediate.crt",
+      "size": 1330,
+      "status": "attention"
+    },
+    {
+      "evidence_id": "E0005",
+      "findings": [
+        "CERT_EXPIRED_AT_DATE"
+      ],
+      "index": 5,
+      "path": "R:\\evidence\\certs\\leaf-expired.crt",
+      "report_folder": "items/00005-leaf-expired.crt",
+      "size": 1574,
+      "status": "problem"
+    },
+    {
+      "evidence_id": "E0006",
+      "findings": [
+        "CERT_REVOKED"
+      ],
+      "index": 6,
+      "path": "R:\\evidence\\certs\\leaf-revoked.crt",
+      "report_folder": "items/00006-leaf-revoked.crt",
+      "size": 1574,
+      "status": "problem"
+    },
+    {
+      "evidence_id": "E0007",
+      "findings": [
+        "CERT_CHAIN_VALID"
+      ],
+      "index": 7,
+      "path": "R:\\evidence\\certs\\leaf.crt",
+      "report_folder": "items/00007-leaf.crt",
+      "size": 1566,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0008",
+      "findings": [
+        "CERT_CHAIN_VALID"
+      ],
+      "index": 8,
+      "path": "R:\\evidence\\certs\\tsa.crt",
+      "report_folder": "items/00008-tsa.crt",
+      "size": 1261,
+      "status": "ok"
+    }
+  ],
+  "items_by_status": {
+    "attention": 1,
+    "ok": 5,
+    "problem": 2
+  },
+  "items_by_type": {
+    "RFC 3161 timestamp token": 1,
+    "X.509 certificate": 5,
+    "X.509 certificate revocation list": 1,
+    "unknown": 1
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 142,
+    "finished_utc": "2026-11-13T06:56:57.965Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065657Z-5588dc",
+    "started_utc": "2026-11-13T06:56:57.822Z"
+  },
+  "schema": "rakvor.statistics/1",
+  "timestamp": {
+    "status": "off"
+  },
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  },
+  "totals": {
+    "bytes": 10364,
+    "errors": 0,
+    "items": 8
+  }
+}

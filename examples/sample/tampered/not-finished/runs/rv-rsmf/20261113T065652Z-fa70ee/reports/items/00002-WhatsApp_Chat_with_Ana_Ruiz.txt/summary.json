@@ -1,0 +1,112 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "DATE_ORDER_INFERRED",
+      "params": {
+        "example": "13/03/2026, 18:45",
+        "line": "11",
+        "order": "dmy"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show that every line was written with the same phone settings; an export that mixes day-first and month-first dates stops with an error instead of being converted.",
+          "shows": "Numeric dates were read as dmy: line 11 (\"13/03/2026, 18:45\") can only be read that way.",
+          "title": "Date order inferred from the export"
+        }
+      }
+    },
+    {
+      "code": "MEDIA_OMITTED_IN_EXPORT",
+      "params": {
+        "count": "1"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show what the media contained, or that it was deleted from the phone.",
+          "shows": "1 message(s) say the media was omitted when the chat was exported (\"without media\").",
+          "title": "Media not included in the export"
+        }
+      }
+    },
+    {
+      "code": "ATTACHMENT_REFERENCED_NOT_FOUND",
+      "params": {
+        "count": "1",
+        "examples": "IMG-20260302-WA0002.jpg"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show that the file was removed on purpose; exports can be incomplete.",
+          "shows": "1 attachment(s) are named in the export but the file is not in it: IMG-20260302-WA0002.jpg.",
+          "title": "Referenced file not found"
+        }
+      }
+    },
+    {
+      "code": "PARTICIPANT_IDENTIFIED_BY_NUMBER_ONLY",
+      "params": {
+        "count": "1",
+        "examples": "+33 6 00 00 00 01"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "A number does not identify a person; establish who used it from other evidence.",
+          "shows": "1 participant(s) appear only as a number (not in the exporting phone's contacts): +33 6 00 00 00 01.",
+          "title": "Participants known only by phone number"
+        }
+      }
+    },
+    {
+      "code": "TIMEZONE_APPLIED",
+      "params": {
+        "timezone": "Europe/Paris"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show that the phone was set to Europe/Paris; a wrong zone shifts every time by the same amount.",
+          "shows": "The export's times carry no UTC offset; they were read as Europe/Paris and stored in UTC. The original text of each time is kept in the event's custom field source_time.",
+          "title": "Local times converted with the examiner's time zone"
+        }
+      }
+    },
+    {
+      "code": "DELETED_MESSAGES_NOT_IN_EXPORT",
+      "params": {
+        "source": "WhatsApp"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show whether any messages were deleted.",
+          "shows": "WhatsApp exports leave out messages deleted before the export; the RSMF can only contain what the export contains.",
+          "title": "Deleted messages are not exported"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
+  },
+  "item": {
+    "evidence_id": "E0010",
+    "file_name": "WhatsApp Chat with Ana Ruiz.txt",
+    "index": 2
+  },
+  "run_id": "20261113T065652Z-fa70ee",
+  "schema": "rakvor.item-summary/1",
+  "status": "attention",
+  "text": {
+    "en": {
+      "next_step": "Review the findings below with your examiner before relying on this file.",
+      "status": "Needs attention",
+      "summary": "The file was hashed and checked. Some points need attention."
+    }
+  }
+}

@@ -1,0 +1,303 @@
+{
+  "revisions": [
+    {
+      "objects": [
+        {
+          "dict": {
+            "F1": "2 0 R",
+            "F2": "3 0 R"
+          },
+          "id": "1 0",
+          "offset": 61,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "BaseFont": "/Helvetica",
+            "Encoding": "/WinAnsiEncoding",
+            "Name": "/F1",
+            "Subtype": "/Type1",
+            "Type": "/Font"
+          },
+          "id": "2 0",
+          "offset": 102,
+          "type": "Font"
+        },
+        {
+          "dict": {
+            "BaseFont": "/Helvetica-Bold",
+            "Encoding": "/WinAnsiEncoding",
+            "Name": "/F2",
+            "Subtype": "/Type1",
+            "Type": "/Font"
+          },
+          "id": "3 0",
+          "offset": 209,
+          "type": "Font"
+        },
+        {
+          "dict": {
+            "Contents": "8 0 R",
+            "MediaBox": [
+              0,
+              0,
+              612,
+              792
+            ],
+            "Parent": "7 0 R",
+            "Resources": {
+              "Font": "1 0 R",
+              "ProcSet": [
+                "/PDF",
+                "/Text",
+                "/ImageB",
+                "/ImageC",
+                "/ImageI"
+              ]
+            },
+            "Rotate": 0,
+            "Trans": {},
+            "Type": "/Page"
+          },
+          "id": "4 0",
+          "offset": 321,
+          "type": "Page"
+        },
+        {
+          "dict": {
+            "PageMode": "/UseNone",
+            "Pages": "7 0 R",
+            "Type": "/Catalog"
+          },
+          "id": "5 0",
+          "offset": 514,
+          "type": "Catalog"
+        },
+        {
+          "dict": {
+            "Author": "Rakvor test generator",
+            "CreationDate": "D:20260504080000-05'00'",
+            "Creator": "Rakvor make_samples.py",
+            "Keywords": "",
+            "ModDate": "D:20260504080000-05'00'",
+            "Producer": "ReportLab PDF Library - (opensource)",
+            "Subject": "unspecified",
+            "Title": "SYNTHETIC TEST SAMPLE - signed",
+            "Trapped": "/False"
+          },
+          "id": "6 0",
+          "offset": 582,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "Count": 1,
+            "Kids": [
+              "4 0 R"
+            ],
+            "Type": "/Pages"
+          },
+          "id": "7 0",
+          "offset": 890,
+          "type": "Pages"
+        },
+        {
+          "dict": {
+            "Filter": [
+              "/ASCII85Decode",
+              "/FlateDecode"
+            ],
+            "Length": 216
+          },
+          "id": "8 0",
+          "offset": 949,
+          "stream": {
+            "length": 216,
+            "offset": 1022
+          },
+          "type": "stream"
+        }
+      ]
+    },
+    {
+      "objects": [
+        {
+          "dict": {
+            "Annots": [
+              "10 0 R"
+            ],
+            "Contents": "8 0 R",
+            "MediaBox": [
+              0,
+              0,
+              612,
+              792
+            ],
+            "Parent": "7 0 R",
+            "Resources": {
+              "Font": {
+                "F1": "2 0 R",
+                "F2": "3 0 R"
+              },
+              "ProcSet": [
+                "/PDF",
+                "/Text",
+                "/ImageB",
+                "/ImageC",
+                "/ImageI"
+              ]
+            },
+            "Rotate": 0,
+            "Trans": {},
+            "Type": "/Page"
+          },
+          "id": "4 0",
+          "offset": 1646,
+          "type": "Page"
+        },
+        {
+          "dict": {
+            "AcroForm": "11 0 R",
+            "PageMode": "/UseNone",
+            "Pages": "7 0 R",
+            "Perms": {
+              "DocMDP": "9 0 R"
+            },
+            "Type": "/Catalog"
+          },
+          "id": "5 0",
+          "offset": 1872,
+          "type": "Catalog"
+        },
+        {
+          "dict": {
+            "ByteRange": [
+              0,
+              2119,
+              10313,
+              662
+            ],
+            "Contents": "<308207f006092a864886f70d010702a08207e1308207dd020101310f300d06096086480165030402010500300b06092a864886f70d010701a08205e9308202ed308201d5a003020102020203e9300d06092a864886f70d01010b0500302f3117301506035504030c0e52616b766f72205445535420434131143012060355040a0c0b52616b766f722054455354301e170d3236303130313030303030305a170d3336303130313030303030305a302f3117301506035504030c0e52616b766f72205445535420434131143012060355040a0c0b52616b766f72205445535430820122300d06092a864886f70d01010105000382010f003082010a0282010100f1>",
+            "Filter": "/Adobe.PPKLite",
+            "M": "D:20260504132000+00'00'",
+            "Name": "Ana Ruiz (TEST examiner)",
+            "Reason": "SYNTHETIC TEST SAMPLE",
+            "Reference": [
+              {
+                "TransformMethod": "/DocMDP",
+                "TransformParams": {
+                  "P": 2,
+                  "Type": "/TransformParams",
+                  "V": "/1.2"
+                },
+                "Type": "/SigRef"
+              }
+            ],
+            "SubFilter": "/adbe.pkcs7.detached",
+            "Type": "/Sig"
+          },
+          "id": "9 0",
+          "offset": 1984,
+          "type": "Sig"
+        },
+        {
+          "dict": {
+            "F": 132,
+            "FT": "/Sig",
+            "P": "4 0 R",
+            "Rect": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "Subtype": "/Widget",
+            "T": "Signature1",
+            "Type": "/Annot",
+            "V": "9 0 R"
+          },
+          "id": "10 0",
+          "offset": 10537,
+          "type": "Annot"
+        },
+        {
+          "dict": {
+            "Fields": [
+              "10 0 R"
+            ],
+            "SigFlags": 3
+          },
+          "id": "11 0",
+          "offset": 10655,
+          "type": "dict"
+        }
+      ]
+    },
+    {
+      "objects": [
+        {
+          "dict": {
+            "Annots": [
+              "10 0 R"
+            ],
+            "Contents": "12 0 R",
+            "MediaBox": [
+              0,
+              0,
+              612,
+              792
+            ],
+            "Parent": "7 0 R",
+            "Resources": {
+              "Font": {
+                "F1": "2 0 R",
+                "F2": "3 0 R"
+              },
+              "ProcSet": [
+                "/PDF",
+                "/Text",
+                "/ImageB",
+                "/ImageC",
+                "/ImageI"
+              ]
+            },
+            "Rotate": 0,
+            "Trans": {},
+            "Type": "/Page"
+          },
+          "id": "4 0",
+          "offset": 10975,
+          "type": "Page"
+        },
+        {
+          "dict": {
+            "Author": "Rakvor test generator",
+            "CreationDate": "D:20260504080000-05'00'",
+            "Creator": "Rakvor make_samples.py",
+            "Keywords": "",
+            "ModDate": "D:20260507080000-05'00'",
+            "Producer": "ReportLab PDF Library - (opensource)",
+            "Subject": "unspecified",
+            "Title": "SYNTHETIC TEST SAMPLE - signed",
+            "Trapped": "/False"
+          },
+          "id": "6 0",
+          "offset": 11202,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "Length": 184
+          },
+          "id": "12 0",
+          "offset": 11509,
+          "stream": {
+            "length": 184,
+            "offset": 11543
+          },
+          "type": "stream"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,483 @@
+{
+  "audit": {
+    "first_seq": 23,
+    "last_seq": 31
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T06:56:39.690Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "extracted_files": [
+    {
+      "bytes": 11002,
+      "hashes": {
+        "md5": "f207eaa4f11b5e7af6a8cedc1fef7de2",
+        "sha256": "30b9f0583c2967a5f01942a9f8c81e1e73c0bd79557142753b7625bc522be0d7"
+      },
+      "kind": "structure",
+      "rel_path": "structure.json"
+    },
+    {
+      "bytes": 3014,
+      "hashes": {
+        "md5": "6bd1c3a2f050217ca9513a21d6899a41",
+        "sha256": "dd02b3d88f941c9aa000c8ef0b61128db87df9de0b112822149fc53bb7f3afe2"
+      },
+      "kind": "metadata",
+      "rel_path": "metadata.json"
+    },
+    {
+      "bytes": 1181973,
+      "hashes": {
+        "md5": "f4cf4485a057e8ff77ed992285610f45",
+        "sha256": "fcc59ce43c02234e20c95faa395e8d3bca855517e91f36b694fa313226dffcc1"
+      },
+      "kind": "original_preview",
+      "rel_path": "maps/original.png"
+    },
+    {
+      "bytes": 69967,
+      "hashes": {
+        "md5": "efb3932faa5a42659cb324528aab5d2b",
+        "sha256": "c213e7ff8db70b580bf676128a141281298b0acd7a5f8a35e668c0b9aba10596"
+      },
+      "kind": "map",
+      "rel_path": "maps/thumbnail-diff.png"
+    }
+  ],
+  "findings": [
+    {
+      "code": "QT_NON_STANDARD",
+      "params": {
+        "distance": "578",
+        "nearest": "90"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "Cameras and many apps use their own tables; a quality figure for them is only an approximation and is not stated as fact.",
+          "shows": "The quantization tables are not IJG standard tables; the nearest IJG quality is 90 (distance 578).",
+          "title": "Non-standard compression tables"
+        }
+      }
+    },
+    {
+      "code": "QT_UNKNOWN",
+      "params": {
+        "hash": "cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "The database covers few devices and apps; an unknown table says nothing about authenticity. Add known originals with `fingerprints learn`.",
+          "shows": "No entry of the fingerprint databases matches these tables (SHA-256 cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545).",
+          "title": "Compression tables not in the database"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "2e6a144de59544131c1f2ef04735cf27",
+    "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+  },
+  "image": {
+    "analysis": "completed",
+    "evidence_rehash": {
+      "algorithm": "sha256",
+      "bytes": 120443,
+      "first_pass": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c",
+      "match": true,
+      "second_pass": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+    },
+    "fingerprint_dbs": [
+      {
+        "entries": 0,
+        "name": "rakvor-starter",
+        "role": "starter",
+        "sha256": "e0b0c87e4b79e5c5402e920d343436056c25bb959a5bb757a7d0519b95ab4be8",
+        "status": "loaded",
+        "version": "0"
+      },
+      {
+        "path": "R:\\profile\\local\\Rakvor\\rv-imgauth\\fingerprints.local.json",
+        "role": "local",
+        "status": "absent"
+      }
+    ],
+    "format": "jpeg",
+    "height": 900,
+    "map_parameters": [
+      {
+        "file": "maps/thumbnail-diff.png",
+        "params": {
+          "compared_area": "160x120 at 0,0 (black bars trimmed)",
+          "gain": "4",
+          "largest_block_difference": "9.7",
+          "mean_difference": "2.6",
+          "resize": "main image area-averaged to the thumbnail size",
+          "thumbnail_size": "160x120",
+          "upscale": "4"
+        }
+      }
+    ],
+    "maps": [
+      "maps/thumbnail-diff.png"
+    ],
+    "metadata_summary": {
+      "fields": [
+        {
+          "group": "IFD0",
+          "name": "Make",
+          "value": "Canon"
+        },
+        {
+          "group": "IFD0",
+          "name": "Model",
+          "value": "Canon EOS R6"
+        },
+        {
+          "group": "IFD0",
+          "name": "DateTime",
+          "value": "2031:05:14 10:25:02"
+        },
+        {
+          "group": "Exif",
+          "name": "DateTimeOriginal",
+          "value": "2031:05:14 10:25:02"
+        },
+        {
+          "group": "Exif",
+          "name": "DateTimeDigitized",
+          "value": "2031:05:14 10:25:02"
+        },
+        {
+          "group": "Exif",
+          "name": "OffsetTime",
+          "value": "+02:00"
+        },
+        {
+          "group": "Exif",
+          "name": "OffsetTimeOriginal",
+          "value": "+02:00"
+        },
+        {
+          "group": "Exif",
+          "name": "PixelXDimension",
+          "value": "1200"
+        },
+        {
+          "group": "Exif",
+          "name": "PixelYDimension",
+          "value": "900"
+        },
+        {
+          "group": "IFD0",
+          "name": "Orientation",
+          "value": "1 (row 0 at top and column 0 at left)"
+        }
+      ],
+      "gps_tags": 0,
+      "groups": {
+        "Exif": 13,
+        "IFD0": 7,
+        "IFD1": 6
+      },
+      "icc_sha256": null,
+      "makernote_present": true,
+      "problems": [],
+      "tag_count": 26,
+      "thumbnail_present": true,
+      "xmp_history": [],
+      "xmp_present": false
+    },
+    "options": {
+      "copy_move": true,
+      "ela_quality": 95,
+      "maps": [],
+      "max_pixels": 100000000,
+      "references": []
+    },
+    "original_preview": {
+      "file": "maps/original.png",
+      "height": 900,
+      "params": {
+        "decoder": "zune-jpeg 0.4.21",
+        "orientation": "stored order (EXIF Orientation not applied)",
+        "samples": "RGB 8-bit, lossless PNG",
+        "size": "1200x900"
+      },
+      "width": 1200
+    },
+    "parser": null,
+    "parser_error": null,
+    "pixel_decode_error": null,
+    "qt_fingerprint": {
+      "distance": 578,
+      "ijg_quality": null,
+      "matches": [],
+      "nearest_quality": 90,
+      "sha256": "cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545",
+      "tables": [
+        {
+          "components": [
+            "1"
+          ],
+          "id": 0,
+          "precision": 0,
+          "values": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            10,
+            11,
+            4,
+            5,
+            6,
+            8,
+            9,
+            10,
+            12,
+            13,
+            5,
+            6,
+            8,
+            9,
+            11,
+            12,
+            14,
+            15,
+            6,
+            7,
+            9,
+            11,
+            12,
+            14,
+            16,
+            17,
+            7,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            19,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            22,
+            9,
+            11,
+            13,
+            15,
+            17,
+            19,
+            22,
+            24
+          ]
+        },
+        {
+          "components": [
+            "2",
+            "3"
+          ],
+          "id": 1,
+          "precision": 0,
+          "values": [
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17,
+            5,
+            7,
+            9,
+            12,
+            14,
+            16,
+            19,
+            21,
+            7,
+            9,
+            12,
+            15,
+            17,
+            20,
+            23,
+            25,
+            9,
+            12,
+            15,
+            18,
+            21,
+            24,
+            27,
+            30,
+            11,
+            14,
+            17,
+            21,
+            24,
+            27,
+            31,
+            34,
+            13,
+            16,
+            20,
+            24,
+            27,
+            31,
+            35,
+            38,
+            15,
+            19,
+            23,
+            27,
+            31,
+            35,
+            39,
+            43,
+            17,
+            21,
+            25,
+            30,
+            34,
+            38,
+            43,
+            47
+          ]
+        }
+      ]
+    },
+    "reference_table": null,
+    "references": null,
+    "structure_summary": {
+      "facts": [
+        {
+          "name": "frame",
+          "value": "SOF0"
+        },
+        {
+          "name": "chroma subsampling",
+          "value": "4:2:0"
+        },
+        {
+          "name": "components",
+          "value": "3"
+        },
+        {
+          "name": "restart interval",
+          "value": "75"
+        },
+        {
+          "name": "quantization tables",
+          "value": "2"
+        },
+        {
+          "name": "Huffman tables",
+          "value": "4"
+        },
+        {
+          "name": "bytes after EOI",
+          "value": "0"
+        },
+        {
+          "name": "comments",
+          "value": "0"
+        }
+      ],
+      "segments": 13,
+      "sequence": [
+        "SOI",
+        "APP1/Exif",
+        "DQT ×2",
+        "SOF0",
+        "DHT ×4",
+        "DRI",
+        "SOS",
+        "EOI"
+      ]
+    },
+    "width": 1200,
+    "worker": {
+      "elapsed_ms": 466,
+      "memory_mb": 2048,
+      "network": {
+        "detail": "Windows: no OS network block for the worker (a Job Object cannot restrict network access); the worker code path has no network code",
+        "isolated": false,
+        "method": "none"
+      },
+      "protocol": "rv-imgauth-worker/1",
+      "status": "completed",
+      "timeout_s": 120
+    }
+  },
+  "item": {
+    "detected_type": "JPEG image",
+    "error": null,
+    "evidence_id": "E0013",
+    "extension": "jpg",
+    "file_name": "future-exif.jpg",
+    "index": 3,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\images\\future-exif.jpg",
+    "size": 120443,
+    "status": "ok"
+  },
+  "limitations": [
+    "NO_FINDING_IS_NOT_AUTHENTICITY",
+    "VISUAL_MAPS_REQUIRE_INTERPRETATION",
+    "DOUBLE_COMPRESSION_IS_NOT_MANIPULATION",
+    "FINGERPRINT_DB_COVERAGE",
+    "COPY_MOVE_SCALE_ROTATION_NOT_DETECTED",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY",
+    "SIGNATURE_TABLE_LIMITED"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 1598,
+    "finished_utc": "2026-11-13T06:56:49.920Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "run_id": "20261113T065648Z-b151c3",
+    "started_utc": "2026-11-13T06:56:48.321Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-imgauth",
+    "version": "0.3.1"
+  }
+}

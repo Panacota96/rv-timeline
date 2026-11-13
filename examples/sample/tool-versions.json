@@ -1,0 +1,11 @@
+{
+  "description": "Executables that wrote examples/sample/case (rakvor-root/<tool>/target/release, built from the commit shown).",
+  "tools": {
+    "rv-hashinv": {"version": "0.4.1", "commit": "cd307e945de3ba87579bb4e0abcd3c179297ecc3", "exe_sha256": "da4e41eb77a4c2c1a488c3708a8d38f5fb146b2b2fb58289f1c1907b022c44db"},
+    "rv-pdfauth": {"version": "0.4.1", "commit": "88f6730f291adc29b0183f785bb30bc2a08286d2", "exe_sha256": "79cf3d9e513a163ef8200273dd01bc07d8b8a786e9bc76ab4fa8354fdf1bbe10"},
+    "rv-imgauth": {"version": "0.3.1", "commit": "ff76f816a49f39af41772a68aa38d1ee5fe1dcc2", "exe_sha256": "c0f7f1a8e6818687ff2c432e8b963af31d68b49356462805887d709b42d89ff9"},
+    "rv-rsmf": {"version": "0.3.1", "commit": "fddbd445ac8bd467211cb2981acd403f70ae173c", "exe_sha256": "cb65354ba66bde96e19201c14d8c566de2c2544181e5de0a822a5b326006ddfe"},
+    "rv-mailauth": {"version": "0.2.0", "commit": "cf488faf8c1d76e44519c228d7f7443fff6d47b6", "exe_sha256": "549e22a204184061262e552ffe93f74b954370b31f5a1fa2c2ff93949d995b80"},
+    "rv-certcheck": {"version": "0.2.2", "commit": "4d5b3d0aa317c0fad353e3b857ead5d29b24964a", "exe_sha256": "c8e47e8703de36dc242c0fc092f752bb3675ad0890e94bc2b34be3e936518f98"}
+  }
+}

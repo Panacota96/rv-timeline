@@ -1,0 +1,7 @@
+index,path,size,sha256,md5,status,error
+1,R:\evidence\mail\01-clean-rsa.eml,1464,d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59,3b910e8841d5a4b560a2157d9595b08c,ok,
+2,R:\evidence\mail\12-mailbox.mbox,3238,2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe,f4e8e05ccc50d543ed3703f21cb965d4,ok,
+2,R:\evidence\mail\12-mailbox.mbox#1@0,1321,9c0b8fc2b587c508b68665731e50d02fe29469f40b2b35f6c7e1ec96526a9f07,e49093b806481fccb463cb1bc0b62d91,ok,
+2,R:\evidence\mail\12-mailbox.mbox#2@1372,1276,a62b0d52faaaad62074e6f84f0f9c08c998c11138514f3f9db5a459231ab5c50,a3bd09e3d5582c8dc5c000d71e455d3f,problem,
+2,R:\evidence\mail\12-mailbox.mbox#3@2699,490,9d13579ab0f6860e938f33c35b485fca29c2417dd5b6d57fa59c892eb6a4499a,c00d9f9edc005b7e74a14f28fbad963e,attention,
+3,R:\evidence\mail\20-date-after-first-hop.eml,1464,4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa,827870dedf658a5968a9a8beb4900baf,attention,
