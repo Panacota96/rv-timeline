@@ -542,13 +542,24 @@ struct Anchor {
     s: i64,
     /// Event id when the intake came from an `intake.registered` event (else the registry).
     event: Option<String>,
+    /// Run that registered the item (with `event`): its `fs.modified` is the time seen at intake.
+    run_id: Option<String>,
     text: String,
+}
+
+/// One `mail.hop` of a message: the run that read it, its `Received` position (1 = first relay), relay host.
+#[derive(Clone, Debug)]
+struct Hop {
+    run_id: String,
+    position: Option<u32>,
+    by: String,
+    m: Mini,
 }
 
 #[derive(Default)]
 struct MailGroup {
     date: Vec<Mini>,
-    hops: Vec<Mini>,
+    hops: Vec<Hop>,
 }
 
 /// `<evidence_id>` or `path:<path>` for items not linked to the registry.
@@ -609,7 +620,8 @@ pub struct SignalEngine {
     intake: BTreeMap<String, Anchor>,
     items: BTreeMap<String, ItemRef>,
     exif: BTreeMap<String, Vec<Mini>>,
-    fs_mod: BTreeMap<String, Vec<Mini>>,
+    /// item key → (run id, fs.modified)
+    fs_mod: BTreeMap<String, Vec<(String, Mini)>>,
     mail: BTreeMap<(String, String), MailGroup>,
     pdf: BTreeMap<String, BTreeMap<u32, Vec<Mini>>>,
     /// item key → (kind, sub) → tool → first explicit-zone value
@@ -646,6 +658,7 @@ impl SignalEngine {
                 Anchor {
                     s,
                     event: None,
+                    run_id: None,
                     text: registered_utc.to_string(),
                 },
             );
@@ -716,12 +729,17 @@ impl SignalEngine {
                 let a = Anchor {
                     s: e.utc_s,
                     event: Some(e.id.clone()),
+                    run_id: Some(e.source.run_id.clone()),
                     text: e.original.clone(),
                 };
                 self.anchor(&e.item.evidence_id.clone(), a);
             }
             "exif.original" => self.exif.entry(key.clone()).or_default().push(m.clone()),
-            "fs.modified" => self.fs_mod.entry(key.clone()).or_default().push(m.clone()),
+            "fs.modified" => self
+                .fs_mod
+                .entry(key.clone())
+                .or_default()
+                .push((e.source.run_id.clone(), m.clone())),
             "mail.date" => self
                 .mail
                 .entry((key.clone(), e.item.sub.clone()))
@@ -733,7 +751,15 @@ impl SignalEngine {
                 .entry((key.clone(), e.item.sub.clone()))
                 .or_default()
                 .hops
-                .push(m.clone()),
+                .push(Hop {
+                    run_id: e.source.run_id.clone(),
+                    position: e
+                        .details
+                        .get("position")
+                        .and_then(|p| p.trim().parse().ok()),
+                    by: e.details.get("by").cloned().unwrap_or_default(),
+                    m: m.clone(),
+                }),
             _ => {}
         }
         if PDF_REVISION_KINDS.contains(&e.kind.as_str())
@@ -823,7 +849,9 @@ impl SignalEngine {
 
         // FILE_MODIFIED_AFTER_INTAKE. Medium: the file-system time moved after intake. The content can still match
         // the registry (copy, touch, restore) — the analysis tools verify the hash separately; this does not by
-        // itself contradict the intake.
+        // itself contradict the intake. A modification time counts when it is later than the intake beyond the
+        // tolerance, or later than the intake and different from the one the intake run itself recorded: the file
+        // was then touched after it was registered, whatever the clocks (no tolerance needed).
         for (k, list) in &self.fs_mod {
             let Some(ev_id) = self.items.get(k).map(|i| i.evidence_id.clone()) else {
                 continue;
@@ -831,9 +859,23 @@ impl SignalEngine {
             let Some(a) = self.intake.get(&ev_id) else {
                 continue;
             };
+            let at_intake: Vec<i64> = list
+                .iter()
+                .filter(|(r, _)| Some(r) == a.run_id.as_ref())
+                .map(|(_, m)| m.s)
+                .collect();
             let late: Vec<&Mini> = list
                 .iter()
-                .filter(|m| m.s > a.s + tol + if m.unknown { ZONE_MARGIN_S } else { 0 })
+                .filter(|(r, m)| {
+                    let beyond = m.s > a.s + tol + if m.unknown { ZONE_MARGIN_S } else { 0 };
+                    let changed = !m.unknown
+                        && m.s > a.s
+                        && Some(r) != a.run_id.as_ref()
+                        && !at_intake.is_empty()
+                        && !at_intake.contains(&m.s);
+                    beyond || changed
+                })
+                .map(|(_, m)| m)
                 .collect();
             if late.is_empty() {
                 continue;
@@ -860,7 +902,16 @@ impl SignalEngine {
         // MAIL_DATE_AFTER_FIRST_HOP. Medium: the Date header (set by the sender's client) is later than the first
         // relay's Received time, possibly read by different tools; clocks and relays disagree.
         for ((k, sub), g) in &self.mail {
-            let Some(first) = g.hops.iter().min_by_key(|m| m.s) else {
+            // The first relay: position 1 when the hops carry their position, else the earliest hop.
+            let first = if g.hops.iter().any(|h| h.position.is_some()) {
+                g.hops
+                    .iter()
+                    .filter(|h| h.position.is_some())
+                    .min_by_key(|h| (h.position, h.m.s))
+            } else {
+                g.hops.iter().min_by_key(|h| h.m.s)
+            };
+            let Some(first) = first.map(|h| &h.m) else {
                 continue;
             };
             for d in &g.date {
@@ -887,6 +938,55 @@ impl SignalEngine {
                             ("message", sub.clone()),
                             ("delta_s", delta.to_string()),
                             ("delta", human_delta(delta)),
+                            ("tolerance_s", tol.to_string()),
+                        ]),
+                    });
+                }
+            }
+        }
+
+        // CLOCK_SKEW_SUSPECTED (Received hops). Low: in one message, as one run read it, a relay stamped its
+        // Received time more than the tolerance *before* the relay that handed the message to it. A message only
+        // moves forward, so the relays' clocks (or zones) disagree.
+        for ((k, sub), g) in &self.mail {
+            let mut by_run: BTreeMap<&str, Vec<&Hop>> = BTreeMap::new();
+            for h in g.hops.iter().filter(|h| h.position.is_some()) {
+                by_run.entry(h.run_id.as_str()).or_default().push(h);
+            }
+            for hops in by_run.values_mut() {
+                hops.sort_by_key(|h| (h.position, h.m.s));
+                for w in hops.windows(2) {
+                    let (a, b) = (w[0], w[1]);
+                    let margin = tol
+                        + if a.m.unknown || b.m.unknown {
+                            ZONE_MARGIN_S
+                        } else {
+                            0
+                        };
+                    if a.position == b.position || a.m.s <= b.m.end() + margin {
+                        continue;
+                    }
+                    let skew = a.m.s - b.m.s;
+                    let mut it = item(k);
+                    if let Some(i) = it.as_mut() {
+                        i.sub = sub.clone();
+                    }
+                    let pos = |h: &Hop| h.position.map(|p| p.to_string()).unwrap_or_default();
+                    out.push(Signal {
+                        code: "CLOCK_SKEW_SUSPECTED".into(),
+                        severity: Severity::Low,
+                        events: vec![a.m.id.clone(), b.m.id.clone()],
+                        item: it,
+                        params: p(&[
+                            ("basis", "received_hops".into()),
+                            ("tool_a", format!("{} (Received hop {})", a.by, pos(a))),
+                            ("tool_b", format!("{} (Received hop {})", b.by, pos(b))),
+                            ("previous_hop", pos(a)),
+                            ("hop", pos(b)),
+                            ("message", sub.clone()),
+                            ("skew_s", skew.to_string()),
+                            ("skew", human_delta(skew)),
+                            ("pairs", "1".into()),
                             ("tolerance_s", tol.to_string()),
                         ]),
                     });
@@ -957,7 +1057,7 @@ impl SignalEngine {
             });
         }
 
-        // CLOCK_SKEW_SUSPECTED. Low: two tools read the same facts of one item at least twice, always apart by
+        // CLOCK_SKEW_SUSPECTED (across tools). Low: two tools read the same facts of one item at least twice, always apart by
         // more than the tolerance and by about the same amount — a clock or zone offset of one source, which also
         // explains other signals. Zone-unknown values are not compared.
         for (k, facts) in &self.skew {
@@ -995,6 +1095,7 @@ impl SignalEngine {
                         .collect(),
                     item: item(k),
                     params: p(&[
+                        ("basis", "tools".into()),
                         ("tool_a", ta),
                         ("tool_b", tb),
                         ("skew_s", median.to_string()),
@@ -1612,6 +1713,125 @@ pub(crate) mod tests {
             1,
         );
         assert!(codes(vec![intake("E0001"), m], vec![]).is_empty());
+    }
+
+    /// The same event read by another run (`run_id`).
+    fn in_run(mut e: TimeEvent, run_id: &str) -> TimeEvent {
+        e.id = e.id.replace("20261112T090000Z-aaaaaa", run_id);
+        e.source.run_id = run_id.into();
+        e
+    }
+
+    #[test]
+    fn file_touched_seconds_after_intake_is_seen_by_a_later_run() {
+        // The sample case: the intake run recorded the file's old mtime; a later run saw a new one 3 s after the
+        // intake — within the clock tolerance, yet the mtime changed after the item was registered.
+        let at_intake = ev(
+            "rv-hashinv",
+            "E0001",
+            "fs.modified",
+            "2026-11-09T06:00:00Z",
+            0,
+        );
+        let later = in_run(
+            ev(
+                "rv-imgauth",
+                "E0001",
+                "fs.modified",
+                "2026-11-10T10:00:03Z",
+                0,
+            ),
+            "20261112T100000Z-bbbbbb",
+        );
+        let t = build(
+            "C",
+            vec![],
+            vec![intake("E0001"), at_intake.clone(), later.clone()],
+            &opts(),
+        );
+        assert_eq!(
+            t.signals
+                .iter()
+                .map(|s| (s.code.as_str(), s.severity))
+                .collect::<Vec<_>>(),
+            [("FILE_MODIFIED_AFTER_INTAKE", Severity::Medium)]
+        );
+        assert_eq!(t.signals[0].events[1], later.id);
+        // Without the intake run's own reading, 3 s is within the tolerance: nothing.
+        assert!(codes(vec![intake("E0001"), later.clone()], vec![]).is_empty());
+        // The value the intake run recorded, read again later: unchanged, nothing.
+        let mut same = later;
+        same.utc_s = at_intake.utc_s;
+        assert!(codes(vec![intake("E0001"), at_intake, same], vec![]).is_empty());
+    }
+
+    #[test]
+    fn received_hops_out_of_order_are_a_clock_skew() {
+        // The sample's mbox message #3: hop 2 (mx.acme.example) is stamped 20 min before hop 1.
+        let hop = |pos: u32, by: &str, t: &str| {
+            let mut e = ev("rv-mailauth", "E0016", "mail.hop", t, pos - 1);
+            e.item.sub = "#3".into();
+            e.details.insert("position".into(), pos.to_string());
+            e.details.insert("by".into(), by.into());
+            e
+        };
+        let h1 = hop(1, "smtp.example.org", "2026-11-11T10:00:00Z");
+        let h2 = hop(2, "mx.acme.example", "2026-11-11T09:40:00Z");
+        let t = build("C", vec![], vec![h2.clone(), h1.clone()], &opts());
+        assert_eq!(t.signals.len(), 1, "{:?}", t.signals);
+        let s = &t.signals[0];
+        assert_eq!(
+            (s.code.as_str(), s.severity),
+            ("CLOCK_SKEW_SUSPECTED", Severity::Low)
+        );
+        assert_eq!(s.events, vec![h1.id.clone(), h2.id.clone()]);
+        assert_eq!(s.item.as_ref().unwrap().sub, "#3");
+        assert_eq!(s.params["skew_s"], "1200");
+        // In order, or out of order within the tolerance: nothing.
+        let ok = hop(2, "mx.acme.example", "2026-11-11T10:00:03Z");
+        assert!(codes(vec![h1.clone(), ok], vec![]).is_empty());
+        let near = hop(2, "mx.acme.example", "2026-11-11T09:57:00Z");
+        assert!(codes(vec![h1.clone(), near], vec![]).is_empty());
+        // Hops read by two different runs are not compared with each other.
+        let other = in_run(h2, "20261112T100000Z-bbbbbb");
+        assert!(codes(vec![h1, other], vec![]).is_empty());
+    }
+
+    #[test]
+    fn first_hop_is_position_one_when_known() {
+        let mut d = ev(
+            "rv-mailauth",
+            "E0002",
+            "mail.date",
+            "2026-11-02T10:30:00Z",
+            0,
+        );
+        let mut h1 = ev(
+            "rv-mailauth",
+            "E0002",
+            "mail.hop",
+            "2026-11-02T10:00:00Z",
+            0,
+        );
+        let mut h2 = ev(
+            "rv-mailauth",
+            "E0002",
+            "mail.hop",
+            "2026-11-02T09:00:00Z",
+            1,
+        );
+        for (e, pos) in [(&mut h1, "1"), (&mut h2, "2")] {
+            e.details.insert("position".into(), pos.into());
+        }
+        d.item.sub = String::new();
+        let t = build("C", vec![], vec![d.clone(), h1.clone(), h2], &opts());
+        let m = t
+            .signals
+            .iter()
+            .find(|s| s.code == "MAIL_DATE_AFTER_FIRST_HOP")
+            .unwrap();
+        assert_eq!(m.events, vec![d.id, h1.id]);
+        assert_eq!(m.params["delta_s"], "1800");
     }
 
     #[test]
