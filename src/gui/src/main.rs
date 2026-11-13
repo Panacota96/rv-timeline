@@ -14,8 +14,8 @@ fn main() -> eframe::Result {
                 .expect("bundled icon is a valid PNG"),
             )
             .with_title("RV Timeline — Rakvor")
-            .with_inner_size([860.0, 720.0])
-            .with_min_inner_size([640.0, 520.0])
+            .with_inner_size([1280.0, 860.0])
+            .with_min_inner_size([900.0, 600.0])
             .with_drag_and_drop(true),
         // wgpu falls back to a software adapter (WARP on Windows), so the GUI also runs on
         // forensic VMs without a GPU driver.
@@ -25,7 +25,7 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "RV Timeline",
         options,
-        // Files or folders dropped on the .exe icon (or passed on the command line) are pre-loaded;
+        // A case folder dropped on the .exe icon (or passed on the command line) is pre-selected;
         // `--case-dir DIR` (RV Hub) presets the case folder.
         Box::new(|_cc| {
             Ok(Box::new(rv_timeline_gui::app::HashInvApp::from_launch(
