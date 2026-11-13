@@ -67,6 +67,10 @@ jobs:
             grep -E "panicked at|^---- |FAILED|^failures:|assertion|Error:|error:" test.log | head -40 | while IFS= read -r l; do echo "::error title=cargo test::${l}"; done
             exit 1
           fi
+      - name: Ground truth (sample case against examples/sample/expected_timeline.json)
+        run: cargo test --locked -p rv-timeline-core --test sample_case
+      - name: Determinism (two builds of the same case give the same timeline.jsonl and reports JSON)
+        run: cargo test --locked -p rv-timeline-core --test determinism
       - name: Self-test of the hash implementations
         run: cargo run --locked -q -p rv-timeline-cli -- self-test
       - name: Sample run (build on a copy of the sample case; exit 3 expected, planted signals)
@@ -133,3 +137,31 @@ jobs:
             target/release/rv-timeline.exe
             target/release/rv-timeline-gui.exe
           retention-days: 14
+
+  # Size and hostile inputs, in an optimised build that keeps overflow checks and debug assertions (Linux only:
+  # the code paths are platform-independent and the Windows job already runs the debug fuzz pass).
+  large:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS: "true"
+      CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain pinned in rust-toolchain.toml (channel and components)
+        run: rustup toolchain install && rustc --version
+      - uses: Swatinem/rust-cache@v2
+      - name: Large case (200k events, external sort, bounded memory, ordered timeline.jsonl)
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --release --locked -p rv-timeline-core --test large_case -- --ignored --nocapture 2>&1 | tee large.log
+          grep "large case:" large.log >> "$GITHUB_STEP_SUMMARY"
+      - name: Hostile inputs (3000 mutations of the sample case, re-sealed)
+        shell: bash
+        env:
+          RV_FUZZ_ITERS: "3000"
+        run: |
+          set -o pipefail
+          cargo test --release --locked -p rv-timeline-core --test hostile -- --nocapture 2>&1 | tee fuzz.log
+          grep "mutations, slowest" fuzz.log >> "$GITHUB_STEP_SUMMARY"
