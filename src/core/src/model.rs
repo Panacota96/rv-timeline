@@ -13,6 +13,43 @@
 //!
 //! Times are integers only (seconds + nanoseconds since the Unix epoch, offsets in minutes): the audit chain is
 //! canonical JSON with integers and strings, never floats.
+//!
+//! # Conventions (readers, engine and the sample case's ground truth all follow these)
+//!
+//! **Event id** — `<tool>:<run_id>:<item>[/<sub>]:<kind>:<n>`.
+//! - `<item>` is the evidence id (`E0004`); `i<index>` (the run's item index) when the run did not link the item to
+//!   the registry; `run` for run-level events.
+//! - `/<sub>` is present only when [`ItemRef::sub`] is not empty, always with a `/` (`E0016/#3`, `E0018/r2`).
+//! - `n` counts **from 0** per (run, item/sub, kind), in the order the values appear in the source file (the same
+//!   base as the JSON pointer indices).
+//!
+//! **What counts as an event**: one time value written in a tool's audited output, once per run that wrote it. A
+//! value derived from other events (first/last of a conversation, a duration) is not an event; two different source
+//! values with the same instant are two events (e.g. a PDF signature's `/M` and its CMS signingTime).
+//!
+//! **Run-level events** (every tool, item `run`, from the run's `logs/audit.jsonl`, the hash-chained record):
+//! `run.started` = `ts_utc` of the `run_started` entry, `run.finished` = `ts_utc` of the `run_finished` entry,
+//! `run.timestamped` = `details.gen_time` of each `timestamp_obtained` entry. `reports/statistics.json` holds close
+//! but different times (written before the final audit entry) and is not used.
+//!
+//! **Kinds and sources per tool** (`fs.modified` comes from every tool: `item_started.details.modified_utc` in the
+//! audit log, once per item and run — the messages of an mbox share their container's):
+//!
+//! | Tool | Kinds (source) | Sub-item |
+//! | --- | --- | --- |
+//! | rv-hashinv | `intake.registered` (`technical.json` `/case/intake_utc`, only items this run registered) | none |
+//! | rv-imgauth | `exif.original`, `exif.digitized`, `exif.modify` (EXIF DateTimeOriginal / DateTimeDigitized / IFD0 DateTime + OffsetTime* + SubSecTime*), `gps.time`, `xmp.create`, `xmp.modify`, `xmp.metadata`, `xmp.photoshop_created`, `xmp.exif_original`, `xmp.history`, `png.time`, `png.creation_time` (`metadata.json`) | none |
+//! | rv-pdfauth | `pdf.info.created`, `pdf.info.modified` (Info dictionary of each revision, `objects.json`); `pdf.signature.claimed` (a signature dictionary's `/M`); `pdf.revision.signed` (CMS signingTime, `technical.json`); `pdf.xmp.saved`; `pdf.info.saved` (only without `objects.json`) | `r<n>`, revision n from 1 |
+//! | rv-rsmf | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` (one per `rsmf/trace.json` row, by its RSMF kind) | `<conversation id>/<day>`: the row's `conversation` and the stem of its `rsmf_file` (`c-554810aa3173/2026-03-02`) |
+//! | rv-mailauth | `mail.date`, `mail.hop` (`headers.json`), `mail.attachment.created`, `mail.attachment.modified`, `mail.msg.submitted`, `mail.msg.delivered`, `mail.mbox_from` (`mbox_index.json`, the mbox `From ` line) | `#<n>` for message n of an mbox, else none |
+//! | rv-certcheck | `cert.not_before`, `cert.not_after`, `cert.revoked`, `tsa.gen_time` (`chain.json`) | `c<n>` (n-th certificate of the file, from 1) when the file holds several certificates; none when it holds one (and for `tsa.gen_time`) |
+//!
+//! **Zone**: [`ZoneInfo::Explicit`] when the value or the tool's output states it (an RFC 5322 date, ISO 8601 with
+//! an offset or `Z`, EXIF with its OffsetTime*, PNG tIME — UTC by the PNG specification and labelled UTC by
+//! rv-imgauth —, a chat time converted by rv-rsmf with the examiner's `--timezone`); [`ZoneInfo::Unknown`] when it
+//! does not (EXIF without OffsetTime*, an mbox `From ` line, a chat time without `--timezone`, `-0000`).
+//! [`Timeline::zone_unknown`] counts them and the engine emits **one** case-level `ZONE_UNKNOWN_EVENTS` (info,
+//! no item) with that count.
 
 #![forbid(unsafe_code)]
 
@@ -51,7 +88,8 @@ pub enum ZoneInfo {
 /// time read as UTC); `original` keeps the source's own wording, unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub struct TimeEvent {
-    /// Stable id: `<tool>:<run_id>:<item>:<kind>:<n>` — unique in a timeline, the same on every rebuild.
+    /// Stable id: `<tool>:<run_id>:<item>[/<sub>]:<kind>:<n>`, n from 0 (see the module's conventions) — unique in
+    /// a timeline, the same on every rebuild.
     pub id: String,
     pub utc_s: i64,
     #[serde(default)]
@@ -83,7 +121,8 @@ pub struct ItemRef {
     pub evidence_id: String,
     /// Path as the tool recorded it (registry path, or `<mbox>#<n>@<offset>` for a derived item).
     pub path: String,
-    /// Sub-item inside the evidence: PDF revision `r2`, mbox message `#3`, chat `conversation/day`; empty if none.
+    /// Sub-item inside the evidence: PDF revision `r2`, mbox message `#3`, chat `<conversation id>/<day>`,
+    /// certificate `c2` of a file holding several; empty if none (formats per tool: the module's conventions).
     #[serde(default)]
     pub sub: String,
     /// SHA-256 of the evidence as registered (from the registry or the run), empty if unknown.
