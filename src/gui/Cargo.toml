@@ -28,3 +28,7 @@ rfd.workspace = true
 # Icon + version details in the Windows .exe (build.rs; does nothing on other platforms).
 [build-dependencies]
 winresource = "0.1"
+
+# The documentation screenshots (examples/gui_screenshot.rs) are written as PNG.
+[dev-dependencies]
+png = "0.18"
