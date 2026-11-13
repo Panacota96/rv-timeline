@@ -192,15 +192,25 @@ fn limitation_texts(c: &Catalog, run: &RunInfo) -> Vec<String> {
     }
 }
 
+/// `limitations`: the codes, as strings (the template's report contract, `schemas/*.schema.json`).
 fn limitation_codes(run: &RunInfo) -> Value {
+    match &run.timeline {
+        Some(t) => json!(t.limitations().iter().map(|(c, _)| *c).collect::<Vec<_>>()),
+        None => json!(LIMITATIONS),
+    }
+}
+
+/// `limitation_params`: code → the values its text is filled with (timeline runs; empty otherwise).
+fn limitation_params(run: &RunInfo) -> Value {
     match &run.timeline {
         Some(t) => json!(
             t.limitations()
-                .iter()
-                .map(|(c, p)| json!({"code": c, "params": p}))
-                .collect::<Vec<_>>()
+                .into_iter()
+                .filter(|(_, p)| !p.is_empty())
+                .map(|(c, p)| (c.to_string(), json!(p)))
+                .collect::<serde_json::Map<String, Value>>()
         ),
-        None => json!(LIMITATIONS),
+        None => json!({}),
     }
 }
 
@@ -820,6 +830,7 @@ pub fn statistics_json(
         "items": items.iter().map(|it| json!({"index": it.index, "evidence_id": it.evidence_id, "path": it.path.display().to_string(), "size": it.size, "status": it.status(),
               "findings": it.findings.iter().map(|f| f.code.clone()).collect::<Vec<_>>(), "report_folder": format!("items/{}", it.folder())})).collect::<Vec<_>>(),
         "limitations": limitation_codes(run),
+        "limitation_params": limitation_params(run),
         "timeline": run.timeline.as_ref().map(|t| timeline_json(t, &run.langs)),
         "audit": {"head": audit.head, "entries": audit.entries, "log_dir": audit.log_dir},
         "timestamp": if run.timestamp.is_object() { run.timestamp.clone() } else { json!({"status": "off"}) },
@@ -847,6 +858,7 @@ pub fn technical_json(run: &RunInfo, it: &ItemResult) -> Value {
             "signals": tl.signals.iter().map(|s| signal_json(s, &run.langs)).collect::<Vec<_>>(),
         })),
         "limitations": limitation_codes(run),
+        "limitation_params": limitation_params(run),
         "audit": {"first_seq": it.audit_first_seq, "last_seq": it.audit_last_seq},
     })
 }

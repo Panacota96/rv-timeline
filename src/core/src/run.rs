@@ -1143,6 +1143,60 @@ fn failed(log: &mut AuditLog, stage: &str, message: String) -> String {
 }
 
 #[allow(clippy::too_many_arguments)]
+/// One row of the timeline run's `hashes.csv`.
+struct RegisterRow {
+    path: PathBuf,
+    size: u64,
+    hashes: Vec<(HashAlgo, String)>,
+    error: String,
+}
+
+/// The hash register of a timeline run: what this tool hashes is what it reads, so `hashes.csv` lists the case
+/// files whose content entered the timeline, hashed (with the run's algorithms) when the run read them:
+/// `case.json`, `evidence/registry.json`, then for every verified run that was read, its `logs/audit.jsonl` and
+/// each output its audit log records with a digest (`.json`, `.csv`, `.jsonl`: the files the readers and the
+/// verification check). Paths are absolute. The case log is left out: this run appends to it after the register is
+/// written (its head at the start is in `case_linked`). Excluded and skipped runs are not listed (not read).
+fn read_files_register(case_dir: &Path, runs: &[RunRef], algos: &[HashAlgo]) -> Vec<RegisterRow> {
+    let base = std::path::absolute(case_dir).unwrap_or_else(|_| case_dir.to_path_buf());
+    let mut rels: Vec<String> = vec!["case.json".into(), case::REGISTRY_JSON.into()];
+    for r in runs.iter().filter(|r| r.status == RunStatus::Verified) {
+        let Ok(data) = crate::readers::RunData::load(case_dir, r) else {
+            continue;
+        };
+        rels.push(format!("{}/logs/audit.jsonl", r.run_dir));
+        for rel in data.digests.keys() {
+            if [".json", ".csv", ".jsonl"].iter().any(|x| rel.ends_with(x)) {
+                rels.push(format!("{}/{}", r.run_dir, rel));
+            }
+        }
+    }
+    let mut out = Vec::new();
+    for rel in rels {
+        let path = rel.split('/').fold(base.clone(), |p, c| p.join(c));
+        if !path.is_file() {
+            continue;
+        }
+        let row = match File::open(&path).and_then(|f| hash_reader(f, algos, |_| true)) {
+            Ok(Some(o)) => RegisterRow {
+                path,
+                size: o.bytes,
+                hashes: o.digests,
+                error: String::new(),
+            },
+            Ok(None) => continue,
+            Err(e) => RegisterRow {
+                path,
+                size: 0,
+                hashes: vec![],
+                error: e.to_string(),
+            },
+        };
+        out.push(row);
+    }
+    out
+}
+
 fn timeline_pipeline(
     cfg: &RunConfig,
     opts: &TimelineOptions,
@@ -1452,9 +1506,12 @@ fn timeline_pipeline(
         if e.zone == ZoneInfo::Unknown {
             zone_unknown += 1;
         }
-        acc.entry(engine::item_key(&e.item))
-            .or_insert_with(|| ItemAcc::new(&e.item))
-            .add(e);
+        // Run-level events (no evidence id, no path) belong to no item: no item folder for them.
+        if !(e.item.evidence_id.is_empty() && e.item.path.is_empty()) {
+            acc.entry(engine::item_key(&e.item))
+                .or_insert_with(|| ItemAcc::new(&e.item))
+                .add(e);
+        }
     }
     let _ = std::fs::remove_dir(link.run_dir.join("tmp"));
     let mut timeline_file = None;
@@ -1490,6 +1547,49 @@ fn timeline_pipeline(
             path: jsonl.display().to_string(),
         });
     }
+
+    // hashes.csv: the register of the case files this run read (see [`read_files_register`]).
+    let rows = read_files_register(&case_dir, &runs, &cfg.algorithms);
+    let mut csv = format!(
+        "index,path,size,{},status,error\n",
+        cfg.algorithms
+            .iter()
+            .map(|a| a.name())
+            .collect::<Vec<_>>()
+            .join(",")
+    );
+    for (i, row) in rows.iter().enumerate() {
+        let hashes: Vec<String> = cfg
+            .algorithms
+            .iter()
+            .map(|a| {
+                row.hashes
+                    .iter()
+                    .find(|(x, _)| x == a)
+                    .map(|(_, h)| h.clone())
+                    .unwrap_or_default()
+            })
+            .collect();
+        csv.push_str(&format!(
+            "{},{},{},{},{},{}\n",
+            i + 1,
+            csv_field(&row.path.display().to_string()),
+            row.size,
+            hashes.join(","),
+            if row.error.is_empty() {
+                "read"
+            } else {
+                "error"
+            },
+            csv_field(&row.error)
+        ));
+    }
+    let (_, csv_digest) =
+        report::write_hashed(&log_dir, "hashes.csv", csv.as_bytes(), &cfg.algorithms)?;
+    let mut csv_details = csv_digest;
+    csv_details["rows"] = json!(rows.len());
+    log.record("hash_register_written", Some("hashes.csv"), csv_details)
+        .map_err(io)?;
 
     // 5. Signals.
     let signals = sig.finish(&runs);
@@ -2315,7 +2415,23 @@ mod tests {
                 .unwrap()
                 .contains("cadena de auditoría")
         }));
-        assert_eq!(stats["limitations"][0]["code"], "TL_ZONE_UNKNOWN");
+        assert_eq!(stats["limitations"][0], "TL_ZONE_UNKNOWN");
+        assert!(stats["limitation_params"].is_object());
+        // The hash register lists the case files the run read (this test's runs come from a stub source, so
+        // only case.json and the registry; the sample-case CLI run covers the runs' outputs).
+        let csv = std::fs::read_to_string(s.log_dir.join("hashes.csv")).unwrap();
+        assert!(csv.starts_with("index,path,size,"), "{csv}");
+        assert!(
+            csv.contains("case.json") && csv.contains("registry.json") && csv.lines().count() == 3,
+            "{csv}"
+        );
+        assert!(csv.lines().skip(1).all(|l| l.contains(",read,")), "{csv}");
+        // Run-level events belong to no item: no `NNNNN-` folder with an empty name.
+        let folders: Vec<String> = std::fs::read_dir(s.report_dir.join("items"))
+            .unwrap()
+            .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+            .collect();
+        assert!(folders.iter().all(|f| !f.ends_with('-')), "{folders:?}");
         // Per item: technical report with events and the signal; custody form still there.
         let item = s.report_dir.join("items/00001-a-photo.jpg");
         let tech: Value =
@@ -2426,7 +2542,7 @@ mod tests {
             &std::fs::read_to_string(s.report_dir.join("statistics.json")).unwrap(),
         )
         .unwrap();
-        assert_eq!(stats["limitations"][0]["code"], "TL_MAX_EVENTS");
+        assert_eq!(stats["limitations"][0], "TL_MAX_EVENTS");
         assert_eq!(stats["timeline"]["skipped"][0]["reason"], "max_events");
         assert_eq!(stats["timeline"]["max_events_reached"], true);
         // Window and tool filters.
