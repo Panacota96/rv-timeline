@@ -45,7 +45,9 @@ Source: "{#SourceDir}\LICENSE"; DestDir: "{app}"
 Source: "{#SourceDir}\NOTICE"; DestDir: "{app}"
 Source: "{#SourceDir}\CHANGELOG.md"; DestDir: "{app}"
 Source: "{#SourceDir}\docs\*"; DestDir: "{app}\docs"; Flags: recursesubdirs
-Source: "{#SourceDir}\examples\sample\evidence\*"; DestDir: "{app}\examples\sample\evidence"
+; The sample case folder (six tool runs, case log, registry) that "build --case-dir" reads, with its README.
+Source: "{#SourceDir}\examples\sample\case\*"; DestDir: "{app}\examples\sample\case"; Flags: recursesubdirs createallsubdirs
+Source: "{#SourceDir}\examples\sample\README.md"; DestDir: "{app}\examples\sample"
 
 [Icons]
 Name: "{group}\RV Timeline"; Filename: "{app}\rv-timeline-gui.exe"

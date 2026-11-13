@@ -982,3 +982,22 @@ fn workflows_use_the_pinned_toolchain() {
         assert!(text.contains("rustup toolchain install"), "{}", wf);
     }
 }
+
+/// The installer ships the sample case folder (recursively, every run's logs and reports) so `build --case-dir`
+/// works on a fresh install, and every file it names exists in the repository.
+#[test]
+fn installer_ships_the_sample_case() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let iss = std::fs::read_to_string(root.join("packaging/windows/installer.iss")).unwrap();
+    let line = iss
+        .lines()
+        .find(|l| l.contains(r"examples\sample\case\*"))
+        .expect("installer.iss installs examples/sample/case");
+    assert!(line.contains("recursesubdirs"), "{line}");
+    assert!(
+        !iss.contains(r"examples\sample\evidence"),
+        "the case, not loose evidence"
+    );
+    assert!(root.join("examples/sample/case/case.json").is_file());
+    assert!(root.join("examples/sample/README.md").is_file());
+}
