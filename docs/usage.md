@@ -100,14 +100,15 @@ DONE (to review: excluded runs or medium/high signals)  run 20261113T115004Z-dcb
 ```
 
 Exit code 3 here means "to review": every run verified, and the sample plants medium- and high-severity signals.
-The same command on the tampered copy `examples/sample/tampered/digest-mismatch` (one rv-imgauth output changed
-after its run) leaves that run out and says why:
+The same command on the tampered copy `digest-mismatch` (one rv-imgauth output changed after its run; write the
+three copies with `python tests/make_sample_case.py tamper examples/sample/case <folder>`) leaves that run out
+and says why:
 
 ```text
   runs:     verified 6, excluded 1, skipped 0
   events:   132 (zone unknown: 3)  items: 21
   signals:  high 0, medium 5, low 1, info 1
-  excluded: runs/rv-imgauth/20261113T065648Z-b151c3 (digest_mismatch: reports/items/00003-future-exif.jpg/metadata.json: md5 differs from logs/audit.jsonl)
+  excluded: runs/rv-imgauth/20261113T232757Z-cbb6f3 (digest_mismatch: reports/items/00003-future-exif.jpg/metadata.json: md5 differs from logs/audit.jsonl)
 ```
 
 The planted `EXIF_AFTER_INTAKE` disappears with the excluded run: its events are not in the timeline at all.
@@ -156,6 +157,8 @@ RV Hub (the Rakvor launcher) finds the installed tools and opens them on a case 
 ```powershell
 rv-timeline verify-case R:\case
 # OK  case RV-SAMPLE-001: 19 case-log entries, 21 registered items, 8 runs verified: R:\case
+#     review logs: 0 entries across the runs, all verified
+#     outputs: 1016 verified of 1016 recorded by the runs' audit logs
 rv-timeline verify-log R:\case\runs\rv-timeline\20261113T115004Z-dcb88e\logs
 # OK  67 entries, chain intact: …\audit.jsonl
 #     truncation: the final entry #67 is anchored by the case log (run_finished)

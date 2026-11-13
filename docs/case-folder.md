@@ -159,8 +159,9 @@ flowchart LR
 
 `rv-timeline build` checks the runs it reads separately (and only the machine-readable files a reader parses), so a
 run whose report renderings were deleted is still read, while `verify-case` reports each deleted file as missing.
-The committed sample case ([examples/sample](../examples/sample/README.md)) has its HTML/PDF renderings pruned,
-so `verify-case` on it now reports them as missing (exit 3).
+The committed sample case ([examples/sample](../examples/sample/README.md)) keeps every output, so `verify-case`
+accepts it with every tool (`outputs: 844 verified of 844 recorded`); its tampered copy `digest-mismatch` is
+caught by both `verify-case` (exit 3) and the build (`digest_mismatch`).
 
 ## Tests
 

@@ -203,11 +203,11 @@ the same case with the same filters. Mapping and rationale: [theory.md B9](theor
 | `datetime` | ISO 8601, `+00:00` | `2024-01-01T00:00:00+00:00` (zone-unknown events: the wall clock read as UTC) |
 | `timestamp` | integer, µs since 1970 | `1704067200000000` |
 | `timestamp_desc` | string | `Certificate valid from (notBefore)` |
-| `rakvor_event_id` | string | `rv-certcheck:20261113T065657Z-5588dc:E0005:cert.not_before:0` |
+| `rakvor_event_id` | string | `rv-certcheck:20261113T232802Z-2f0fe5:E0005:cert.not_before:0` |
 | `rakvor_kind` | string | `cert.not_before` |
 | `rakvor_evidence_id`, `rakvor_item_path`, `rakvor_item_sub`, `rakvor_item_sha256` | string | `E0005`, `R:\evidence\certs\leaf-expired.crt`, `""`, `346e2248…e0c9` |
 | `rakvor_tool`, `rakvor_tool_version` | string | `rv-certcheck`, `0.2.2` |
-| `rakvor_run`, `rakvor_run_dir` | string | `20261113T065657Z-5588dc`, `runs/rv-certcheck/20261113T065657Z-5588dc` |
+| `rakvor_run`, `rakvor_run_dir` | string | `20261113T232802Z-2f0fe5`, `runs/rv-certcheck/20261113T232802Z-2f0fe5` |
 | `rakvor_file`, `rakvor_file_sha256`, `rakvor_pointer` | string | `reports/items/00005-leaf-expired.crt/chain.json`, `6eb268b5…7ce3`, `/certificates/0/not_before` |
 | `rakvor_zone` | `explicit` / `unknown` | `explicit` |
 | `rakvor_offset_min` | integer or null | `0` (null for zone-unknown events, and for a chat zone name this version has no rules for) |
@@ -231,9 +231,9 @@ the timeline, hashed with the run's algorithms when the build read them (`read_f
 
 ```text
 index,path,size,sha256,status,error
-1,<CASE>\case.json,276,be578186…40b148,read,
-2,<CASE>\evidence\registry.json,10455,1d0912c1…7be0152,read,
-3,<CASE>\runs\rv-certcheck\20261113T065657Z-5588dc\logs\audit.jsonl,46337,4c923ed0…8b17e0,read,
+1,<CASE>\case.json,276,7fae6454…e8a0f1,read,
+2,<CASE>\evidence\registry.json,10455,10e91463…de2737,read,
+3,<CASE>\runs\rv-certcheck\20261113T232802Z-2f0fe5\logs\audit.jsonl,46336,4ff430ea…585ab8a,read,
 …
 ```
 

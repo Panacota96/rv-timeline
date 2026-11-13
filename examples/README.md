@@ -4,9 +4,8 @@
 
 | Path | What it is |
 | --- | --- |
-| `sample/case/` | A Rakvor case folder (`rakvor.case/1`, case `RV-SAMPLE-001`) with one completed run of each released tool — rv-hashinv (intake, then a second run after one file was touched), rv-pdfauth, rv-imgauth, rv-rsmf, rv-mailauth, rv-certcheck — over 21 synthetic evidence files. The evidence itself is not included: rv-timeline never opens it. |
-| `sample/tampered/` | Three copies of the case, each broken in one way: `digest-mismatch` (an rv-imgauth output edited), `chain-broken` (an rv-mailauth audit entry edited), `not-finished` (rv-certcheck's run cut before `run_finished`). |
-| `sample/expected_timeline.json` | The ground truth: runs, every event (id, UTC time, original wording, zone, citation) and every signal (code, item, severity, events) for the clean case and each tampered copy, derived by an independent standard-library Python script from the tools' own outputs. |
+| `sample/case/` | A Rakvor case folder (`rakvor.case/1`, case `RV-SAMPLE-001`) with one completed run of each released tool — rv-hashinv (intake, then a second run after one file was touched), rv-pdfauth, rv-imgauth, rv-rsmf, rv-mailauth, rv-certcheck — over 21 synthetic evidence files, with every output the runs recorded (about 11 MB). The evidence itself is not included: rv-timeline never opens it. |
+| `sample/expected_timeline.json` | The ground truth: runs, every event (id, UTC time, original wording, zone, citation) and every signal (code, item, severity, events) for the clean case and each tampered copy (`digest-mismatch`: an rv-imgauth output edited; `chain-broken`: an rv-mailauth audit entry edited; `not-finished`: rv-certcheck's run cut before `run_finished`; written at test time by `tests/make_sample_case.py tamper`), derived by an independent standard-library Python script from the tools' own outputs. |
 | `sample/derived-evidence.json`, `sample/tool-versions.json` | The three planted files and how they were derived; the version, commit and SHA-256 of each tool executable that wrote the case. |
 | `sample/run.sh`, `sample/run.ps1` | Build the timeline of a copy of the case and check the result. |
 | `sample/README.md` | What is planted where, and where every field of the ground truth comes from. |
@@ -38,8 +37,8 @@ examples/sample/run.sh target/release/rv-timeline          # Linux / macOS / Git
 
 Expected: `build` exits 3 with `runs: verified 7, excluded 0, skipped 0`, `events: 154 (zone unknown: 5)`,
 `signals: high 1, medium 5, low 1, info 1`; then `timeline.jsonl is listed in the audit log (…)` and two `OK` lines.
-Try a tampered copy by hand: `rv-timeline build --case-dir <copy of sample/tampered/digest-mismatch>` excludes the
-rv-imgauth run with `digest_mismatch`.
+Try a tampered copy by hand: `python tests/make_sample_case.py tamper examples/sample/case <folder>` writes the three
+copies; `rv-timeline build --case-dir <folder>/digest-mismatch` excludes the rv-imgauth run with `digest_mismatch`.
 
 Regenerating the sample (only when a tool version or a convention changes): `tests/make_sample_case.sh`
 ([development.md](../docs/development.md#the-sample-case-and-its-ground-truth)). Nothing in `sample/` is edited by
