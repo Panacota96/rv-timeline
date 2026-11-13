@@ -501,8 +501,14 @@ const SKEW_PREFIXES: [&str; 7] = [
     "tsa.",
 ];
 
-/// Kind that gives a PDF revision its time, by priority.
-const PDF_REVISION_KINDS: [&str; 3] = ["pdf.revision.signed", "pdf.info.modified", "xmp.modify"];
+/// Kind that gives a PDF revision its time, by priority: the kinds the rv-pdfauth reader emits per revision (a
+/// signature time, the Info /ModDate, then the save times rv-pdfauth derives from Info or XMP).
+const PDF_REVISION_KINDS: [&str; 4] = [
+    "pdf.revision.signed",
+    "pdf.info.modified",
+    "pdf.info.saved",
+    "pdf.xmp.saved",
+];
 
 #[derive(Clone, Debug)]
 struct Mini {
@@ -1895,6 +1901,22 @@ pub(crate) mod tests {
         // A hop of another message does not count.
         h1.item.sub = "#4".into();
         assert!(codes(vec![d, h1], vec![]).is_empty());
+    }
+
+    #[test]
+    fn pdf_revision_before_previous_from_save_times_only() {
+        // Unsigned revisions timed only by rv-pdfauth's save times (Info or XMP) are compared too.
+        for kind in ["pdf.xmp.saved", "pdf.info.saved"] {
+            let mk = |r: u32, t: &str| {
+                let mut e = ev("rv-pdfauth", "E0004", kind, t, r);
+                e.item.sub = format!("r{}", r);
+                e
+            };
+            let evs = vec![mk(1, "2026-11-05T10:00:00Z"), mk(2, "2026-11-03T10:00:00Z")];
+            let t = build("C", vec![], evs, &opts());
+            assert_eq!(t.signals.len(), 1, "{kind}");
+            assert_eq!(t.signals[0].code, "PDF_REVISION_BEFORE_PREVIOUS", "{kind}");
+        }
     }
 
     #[test]
