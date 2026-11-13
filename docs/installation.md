@@ -221,7 +221,7 @@ TSA, [src/core/src/trust.rs](../src/core/src/trust.rs)). There is no telemetry, 
 An offline run with the timestamp enabled still completes: it logs `timestamp_pending` and the statistics report
 shows a warning. Later, on a machine that can reach the TSA, run `rv-timeline timestamp <log folder>` (it
 re-verifies the chain, then appends `timestamp_obtained`). To use an internal or qualified TSA, pass `--tsa-url`
-(see [admissibility.md](admissibility.md#63-eidas--regulation-eu-9102014-as-amended-by-eu-20241183)). The network
+(see [admissibility.md](admissibility.md#63-eidas--regulation-eu-9102014-as-amended-by-eu-20241183-time-stamps)). The network
 restriction is not enforced by the OS; on a connected workstation, a Windows Firewall outbound rule for
 `rv-timeline.exe` / `rv-timeline-gui.exe` allowing only the TSA host enforces it.
 
