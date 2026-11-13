@@ -2472,7 +2472,34 @@ mod tests {
         assert_eq!(fin["details"]["status"], "completed");
         let v = case::verify_case(&case);
         assert!(v.problems.is_empty(), "{:?}", v.problems);
+        assert_eq!(v.review_entries, 0);
         assert!(matches!(events.last(), Some(Event::RunFinished { .. })));
+        // Viewing the timeline afterwards (GUI) goes to review.jsonl: verify-log and verify-case count it, and an
+        // edited review entry fails both.
+        crate::review::append(
+            &s.log_dir,
+            "Ana",
+            "ui_timeline_viewed",
+            json!({"file": "reports/timeline.jsonl"}),
+        )
+        .unwrap();
+        assert_eq!(case::verify_case(&case).review_entries, 1);
+        let lv = crate::verify::verify_log(&s.log_dir.join("audit.jsonl")).unwrap();
+        assert!(lv.problems.is_empty(), "{:?}", lv.problems);
+        assert_eq!(lv.review_entries, Some(1));
+        let review = s.log_dir.join(crate::review::REVIEW_FILE);
+        let good = std::fs::read_to_string(&review).unwrap();
+        std::fs::write(&review, good.replace("timeline.jsonl", "timeline.json")).unwrap();
+        let v = case::verify_case(&case);
+        assert!(
+            v.problems
+                .iter()
+                .any(|p| p.contains("review.jsonl") && p.contains("edited entry")),
+            "{:?}",
+            v.problems
+        );
+        let lv = crate::verify::verify_log(&s.log_dir.join("audit.jsonl")).unwrap();
+        assert!(lv.problems.iter().any(|p| p.starts_with("review.jsonl:")));
     }
 
     #[test]

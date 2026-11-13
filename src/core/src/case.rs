@@ -830,6 +830,8 @@ pub struct CaseVerification {
     pub entries: u64,
     pub registry_items: usize,
     pub runs: usize,
+    /// Entries of the runs' review logs (`review.jsonl`, viewing after the run), all verified.
+    pub review_entries: u64,
     pub problems: Vec<String>,
     pub warnings: Vec<String>,
 }
@@ -925,6 +927,14 @@ pub fn verify_case(dir: &Path) -> CaseVerification {
         }
         for p in crate::trust::verify_timestamps(&audit_path) {
             v.problems.push(format!("run {}: {}", rid, p));
+        }
+        match crate::review::verify(&log_dir) {
+            Ok(n) => v.review_entries += n.unwrap_or(0),
+            Err(p) => {
+                for x in p {
+                    v.problems.push(format!("run {}: review.jsonl {}", rid, x));
+                }
+            }
         }
         let Some(fin) = fin else {
             v.warnings.push(format!(

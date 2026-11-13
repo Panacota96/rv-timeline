@@ -9,6 +9,10 @@
 //! Entries after the last anchored one cannot be proven complete; the report says how many there are.
 //! Without a timestamp or a case record, truncation is not detectable and the report says so.
 //! Same rules and wording as the Python profile (`core/verify.py`).
+//!
+//! The run's review log (`review.jsonl`, viewing after the run, see [`crate::review`]) is checked when it is
+//! present: its own chain, its anchor to this run's `run_finished` entry, and every entry naming this run. An
+//! edited review log, or one copied from another run, is a problem.
 
 use crate::audit;
 use crate::case::{CASE_FILE, CASE_LOG, normalize};
@@ -31,6 +35,8 @@ pub struct LogVerification {
     /// One line on truncation: what anchors the end of the log, or [`NO_ANCHOR`].
     pub truncation: String,
     pub warnings: Vec<String>,
+    /// Entries of the run's `review.jsonl` when it is present and verifies (None when there is none).
+    pub review_entries: Option<u64>,
 }
 
 fn read_entries(path: &Path) -> Vec<Value> {
@@ -117,6 +123,14 @@ pub fn verify_log_with(
 
     if let Some(case) = case_of_log_dir(&dir) {
         case_anchor(&case, &entries, n, &mut v, &mut anchors);
+    }
+
+    // The review log (viewing after the run): chain integrity and the link to this run's audit chain.
+    match crate::review::verify(&dir) {
+        Ok(r) => v.review_entries = r,
+        Err(p) => v
+            .problems
+            .extend(p.into_iter().map(|x| format!("review.jsonl: {x}"))),
     }
 
     v.truncation = match anchors.iter().max_by_key(|(s, _)| *s) {
@@ -232,6 +246,50 @@ mod tests {
         let mut lines: Vec<&str> = text.lines().collect();
         lines.pop();
         std::fs::write(p, format!("{}\n", lines.join("\n"))).unwrap();
+    }
+
+    #[test]
+    fn review_log_is_counted_and_an_edited_or_misplaced_one_fails() {
+        let d = tempfile::tempdir().unwrap();
+        let mut l = audit::AuditLog::create(d.path(), "RUN-1", "t").unwrap();
+        l.record("run_started", None, json!({})).unwrap();
+        l.record("run_finished", None, json!({})).unwrap();
+        let p = d.path().join("audit.jsonl");
+        assert_eq!(verify_log(&p).unwrap().review_entries, None);
+        for f in ["a", "b"] {
+            crate::review::append(d.path(), "Ana", "ui_timeline_viewed", json!({"file": f}))
+                .unwrap();
+        }
+        let v = verify_log(&p).unwrap();
+        assert!(v.problems.is_empty(), "{:?}", v.problems);
+        assert_eq!(v.review_entries, Some(2));
+
+        // Edited.
+        let review = d.path().join(crate::review::REVIEW_FILE);
+        let good = std::fs::read_to_string(&review).unwrap();
+        std::fs::write(&review, good.replace("\"file\":\"b\"", "\"file\":\"c\"")).unwrap();
+        let v = verify_log(&p).unwrap();
+        assert!(
+            v.problems
+                .iter()
+                .any(|x| x.starts_with("review.jsonl:") && x.contains("edited entry")),
+            "{:?}",
+            v.problems
+        );
+        assert_eq!(v.review_entries, None);
+
+        // Misplaced: the same review log next to another run's audit log.
+        let other = tempfile::tempdir().unwrap();
+        let mut l = audit::AuditLog::create(other.path(), "RUN-2", "t").unwrap();
+        l.record("run_started", None, json!({})).unwrap();
+        l.record("run_finished", None, json!({})).unwrap();
+        std::fs::write(other.path().join(crate::review::REVIEW_FILE), &good).unwrap();
+        let v = verify_log(&other.path().join("audit.jsonl")).unwrap();
+        assert!(
+            v.problems.iter().any(|x| x.contains("not anchored")),
+            "{:?}",
+            v.problems
+        );
     }
 
     #[test]
