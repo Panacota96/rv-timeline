@@ -997,9 +997,9 @@ impl SignalEngine {
                         events: vec![a.m.id.clone(), b.m.id.clone()],
                         item: it,
                         params: p(&[
+                            // Relay host names (the tool_a/tool_b params of the cross-source variant name tools,
+                            // so they are not set here).
                             ("basis", "received_hops".into()),
-                            ("tool_a", a.by.clone()),
-                            ("tool_b", b.by.clone()),
                             ("previous_host", a.by.clone()),
                             ("host", b.by.clone()),
                             ("previous_hop", pos(a)),
@@ -1815,6 +1815,7 @@ pub(crate) mod tests {
             ),
             ("mx.acme.example", "smtp.example.org")
         );
+        assert!(!s.params.contains_key("tool_a") && !s.params.contains_key("tool_b"));
         assert_eq!(s.params["message"], "#3");
         // In order, or out of order within the tolerance: nothing.
         let ok = hop(2, "mx.acme.example", "2026-11-11T10:00:03Z");
