@@ -88,7 +88,7 @@ def cmd_evidence(root: Path, dst: Path) -> None:
         out.write_bytes(data)
         notes.append({"file": rel, "from": f"{repo}/examples/sample/{src}", "change": why,
                       "sha256": hashlib.sha256(data).hexdigest()})
-    (dst.parent / "derived.json").write_text(json.dumps(notes, indent=2) + "\n", encoding="utf-8")
+    (dst.parent / "derived.json").write_text(json.dumps(notes, indent=2) + "\n", encoding="utf-8", newline="\n")
     # Fixed modification time for every file (the copy would otherwise carry the time of the build).
     for p in list(dst.rglob("*")) + list((dst.parent / "anchors").rglob("*")):
         if p.is_file():
