@@ -103,13 +103,27 @@ impl Catalog {
             .to_string()
     }
 
-    /// (title, shows, does_not_prove) for a finding code.
+    /// (title, shows, does_not_prove) for a finding code; timeline signal codes are read from `signals`.
     pub fn finding(
         &self,
         code: &str,
         params: &BTreeMap<String, String>,
     ) -> (String, String, String) {
-        let f = &self.data["findings"][code];
+        let f = match &self.data["findings"][code] {
+            Value::Null => &self.data["signals"][code],
+            f => f,
+        };
+        let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
+        (get("title"), get("shows"), get("does_not_prove"))
+    }
+
+    /// (title, shows, does_not_prove) for a timeline signal code.
+    pub fn signal(
+        &self,
+        code: &str,
+        params: &BTreeMap<String, String>,
+    ) -> (String, String, String) {
+        let f = &self.data["signals"][code];
         let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
         (get("title"), get("shows"), get("does_not_prove"))
     }
@@ -130,6 +144,16 @@ impl Catalog {
     /// Whether the catalogue labels this event kind.
     pub fn has_kind(&self, key: &str) -> bool {
         self.data["kind"][key].is_string()
+    }
+
+    /// A limitation with `%{name}` placeholders filled.
+    pub fn limitation_with(&self, code: &str, params: &BTreeMap<String, String>) -> String {
+        fill(&self.limitation(code), params)
+    }
+
+    /// Any string of a section (`kind`, `exclusion`, …), if the catalogue has it.
+    pub fn text(&self, section: &str, key: &str) -> Option<String> {
+        self.data[section][key].as_str().map(String::from)
     }
 }
 

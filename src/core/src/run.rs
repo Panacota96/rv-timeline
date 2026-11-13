@@ -8,13 +8,21 @@
 use crate::analyzer::{Finding, Severity, analyze};
 use crate::audit::AuditLog;
 use crate::case::{self, Case, CaseRole, Comparison, Registration, Writer};
+use crate::engine::{self, DisplayZone, EventSorter, SignalEngine};
 use crate::events::{Event, eta_ms};
 use crate::hash::{HashAlgo, hash_bytes, hash_reader, validate_selection};
 use crate::input::collect;
-use crate::report::{self, AuditRef, CaseInfo, CaseTally, ItemResult, RunInfo, RunTotals};
+use crate::model::{
+    Exclusion, ItemRef, ReadError, RunRef, RunStatus, Signal, TimeEvent, TimelineOptions, ZoneInfo,
+};
+use crate::report::{
+    self, AuditRef, CaseInfo, CaseTally, ItemResult, RunInfo, RunTotals, SkippedRun, TimelineInfo,
+};
 use crate::time::{utc_compact, utc_from, utc_now};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
+use std::fs::File;
+use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
@@ -478,6 +486,7 @@ fn pipeline(
             evidence_id: None,
             case_status: None,
             intake_utc: None,
+            timeline: None,
         };
         match outcome {
             Ok(None) => {
@@ -648,6 +657,7 @@ fn pipeline(
         signer,
         timestamp: json!({"status": "off"}),
         case: link.as_deref().map(|l| l.info(cfg.case_role)),
+        timeline: None,
     };
     let log_dir_s = log_dir.display().to_string();
     for r in &results {
@@ -921,6 +931,812 @@ fn register_items(
         });
     }
     Ok(())
+}
+
+// ---------- Timeline build: the case-folder pipeline (rv-timeline's main verb) ----------
+//
+// ```text
+// case folder ─► discover runs ─► skip (own runs, --tool, event limit) ─► verify each run ─► read verified runs
+//   ─► window/tool filter ─► max_events cap ─► SignalEngine + EventSorter (spills past the threshold)
+//   ─► k-way merge ─► reports/timeline.jsonl (hashed) + per-item events ─► signals ─► item + statistics reports
+// every step is an audit entry; the run is linked in the case log by run_started / run_finished
+// ```
+
+/// Where a timeline build gets its source runs. [`BuiltinSources`] uses the readers built into this version;
+/// tests substitute hand-built runs and events.
+pub trait RunSource {
+    fn discover(&self, case_dir: &Path) -> Result<Vec<RunRef>, ReadError>;
+    fn verify(&self, case_dir: &Path, run: RunRef) -> RunRef;
+    fn read(&self, case_dir: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError>;
+}
+
+/// The readers of this version ([`crate::readers`]).
+pub struct BuiltinSources {
+    readers: Vec<Box<dyn crate::model::SourceReader>>,
+}
+
+impl Default for BuiltinSources {
+    fn default() -> Self {
+        BuiltinSources {
+            readers: crate::readers::all(),
+        }
+    }
+}
+
+impl RunSource for BuiltinSources {
+    fn discover(&self, case_dir: &Path) -> Result<Vec<RunRef>, ReadError> {
+        crate::readers::discover_runs(case_dir)
+    }
+    fn verify(&self, case_dir: &Path, run: RunRef) -> RunRef {
+        crate::readers::verify_run(case_dir, run)
+    }
+    fn read(&self, case_dir: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError> {
+        crate::readers::read_run(&self.readers, case_dir, run)
+    }
+}
+
+/// Builds the case timeline: `opts.case_dir` (or `cfg.case_dir`) is the case folder; `cfg` gives the examiner,
+/// languages, algorithms, trust settings and front-end. Outputs go to `<CASE>/runs/<tool>/<RUN-ID>/`.
+pub fn run_timeline(
+    cfg: &RunConfig,
+    opts: &TimelineOptions,
+    sink: &mut dyn FnMut(&Event),
+    cancel: &AtomicBool,
+) -> Result<RunSummary, String> {
+    run_timeline_with(
+        cfg,
+        opts,
+        &BuiltinSources::default(),
+        engine::DEFAULT_SORT_THRESHOLD,
+        sink,
+        cancel,
+    )
+}
+
+/// [`run_timeline`] with an explicit source and in-memory sort threshold (events held before spilling to disk).
+pub fn run_timeline_with(
+    cfg: &RunConfig,
+    opts: &TimelineOptions,
+    sources: &dyn RunSource,
+    sort_threshold: usize,
+    sink: &mut dyn FnMut(&Event),
+    cancel: &AtomicBool,
+) -> Result<RunSummary, String> {
+    validate_selection(&cfg.algorithms)?;
+    if cfg.langs.is_empty() {
+        return Err("select at least one report language".into());
+    }
+    let zone = DisplayZone::parse(&opts.display_zone)?;
+    let dir = if opts.case_dir.as_os_str().is_empty() {
+        cfg.case_dir
+            .clone()
+            .ok_or_else(|| "a timeline is built from a case folder: give --case-dir".to_string())?
+    } else {
+        opts.case_dir.clone()
+    };
+    if opts.max_events == 0 {
+        return Err("--max-events must be at least 1".into());
+    }
+    if let (Some(f), Some(t)) = (opts.from_s, opts.to_s)
+        && f > t
+    {
+        return Err("--from is later than --to".into());
+    }
+    let run_id = new_run_id();
+    let writer = Writer {
+        tool: cfg.tool_name.clone(),
+        version: cfg.tool_version.clone(),
+        run_id: run_id.clone(),
+        actor: cfg.actor.clone(),
+    };
+    // Verifies the case log and the registry; a broken case is never extended.
+    let case = Case::open(&dir)?;
+    if let Some(want) = cfg
+        .case_id
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        && want != case.case_id
+    {
+        return Err(format!(
+            "the case folder {} belongs to case {}, not {}",
+            dir.display(),
+            case.case_id,
+            want
+        ));
+    }
+    let mut c = cfg.clone();
+    c.case_id = Some(case.case_id.clone());
+    c.case_dir = Some(dir.clone());
+    c.jurisdiction = if case.jurisdiction == "fr" {
+        "fr"
+    } else {
+        "co"
+    }
+    .into();
+    c.case_role = CaseRole::Analysis;
+    let run_rel = format!("runs/{}/{}", cfg.tool_name, run_id);
+    let run_dir = dir.join("runs").join(&cfg.tool_name).join(&run_id);
+    let (started_seq, started_head) = case.append(
+        &writer,
+        "run_started",
+        json!({"tool": cfg.tool_name, "version": cfg.tool_version, "run_dir": run_rel, "frontend": cfg.frontend,
+               "role": CaseRole::Analysis.name(), "purpose": "timeline", "display_zone": zone.name(),
+               "evidence_ids": Vec::<String>::new()}),
+    )?;
+    let registry_sha256 = case::registry_digest(&dir);
+    let link = CaseLink {
+        case,
+        writer,
+        run_rel,
+        run_dir,
+        started_seq,
+        started_head,
+        created: false,
+        requested_algorithms: cfg.algorithms.clone(),
+        algo_change: None,
+        requested_jurisdiction: cfg.jurisdiction.clone(),
+        registry_sha256,
+        by_evidence: BTreeMap::new(),
+        tally: CaseTally::default(),
+    };
+    let log_dir = link.run_dir.join("logs");
+    let result = timeline_pipeline(
+        &c,
+        opts,
+        zone,
+        sources,
+        sort_threshold,
+        sink,
+        cancel,
+        &run_id,
+        &link,
+    );
+    finish_case(&link, &c, &log_dir, &result, sink);
+    result
+}
+
+/// Accumulates one item's part of the sorted timeline.
+struct ItemAcc {
+    item: ItemRef,
+    total: u64,
+    events: Vec<TimeEvent>,
+    tools: std::collections::BTreeSet<String>,
+    first: Option<i64>,
+    last: Option<i64>,
+}
+
+impl ItemAcc {
+    fn new(item: &ItemRef) -> ItemAcc {
+        ItemAcc {
+            item: ItemRef {
+                sub: String::new(),
+                ..item.clone()
+            },
+            total: 0,
+            events: Vec::new(),
+            tools: Default::default(),
+            first: None,
+            last: None,
+        }
+    }
+    fn add(&mut self, e: TimeEvent) {
+        self.total += 1;
+        self.tools.insert(e.source.tool.clone());
+        self.first = self.first.or(Some(e.utc_s));
+        self.last = Some(e.utc_s);
+        if self.events.len() < report::ITEM_EVENT_ROWS {
+            self.events.push(e);
+        }
+    }
+}
+
+fn run_json(r: &RunRef) -> Value {
+    json!({"tool": r.tool, "version": r.tool_version, "run_id": r.run_id, "run_dir": r.run_dir})
+}
+
+/// Records a failure (error + run_failed) and hands the message back.
+fn failed(log: &mut AuditLog, stage: &str, message: String) -> String {
+    let _ = log.record("error", None, json!({"stage": stage, "message": message}));
+    let _ = log.record("run_failed", None, json!({"reason": message}));
+    message
+}
+
+#[allow(clippy::too_many_arguments)]
+fn timeline_pipeline(
+    cfg: &RunConfig,
+    opts: &TimelineOptions,
+    zone: DisplayZone,
+    sources: &dyn RunSource,
+    sort_threshold: usize,
+    sink: &mut dyn FnMut(&Event),
+    cancel: &AtomicBool,
+    run_id: &str,
+    link: &CaseLink,
+) -> Result<RunSummary, String> {
+    let started = Instant::now();
+    let started_utc = utc_now();
+    let run_id = run_id.to_string();
+    let case_dir = link.case.dir.clone();
+    let log_dir = link.run_dir.join("logs");
+    let report_dir = link.run_dir.join("reports");
+    let mut log = AuditLog::create(&log_dir, &run_id, &cfg.actor)
+        .map_err(|e| format!("cannot create audit log in {}: {}", log_dir.display(), e))?;
+    let io = |e: std::io::Error| format!("audit log write failed: {}", e);
+
+    log.record(
+        "run_started",
+        None,
+        json!({
+            "tool": cfg.tool_name, "version": cfg.tool_version, "frontend": cfg.frontend, "purpose": "timeline",
+            "algorithms": cfg.algorithms, "langs": cfg.langs, "case_id": cfg.case_id,
+            "case_dir": case_dir.display().to_string(), "jurisdiction": cfg.jurisdiction, "tsa_url": cfg.tsa_url,
+            "sign_cert": cfg.sign_cert.as_ref().map(|p| p.display().to_string()),
+            "timeline": {"display_zone": zone.name(), "requested_display_zone": opts.display_zone, "tools": opts.tools,
+                         "from_s": opts.from_s, "to_s": opts.to_s, "clock_skew_s": opts.clock_skew_s,
+                         "max_events": opts.max_events, "timesketch": opts.timesketch,
+                         "sort_threshold": sort_threshold as u64},
+        }),
+    )
+    .map_err(io)?;
+    log.record(
+        "case_linked",
+        None,
+        json!({"case_id": link.case.case_id, "case_dir": case_dir.display().to_string(), "role": CaseRole::Analysis.name(),
+               "run_dir": link.run_rel, "case_created": false, "case_log_seq_at_start": link.started_seq,
+               "case_log_head_at_start": link.started_head, "registry_sha256": link.registry_sha256,
+               "registry_items": link.case.items.len(), "jurisdiction": link.case.jurisdiction,
+               "requested_jurisdiction": link.requested_jurisdiction}),
+    )
+    .map_err(io)?;
+    for (action, details) in &cfg.preamble {
+        log.record(action, None, details.clone()).map_err(io)?;
+    }
+    let env_json = report::pretty(&crate::env::describe(
+        &cfg.tool_name,
+        &cfg.tool_version,
+        &cfg.frontend,
+        &cfg.command_line,
+    ));
+    let (_, env_digest) =
+        report::write_hashed(&log_dir, "environment.json", &env_json, &cfg.algorithms)?;
+    log.record("environment_recorded", Some("environment.json"), env_digest)
+        .map_err(io)?;
+    let signer = match &cfg.sign_cert {
+        None => None,
+        Some(p) => {
+            match crate::trust::PdfSigner::load(p, cfg.sign_password.as_deref().unwrap_or("")) {
+                Ok(s) => {
+                    log.record(
+                        "signing_certificate_loaded",
+                        Some(&p.display().to_string()),
+                        json!({"subject": s.subject, "certificate_sha256": s.fingerprint_sha256}),
+                    )
+                    .map_err(io)?;
+                    Some(std::sync::Arc::new(s))
+                }
+                Err(e) => {
+                    log.record("run_failed", None, json!({"reason": e}))
+                        .map_err(io)?;
+                    return Err(e);
+                }
+            }
+        }
+    };
+
+    // 1. Discover the case's runs.
+    let mut discovered = match sources.discover(&case_dir) {
+        Ok(r) => r,
+        Err(e) => {
+            return Err(failed(
+                &mut log,
+                "discover",
+                format!("cannot list the case's runs: {} {}", e.reason, e.detail),
+            ));
+        }
+    };
+    discovered.sort_by(|a, b| (&a.tool, &a.run_id).cmp(&(&b.tool, &b.run_id)));
+    let total_runs = discovered.len() as u64;
+    log.record(
+        "runs_discovered",
+        None,
+        json!({"count": total_runs, "runs": discovered.iter().map(run_json).collect::<Vec<_>>()}),
+    )
+    .map_err(io)?;
+    sink(&Event::RunStarted {
+        run_id: run_id.clone(),
+        tool: cfg.tool_name.clone(),
+        version: cfg.tool_version.clone(),
+        frontend: cfg.frontend.clone(),
+        algorithms: cfg.algorithms.clone(),
+        langs: cfg.langs.clone(),
+        total_items: total_runs,
+        total_bytes: 0,
+    });
+
+    // 2–3. Verify, then read each verified run; filter, cap, observe for signals, sort.
+    let mut sorter = EventSorter::new(&link.run_dir.join("tmp"), sort_threshold);
+    let mut sig = SignalEngine::new(opts);
+    for it in &link.case.items {
+        sig.add_registry_intake(&it.evidence_id, &it.registered_utc);
+    }
+    let mut runs: Vec<RunRef> = Vec::new();
+    let mut skipped: Vec<SkippedRun> = Vec::new();
+    let mut by_tool: BTreeMap<String, u64> = BTreeMap::new();
+    let mut by_kind: BTreeMap<String, u64> = BTreeMap::new();
+    let (mut filtered_out, mut kept_total) = (0u64, 0u64);
+    let (mut cap_reached, mut cancelled) = (false, false);
+    for (i, r) in discovered.into_iter().enumerate() {
+        let index = i as u64 + 1;
+        if cancel.load(Ordering::Relaxed) {
+            cancelled = true;
+            break;
+        }
+        let skip = if r.tool == cfg.tool_name {
+            Some("self")
+        } else if !opts.tools.is_empty() && !opts.tools.contains(&r.tool) {
+            Some("tool_filter")
+        } else if cap_reached {
+            Some("max_events")
+        } else {
+            None
+        };
+        if let Some(reason) = skip {
+            let mut d = run_json(&r);
+            d["reason"] = json!(reason);
+            log.record("run_skipped", Some(&r.run_dir), d).map_err(io)?;
+            skipped.push(SkippedRun {
+                run: r,
+                reason: reason.into(),
+            });
+            continue;
+        }
+        sink(&Event::ItemStarted {
+            index,
+            path: r.run_dir.clone(),
+            size: 0,
+        });
+        let mut r = sources.verify(&case_dir, r);
+        if r.status == RunStatus::Verified {
+            log.record("run_verified", Some(&r.run_dir), run_json(&r))
+                .map_err(io)?;
+            match sources.read(&case_dir, &r) {
+                Err(e) => {
+                    r.status = RunStatus::Excluded;
+                    r.exclusion = Some(Exclusion {
+                        reason: e.reason,
+                        detail: e.detail,
+                    });
+                    r.events = 0;
+                }
+                Ok(events) => {
+                    let read = events.len() as u64;
+                    let mut kept: Vec<TimeEvent> = events
+                        .into_iter()
+                        .filter(|e| engine::keep(e, opts))
+                        .collect();
+                    let outside = read - kept.len() as u64;
+                    filtered_out += outside;
+                    let room = opts.max_events.saturating_sub(kept_total);
+                    let mut dropped = 0u64;
+                    if kept.len() as u64 > room {
+                        // Deterministic cut: the run's earliest events are kept.
+                        kept.sort_by(engine::cmp_events);
+                        dropped = kept.len() as u64 - room;
+                        kept.truncate(room as usize);
+                        cap_reached = true;
+                    }
+                    sig.observe_batch(&kept);
+                    let n = kept.len() as u64;
+                    for e in kept {
+                        *by_tool.entry(e.source.tool.clone()).or_default() += 1;
+                        *by_kind.entry(e.kind.clone()).or_default() += 1;
+                        if let Err(err) = sorter.push(e) {
+                            return Err(failed(
+                                &mut log,
+                                "sort",
+                                format!("sorting events: {}", err),
+                            ));
+                        }
+                    }
+                    kept_total += n;
+                    r.events = n;
+                    let mut d = run_json(&r);
+                    d["events_read"] = json!(read);
+                    d["events_kept"] = json!(n);
+                    d["events_outside_filters"] = json!(outside);
+                    log.record("run_read", Some(&r.run_dir), d).map_err(io)?;
+                    if dropped > 0 {
+                        log.record(
+                            "event_cap_reached",
+                            Some(&r.run_dir),
+                            json!({"max_events": opts.max_events, "run_id": r.run_id, "events_dropped": dropped,
+                                   "events_kept_total": kept_total}),
+                        )
+                        .map_err(io)?;
+                    }
+                }
+            }
+        }
+        if let Some(x) = &r.exclusion
+            && r.status == RunStatus::Excluded
+        {
+            let mut d = run_json(&r);
+            d["reason"] = json!(x.reason);
+            d["detail"] = json!(x.detail);
+            log.record("run_excluded", Some(&r.run_dir), d)
+                .map_err(io)?;
+        }
+        sink(&Event::ItemFinished {
+            index,
+            path: r.run_dir.clone(),
+            status: if r.status == RunStatus::Verified {
+                "verified".into()
+            } else {
+                "excluded".into()
+            },
+            findings: r.exclusion.iter().map(|x| x.reason.clone()).collect(),
+        });
+        let elapsed = started.elapsed().as_millis() as u64;
+        sink(&Event::Progress {
+            done: index,
+            total: total_runs,
+            bytes_done: 0,
+            bytes_total: 0,
+            elapsed_ms: elapsed,
+            eta_ms: None,
+        });
+        runs.push(r);
+    }
+    if cancelled {
+        log.record(
+            "run_cancelled",
+            None,
+            json!({"processed": runs.len() + skipped.len(), "of": total_runs}),
+        )
+        .map_err(io)?;
+        sink(&Event::Cancelled {
+            done: (runs.len() + skipped.len()) as u64,
+            elapsed_ms: started.elapsed().as_millis() as u64,
+        });
+    }
+
+    // 4. Order (external merge sort past the threshold), write timeline.jsonl, gather each item's events.
+    let spilled = sorter.spilled_chunks();
+    let n_events = sorter.len();
+    let sorted = match sorter.finish() {
+        Ok(s) => s,
+        Err(e) => return Err(failed(&mut log, "sort", format!("sorting events: {}", e))),
+    };
+    log.record(
+        "events_ordered",
+        None,
+        json!({"events": n_events, "order": "utc_s, utc_ns, id", "sort": if spilled > 0 { "external" } else { "memory" },
+               "spilled_chunks": spilled, "threshold": sort_threshold as u64}),
+    )
+    .map_err(io)?;
+    std::fs::create_dir_all(&report_dir)
+        .map_err(|e| format!("cannot create {}: {}", report_dir.display(), e))?;
+    let jsonl = report_dir.join("timeline.jsonl");
+    let mut out = if opts.timesketch {
+        match File::create(&jsonl) {
+            Ok(f) => Some(BufWriter::new(f)),
+            Err(e) => {
+                return Err(failed(
+                    &mut log,
+                    "timeline",
+                    format!("cannot write {}: {}", jsonl.display(), e),
+                ));
+            }
+        }
+    } else {
+        None
+    };
+    let mut acc: BTreeMap<String, ItemAcc> = BTreeMap::new();
+    let (mut lines, mut zone_unknown) = (0u64, 0u64);
+    for e in sorted {
+        let e = match e {
+            Ok(e) => e,
+            Err(err) => return Err(failed(&mut log, "sort", format!("merging events: {}", err))),
+        };
+        if let Some(w) = out.as_mut()
+            && let Err(err) = writeln!(w, "{}", engine::timesketch_line(&e))
+        {
+            return Err(failed(
+                &mut log,
+                "timeline",
+                format!("writing timeline.jsonl: {}", err),
+            ));
+        }
+        lines += 1;
+        if e.zone == ZoneInfo::Unknown {
+            zone_unknown += 1;
+        }
+        acc.entry(engine::item_key(&e.item))
+            .or_insert_with(|| ItemAcc::new(&e.item))
+            .add(e);
+    }
+    let _ = std::fs::remove_dir(link.run_dir.join("tmp"));
+    let mut timeline_file = None;
+    if let Some(mut w) = out.take() {
+        if let Err(e) = w.flush() {
+            return Err(failed(
+                &mut log,
+                "timeline",
+                format!("writing timeline.jsonl: {}", e),
+            ));
+        }
+        drop(w);
+        let digests = File::open(&jsonl)
+            .and_then(|f| hash_reader(f, &cfg.algorithms, |_| true))
+            .map_err(|e| format!("cannot hash {}: {}", jsonl.display(), e))?
+            .map(|o| {
+                o.digests
+                    .into_iter()
+                    .map(|(a, h)| (a.name().to_string(), json!(h)))
+                    .collect::<serde_json::Map<String, Value>>()
+            })
+            .unwrap_or_default();
+        log.record(
+            "timeline_written",
+            Some("timeline.jsonl"),
+            json!({"folder": "reports", "files": {"timeline.jsonl": digests}, "lines": lines,
+                   "format": "timesketch-jsonl", "display_zone": zone.name()}),
+        )
+        .map_err(io)?;
+        timeline_file = Some("timeline.jsonl".to_string());
+        sink(&Event::ReportWritten {
+            kind: "timeline".into(),
+            path: jsonl.display().to_string(),
+        });
+    }
+
+    // 5. Signals.
+    let signals = sig.finish(&runs);
+    let mut by_code: BTreeMap<&str, u64> = BTreeMap::new();
+    let mut by_sev: BTreeMap<crate::model::Severity, u64> = BTreeMap::new();
+    for s in &signals {
+        *by_code.entry(s.code.as_str()).or_default() += 1;
+        *by_sev.entry(s.severity).or_default() += 1;
+    }
+    log.record(
+        "signals_computed",
+        None,
+        json!({"count": signals.len(), "by_code": by_code, "by_severity": by_sev.iter().map(|(k, v)| (format!("{:?}", k).to_lowercase(), *v)).collect::<BTreeMap<_, _>>(),
+               "clock_skew_s": opts.clock_skew_s, "zone_unknown_events": zone_unknown}),
+    )
+    .map_err(io)?;
+
+    // 6. Items: every registered evidence item, then items the runs named outside the registry.
+    let mut keys: Vec<String> = link
+        .case
+        .items
+        .iter()
+        .map(|i| i.evidence_id.clone())
+        .collect();
+    for k in acc.keys() {
+        if !keys.contains(k) {
+            keys.push(k.clone());
+        }
+    }
+    let mut results: Vec<ItemResult> = Vec::with_capacity(keys.len());
+    for (n, key) in keys.iter().enumerate() {
+        let reg = link.case.get(key);
+        let a = acc.remove(key);
+        let item_signals: Vec<Signal> = signals
+            .iter()
+            .filter(|s| s.item.as_ref().map(engine::item_key).as_deref() == Some(key.as_str()))
+            .cloned()
+            .collect();
+        let path = reg
+            .map(|r| r.path.clone())
+            .or_else(|| a.as_ref().map(|a| a.item.path.clone()))
+            .unwrap_or_default();
+        let hashes: Vec<(HashAlgo, String)> = match reg {
+            Some(r) => r
+                .hashes
+                .iter()
+                .filter_map(|(k, v)| HashAlgo::parse(k).map(|h| (h, v.clone())))
+                .collect(),
+            None => a
+                .as_ref()
+                .filter(|a| !a.item.sha256.is_empty())
+                .map(|a| vec![(HashAlgo::Sha256, a.item.sha256.clone())])
+                .unwrap_or_default(),
+        };
+        let tl = report::ItemTimeline {
+            total: a.as_ref().map(|a| a.total).unwrap_or(0),
+            tools: a
+                .as_ref()
+                .map(|a| a.tools.iter().cloned().collect())
+                .unwrap_or_default(),
+            first_s: a.as_ref().and_then(|a| a.first),
+            last_s: a.as_ref().and_then(|a| a.last),
+            events: a.map(|a| a.events).unwrap_or_default(),
+            signals: item_signals.clone(),
+        };
+        let evidence_id = reg.map(|r| r.evidence_id.clone()).or_else(|| {
+            tl.events
+                .first()
+                .map(|e| e.item.evidence_id.clone())
+                .filter(|s| !s.is_empty())
+        });
+        let seq = log
+            .record(
+                "item_timeline",
+                Some(&path),
+                json!({"index": n as u64 + 1, "evidence_id": evidence_id, "events": tl.total,
+                       "events_listed": tl.events.len(), "tools": tl.tools,
+                       "signals": item_signals.iter().map(|s| s.code.clone()).collect::<Vec<_>>()}),
+            )
+            .map_err(io)?;
+        results.push(ItemResult {
+            index: n as u64 + 1,
+            path: PathBuf::from(&path),
+            size: reg.map(|r| r.size).unwrap_or(0),
+            modified_utc: None,
+            hashes,
+            detected_type: None,
+            extension: None,
+            findings: item_signals.iter().map(report::signal_finding).collect(),
+            error: None,
+            audit_first_seq: seq,
+            audit_last_seq: seq,
+            evidence_id,
+            case_status: None,
+            intake_utc: reg.map(|r| r.registered_utc.clone()),
+            timeline: Some(tl),
+        });
+    }
+
+    // 7. Reports.
+    let elapsed_ms = started.elapsed().as_millis() as u64;
+    let mut info = RunInfo {
+        tool_name: cfg.tool_name.clone(),
+        tool_version: cfg.tool_version.clone(),
+        run_id: run_id.clone(),
+        case_id: cfg.case_id.clone(),
+        actor: cfg.actor.clone(),
+        frontend: cfg.frontend.clone(),
+        algorithms: cfg.algorithms.clone(),
+        langs: cfg.langs.clone(),
+        started_utc,
+        finished_utc: utc_now(),
+        elapsed_ms,
+        cancelled,
+        jurisdiction: cfg.jurisdiction.clone(),
+        signer,
+        timestamp: json!({"status": "off"}),
+        case: Some(link.info(CaseRole::Analysis)),
+        timeline: Some(TimelineInfo {
+            zone,
+            runs: runs.clone(),
+            skipped,
+            events: lines,
+            filtered_out,
+            zone_unknown,
+            by_tool,
+            by_kind,
+            signals: signals.clone(),
+            clock_skew_s: opts.clock_skew_s,
+            max_events: opts.max_events,
+            cap_reached,
+            from_s: opts.from_s,
+            to_s: opts.to_s,
+            tools: opts.tools.clone(),
+            timeline_file,
+            spilled_chunks: spilled,
+        }),
+    };
+    let log_dir_s = log_dir.display().to_string();
+    for r in &results {
+        let audit = AuditRef {
+            head: log.head().to_string(),
+            entries: log.entries(),
+            log_dir: log_dir_s.clone(),
+        };
+        let dir = report_dir.join("items").join(r.folder());
+        let files = report::write_item_reports(&dir, &info, r, &audit)?;
+        log.record(
+            "item_reports_written",
+            Some(&r.path.display().to_string()),
+            json!({"folder": format!("items/{}", r.folder()), "files": files}),
+        )
+        .map_err(io)?;
+    }
+    if !results.is_empty() {
+        sink(&Event::ReportWritten {
+            kind: "items".into(),
+            path: report_dir.join("items").display().to_string(),
+        });
+    }
+    let totals = RunTotals {
+        items: results.len() as u64,
+        bytes: 0,
+        errors: 0,
+    };
+    if let Some(url) = &cfg.tsa_url {
+        match crate::trust::timestamp_head(&log_dir, log.entries(), log.head(), url) {
+            Ok(ts) => {
+                log.record("timestamp_obtained", Some(&ts.file), ts.to_json())
+                    .map_err(io)?;
+                let mut v = ts.to_json();
+                v["status"] = json!("ok");
+                info.timestamp = v;
+            }
+            Err(e) => {
+                log.record("timestamp_pending", None, json!({"tsa": url, "reason": e, "covers_seq": log.entries(), "head": log.head()})).map_err(io)?;
+                info.timestamp = json!({"status": "pending", "tsa": url, "reason": e});
+            }
+        }
+        sink(&Event::Timestamp {
+            status: info.timestamp["status"].as_str().unwrap_or_default().into(),
+            tsa: url.clone(),
+            gen_time: info.timestamp["gen_time"].as_str().map(String::from),
+            reason: info.timestamp["reason"].as_str().map(String::from),
+        });
+    }
+    let audit = AuditRef {
+        head: log.head().to_string(),
+        entries: log.entries(),
+        log_dir: log_dir_s,
+    };
+    let files = report::write_statistics(&report_dir, &info, &results, &totals, &audit)?;
+    log.record("statistics_report_written", None, json!({"files": files}))
+        .map_err(io)?;
+    sink(&Event::ReportWritten {
+        kind: "statistics".into(),
+        path: report_dir
+            .join(format!("statistics.{}.html", cfg.langs[0]))
+            .display()
+            .to_string(),
+    });
+
+    let count = |s: crate::model::Severity| by_sev.get(&s).copied().unwrap_or(0);
+    let summary = RunSummary {
+        run_id,
+        items: totals.items,
+        bytes: 0,
+        errors: 0,
+        elapsed_ms: started.elapsed().as_millis() as u64,
+        high: count(crate::model::Severity::High),
+        medium: count(crate::model::Severity::Medium),
+        low: count(crate::model::Severity::Low),
+        info: count(crate::model::Severity::Info),
+        cancelled,
+        report_dir: report_dir.clone(),
+        log_dir: log_dir.clone(),
+        audit_head: String::new(),
+        timestamp: info.timestamp.clone(),
+        case: info.case.clone(),
+    };
+    log.record(
+        "run_finished",
+        None,
+        json!({"items": summary.items, "events": lines, "runs_verified": runs.iter().filter(|r| r.status == RunStatus::Verified).count(),
+               "runs_excluded": runs.iter().filter(|r| r.status == RunStatus::Excluded).count(),
+               "signals": signals.len(), "max_events_reached": cap_reached, "elapsed_ms": summary.elapsed_ms,
+               "high": summary.high, "medium": summary.medium, "low": summary.low, "info": summary.info,
+               "cancelled": cancelled}),
+    )
+    .map_err(io)?;
+    sink(&Event::RunFinished {
+        items: summary.items,
+        bytes: 0,
+        errors: 0,
+        elapsed_ms: summary.elapsed_ms,
+        high: summary.high,
+        medium: summary.medium,
+        low: summary.low,
+        info: summary.info,
+        report_dir: report_dir.display().to_string(),
+        log_dir: log_dir.display().to_string(),
+        cancelled,
+    });
+    Ok(RunSummary {
+        audit_head: log.head().to_string(),
+        ..summary
+    })
 }
 
 #[cfg(test)]
@@ -1263,5 +2079,375 @@ mod tests {
         let mut c = cfg(PathBuf::from("."), PathBuf::from("."));
         c.algorithms = vec![HashAlgo::Md5, HashAlgo::Sha1, HashAlgo::Sha256];
         assert!(run(&c, &mut |_| {}, &AtomicBool::new(false)).is_err());
+    }
+
+    // ---------- timeline build ----------
+
+    use crate::model::{
+        Exclusion, ReadError, RunRef, RunStatus, TimeEvent, TimelineOptions, ZoneInfo,
+    };
+
+    /// Hand-built runs and events in place of the readers.
+    struct Fake {
+        runs: Vec<RunRef>,
+        excluded: BTreeMap<String, Exclusion>,
+        events: BTreeMap<String, Result<Vec<TimeEvent>, ReadError>>,
+    }
+
+    impl RunSource for Fake {
+        fn discover(&self, _: &Path) -> Result<Vec<RunRef>, ReadError> {
+            Ok(self.runs.clone())
+        }
+        fn verify(&self, _: &Path, mut run: RunRef) -> RunRef {
+            if let Some(x) = self.excluded.get(&run.run_id) {
+                run.status = RunStatus::Excluded;
+                run.exclusion = Some(x.clone());
+            }
+            run
+        }
+        fn read(&self, _: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError> {
+            self.events
+                .get(&run.run_id)
+                .cloned()
+                .unwrap_or_else(|| Ok(vec![]))
+        }
+    }
+
+    fn src_run(tool: &str, id: &str) -> RunRef {
+        RunRef {
+            tool: tool.into(),
+            tool_version: "1.0.0".into(),
+            run_id: id.into(),
+            run_dir: format!("runs/{}/{}", tool, id),
+            ..Default::default()
+        }
+    }
+
+    fn tev(run: &RunRef, evidence: &str, kind: &str, utc_s: i64, n: u32) -> TimeEvent {
+        let mut e = crate::engine::tests::ev(&run.tool, evidence, kind, "2026-01-01T00:00:00Z", n);
+        e.utc_s = utc_s;
+        e.original = crate::engine::fmt_utc(utc_s, 0, crate::model::Precision::Second);
+        e.source.run_id = run.run_id.clone();
+        e.source.run_dir = run.run_dir.clone();
+        e.id = format!("{}:{}:{}:{}:{}", run.tool, run.run_id, evidence, kind, n);
+        e
+    }
+
+    /// A case with two registered items (intake by the reference pipeline).
+    fn timeline_case(tmp: &Path) -> (PathBuf, i64) {
+        let ev = tmp.join("ev");
+        std::fs::create_dir_all(&ev).unwrap();
+        std::fs::write(ev.join("a-photo.jpg"), b"\xFF\xD8\xFF\xE0 not a real photo").unwrap();
+        std::fs::write(ev.join("b-mail.eml"), b"From: a@example.org\r\n\r\nhello").unwrap();
+        let case = tmp.join("case");
+        run(
+            &case_cfg(&case, CaseRole::Intake, vec![ev]),
+            &mut |_| {},
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        let c = Case::open(&case).unwrap();
+        let intake = crate::engine::parse_rfc3339(&c.items[0].registered_utc).unwrap();
+        (case, intake)
+    }
+
+    fn tl_cfg() -> RunConfig {
+        RunConfig {
+            algorithms: vec![HashAlgo::Sha256],
+            langs: vec!["en".into(), "es".into(), "fr".into()],
+            actor: "tester".into(),
+            frontend: "test".into(),
+            tool_version: "0.0.0".into(),
+            ..Default::default()
+        }
+    }
+
+    fn tl_opts(case: &Path) -> TimelineOptions {
+        TimelineOptions {
+            case_dir: case.to_path_buf(),
+            display_zone: "Europe/Paris".into(),
+            ..Default::default()
+        }
+    }
+
+    fn actions(log_dir: &Path) -> Vec<String> {
+        std::fs::read_to_string(log_dir.join("audit.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|l| {
+                serde_json::from_str::<Value>(l).unwrap()["action"]
+                    .as_str()
+                    .unwrap()
+                    .to_string()
+            })
+            .collect()
+    }
+
+    fn html_files(dir: &Path, out: &mut Vec<PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                html_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "html") {
+                out.push(p);
+            }
+        }
+    }
+
+    #[test]
+    fn timeline_build_audits_every_step_and_writes_outputs() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (case, intake) = timeline_case(tmp.path());
+        let img = src_run("rv-imgauth", "20991231T000000Z-aaaaaa");
+        let pdf = src_run("rv-pdfauth", "20991231T000000Z-bbbbbb");
+        let mail = src_run("rv-mailauth", "20991231T000000Z-cccccc");
+        let me = src_run("rv-timeline", "20991231T000000Z-dddddd");
+        let mut unknown = tev(&img, "E0002", "exif.original", intake - 86_400, 3);
+        unknown.zone = ZoneInfo::Unknown;
+        unknown.offset_min = None;
+        let fake = Fake {
+            runs: vec![me, mail.clone(), pdf.clone(), img.clone()],
+            excluded: [(
+                pdf.run_id.clone(),
+                Exclusion {
+                    reason: "chain_broken".into(),
+                    detail: "entry 4".into(),
+                },
+            )]
+            .into_iter()
+            .collect(),
+            events: [
+                (
+                    img.run_id.clone(),
+                    Ok(vec![
+                        tev(&img, "E0001", "exif.original", intake + 2 * 86_400, 1),
+                        tev(&img, "E0001", "fs.modified", intake - 30 * 86_400, 2),
+                        unknown,
+                    ]),
+                ),
+                (
+                    mail.run_id.clone(),
+                    Err(ReadError {
+                        reason: "unsupported_version".into(),
+                        detail: "9.9.9".into(),
+                    }),
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        };
+        let mut events = vec![];
+        let s = run_timeline_with(
+            &tl_cfg(),
+            &tl_opts(&case),
+            &fake,
+            engine::DEFAULT_SORT_THRESHOLD,
+            &mut |e| events.push(e.clone()),
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        assert_eq!(s.items, 2);
+        assert_eq!((s.high, s.medium, s.low, s.info), (1, 1, 1, 1));
+        assert!(s.log_dir.starts_with(case.join("runs/rv-timeline")));
+        assert!(crate::audit::verify(&s.log_dir.join("audit.jsonl")).is_ok());
+        let acts = actions(&s.log_dir);
+        for a in [
+            "run_started",
+            "case_linked",
+            "environment_recorded",
+            "runs_discovered",
+            "run_skipped",
+            "run_verified",
+            "run_read",
+            "run_excluded",
+            "events_ordered",
+            "timeline_written",
+            "signals_computed",
+            "item_timeline",
+            "item_reports_written",
+            "statistics_report_written",
+            "run_finished",
+        ] {
+            assert!(acts.iter().any(|x| x == a), "{} missing in {:?}", a, acts);
+        }
+        assert_eq!(acts.iter().filter(|a| *a == "run_excluded").count(), 2);
+        // timeline.jsonl: one line per event, its digest in the audit log.
+        let jsonl = s.report_dir.join("timeline.jsonl");
+        let text = std::fs::read_to_string(&jsonl).unwrap();
+        assert_eq!(text.lines().count(), 3);
+        let first: Value = serde_json::from_str(text.lines().next().unwrap()).unwrap();
+        assert_eq!(first["rakvor_kind"], "fs.modified");
+        let audit = std::fs::read_to_string(s.log_dir.join("audit.jsonl")).unwrap();
+        let sha = hash_bytes(text.as_bytes(), HashAlgo::Sha256);
+        assert!(audit.contains(&sha), "timeline.jsonl digest audited");
+        // Statistics: runs with reasons, signals, display zone.
+        let stats: Value = serde_json::from_str(
+            &std::fs::read_to_string(s.report_dir.join("statistics.json")).unwrap(),
+        )
+        .unwrap();
+        let tl = &stats["timeline"];
+        assert_eq!(
+            (tl["runs_verified"].as_u64(), tl["runs_excluded"].as_u64()),
+            (Some(1), Some(2))
+        );
+        assert_eq!(tl["skipped"][0]["reason"], "self");
+        assert_eq!(tl["events_by_tool"]["rv-imgauth"], 3);
+        assert_eq!(tl["events_zone_unknown"], 1);
+        assert_eq!(tl["display_zone"], "Europe/Paris");
+        let codes: Vec<&str> = tl["signals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|s| s["code"].as_str().unwrap())
+            .collect();
+        assert_eq!(
+            codes,
+            [
+                "EXIF_AFTER_INTAKE",
+                "RUN_NOT_VERIFIED",
+                "RUN_NOT_VERIFIED",
+                "ZONE_UNKNOWN_EVENTS"
+            ]
+        );
+        assert!(tl["signals"].as_array().unwrap().iter().any(|s| {
+            s["text"]["es"]["shows"]
+                .as_str()
+                .unwrap()
+                .contains("cadena de auditoría")
+        }));
+        assert_eq!(stats["limitations"][0]["code"], "TL_ZONE_UNKNOWN");
+        // Per item: technical report with events and the signal; custody form still there.
+        let item = s.report_dir.join("items/00001-a-photo.jpg");
+        let tech: Value =
+            serde_json::from_str(&std::fs::read_to_string(item.join("technical.json")).unwrap())
+                .unwrap();
+        assert_eq!(tech["item"]["evidence_id"], "E0001");
+        assert_eq!(tech["timeline"]["events_total"], 2);
+        assert_eq!(tech["findings"][0]["code"], "EXIF_AFTER_INTAKE");
+        assert_eq!(tech["findings"][0]["severity"], "high");
+        for f in [
+            "custody.json",
+            "custody.es.pdf",
+            "summary.fr.pdf",
+            "technical.en.pdf",
+            "summary.es.html",
+        ] {
+            assert!(item.join(f).exists(), "{}", f);
+        }
+        let html = std::fs::read_to_string(item.join("technical.en.html")).unwrap();
+        assert!(html.contains("Photo taken after its intake"));
+        assert!(html.contains(" CET (+01:00)") || html.contains(" CEST (+02:00)"));
+        // The display zone is named on every page.
+        let mut pages = vec![];
+        html_files(&s.report_dir, &mut pages);
+        assert!(pages.len() >= 2 * 3 * 2 + 3);
+        for p in pages {
+            let h = std::fs::read_to_string(&p).unwrap();
+            // HTML autoescape writes "/" as "&#x2f;".
+            assert!(
+                h.contains("Europe/Paris") || h.contains("Europe&#x2f;Paris"),
+                "{}",
+                p.display()
+            );
+        }
+        // The case log links the run, and the case still verifies.
+        let fin = case_log(&case).into_iter().last().unwrap();
+        assert_eq!(fin["action"], "run_finished");
+        assert_eq!(fin["details"]["status"], "completed");
+        let v = case::verify_case(&case);
+        assert!(v.problems.is_empty(), "{:?}", v.problems);
+        assert!(matches!(events.last(), Some(Event::RunFinished { .. })));
+    }
+
+    #[test]
+    fn timeline_external_sort_cap_and_rebuild() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (case, intake) = timeline_case(tmp.path());
+        let a = src_run("rv-imgauth", "20991231T000000Z-aaaaaa");
+        let b = src_run("rv-pdfauth", "20991231T000000Z-bbbbbb");
+        let mk = |r: &RunRef, ev: &str, n: u32| {
+            (0..n)
+                .map(|i| {
+                    tev(
+                        r,
+                        ev,
+                        "fs.accessed",
+                        intake - 1000 * ((i * 37 % 101) as i64),
+                        i,
+                    )
+                })
+                .collect::<Vec<_>>()
+        };
+        let fake = Fake {
+            runs: vec![a.clone(), b.clone()],
+            excluded: BTreeMap::new(),
+            events: [
+                (a.run_id.clone(), Ok(mk(&a, "E0001", 40))),
+                (b.run_id.clone(), Ok(mk(&b, "E0002", 25))),
+            ]
+            .into_iter()
+            .collect(),
+        };
+        let go = |threshold: usize, opts: &TimelineOptions| {
+            run_timeline_with(
+                &tl_cfg(),
+                opts,
+                &fake,
+                threshold,
+                &mut |_| {},
+                &AtomicBool::new(false),
+            )
+            .unwrap()
+        };
+        let opts = tl_opts(&case);
+        let mem = go(1_000_000, &opts);
+        let ext = go(4, &opts);
+        let read = |s: &RunSummary| std::fs::read(s.report_dir.join("timeline.jsonl")).unwrap();
+        assert_eq!(
+            read(&mem),
+            read(&ext),
+            "external sort = in-memory sort, byte for byte"
+        );
+        assert_eq!(read(&mem).iter().filter(|b| **b == b'\n').count(), 65);
+        let audit = std::fs::read_to_string(ext.log_dir.join("audit.jsonl")).unwrap();
+        assert!(audit.contains("\"external\""));
+        assert!(
+            !ext.log_dir.parent().unwrap().join("tmp").exists(),
+            "spill folder removed"
+        );
+        // Event limit: recorded in the audit log and as a limitation; the next run is not read.
+        let mut capped = opts.clone();
+        capped.max_events = 10;
+        let s = go(4, &capped);
+        assert_eq!(read(&s).iter().filter(|b| **b == b'\n').count(), 10);
+        let acts = actions(&s.log_dir);
+        assert!(acts.iter().any(|a| a == "event_cap_reached"));
+        let stats: Value = serde_json::from_str(
+            &std::fs::read_to_string(s.report_dir.join("statistics.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(stats["limitations"][0]["code"], "TL_MAX_EVENTS");
+        assert_eq!(stats["timeline"]["skipped"][0]["reason"], "max_events");
+        assert_eq!(stats["timeline"]["max_events_reached"], true);
+        // Window and tool filters.
+        let mut w = opts.clone();
+        w.tools = vec!["rv-pdfauth".into()];
+        let s = go(1000, &w);
+        assert_eq!(read(&s).iter().filter(|b| **b == b'\n').count(), 25);
+        // Bad options are refused before anything is written.
+        let mut bad = opts.clone();
+        bad.display_zone = "Mars/Olympus".into();
+        assert!(
+            run_timeline_with(
+                &tl_cfg(),
+                &bad,
+                &fake,
+                10,
+                &mut |_| {},
+                &AtomicBool::new(false)
+            )
+            .is_err()
+        );
+        assert!(case::verify_case(&case).problems.is_empty());
     }
 }

@@ -91,7 +91,51 @@
     "mismatched": "Différents du registre",
     "unregistered": "Absents du registre",
     "intake_date": "Enregistré à la réception (UTC)",
-    "case_dir": "Dossier de l'affaire"
+    "case_dir": "Dossier de l'affaire",
+    "display_zone": "Fuseau d'affichage",
+    "time_utc": "UTC",
+    "time_display": "Heure dans le fuseau d'affichage",
+    "zone_unknown_short": "fuseau inconnu, non converti",
+    "as_written": "telle qu'écrite, sans fuseau",
+    "events": "Événements",
+    "kind": "Type",
+    "original": "Valeur d'origine",
+    "source": "Source",
+    "tool_run": "Exécution",
+    "runs": "Exécutions d'outils",
+    "runs_verified": "Exécutions vérifiées",
+    "runs_excluded": "Exécutions écartées",
+    "runs_skipped": "Exécutions non utilisées",
+    "reason": "Motif",
+    "events_total": "Événements de la chronologie",
+    "events_filtered": "Événements hors fenêtre ou hors filtre d'outils",
+    "events_zone_unknown": "Événements sans fuseau horaire",
+    "events_by_tool": "Événements par outil",
+    "events_by_kind": "Événements par type",
+    "signals": "Signaux",
+    "signals_by_severity": "Signaux par gravité",
+    "case_signals": "Signaux sur l'affaire",
+    "timeline_file": "Fichier Timesketch",
+    "events_more": "%{n} autres événements de cet élément figurent dans timeline.jsonl.",
+    "events_cap_note": "Limite d'événements atteinte : la lecture s'est arrêtée à %{max} événements.",
+    "run_status_verified": "Vérifiée",
+    "run_status_excluded": "Écartée",
+    "skip_self": "exécution de chronologie (pas une source)",
+    "skip_tool_filter": "non retenue par le filtre d'outils",
+    "window": "Fenêtre de temps (UTC)",
+    "all_tools": "tous les outils pris en charge",
+    "tools_filter": "Outils",
+    "clock_skew": "Tolérance d'horloge",
+    "tl_method_text": "Les exécutions des autres outils Rakvor du dossier d'affaire ont été vérifiées (chaîne d'audit, empreintes de leurs résultats) avant toute lecture. Chaque heure relevée a été placée sur une seule chronologie en UTC, en gardant sa formulation et son décalage d'origine ; les heures sans fuseau ont été signalées, jamais converties. Les heures ont ensuite été comparées entre sources. Chaque action a été écrite dans un journal d'audit chaîné par empreintes.",
+    "tl_summary_ok": "La chronologie de cet élément ne montre aucun signal temporel avec les contrôles appliqués.",
+    "tl_summary_attention": "La chronologie de cet élément montre des signaux temporels qui méritent un examen.",
+    "tl_summary_problem": "La chronologie de cet élément montre une heure qui contredit son enregistrement audité.",
+    "tl_next_ok": "Aucune action nécessaire pour cet élément.",
+    "tl_next_attention": "Examinez les signaux avec les rapports d'outils qu'ils citent avant de conclure.",
+    "tl_next_problem": "Faites examiner les événements cités et l'enregistrement d'intégration par un expert avant de vous fonder sur cet élément.",
+    "tl_item_span": "%{n} événements de %{tools}, du %{first} au %{last} (UTC).",
+    "tl_item_none": "Aucun événement n'a été lu pour cet élément.",
+    "skip_max_events": "non lue : limite d'événements atteinte"
   },
   "severity": {
     "high": "Élevée",
@@ -141,11 +185,67 @@
       "does_not_prove": "Quelle version est l'originale ni pourquoi le contenu a changé."
     }
   },
+  "signals": {
+    "EXIF_AFTER_INTAKE": {
+      "title": "Photo prise après son enregistrement (EXIF)",
+      "shows": "L'heure EXIF d'origine de la photo (%{exif}) est postérieure de %{delta} à son enregistrement à l'intégration (%{intake}), au-delà de la tolérance de %{tolerance_s} s ; fuseau dans l'EXIF : %{zone}.",
+      "does_not_prove": "Cela ne prouve pas que la photo a été remplacée ou retouchée : une horloge d'appareil fausse, un fuseau absent ou faux, ou des métadonnées réécrites par un logiciel donnent le même résultat. Comparez l'empreinte avec le registre et les autres images de l'appareil."
+    },
+    "MAIL_DATE_AFTER_FIRST_HOP": {
+      "title": "Message daté après son premier relais",
+      "shows": "Dans le message %{message}, l'en-tête Date (%{date}) est postérieur de %{delta} au premier saut Received (%{hop}), au-delà de la tolérance de %{tolerance_s} s.",
+      "does_not_prove": "Cela ne prouve pas que le message est falsifié : l'horloge de l'expéditeur, un envoi différé ou l'horloge d'un relais peuvent l'expliquer. Vérifiez les autres sauts et les résultats d'authentification."
+    },
+    "PDF_REVISION_BEFORE_PREVIOUS": {
+      "title": "Révision PDF datée avant la précédente",
+      "shows": "La révision %{revision} est datée %{time}, %{delta} avant la révision %{previous} (%{previous_time}) qu'elle met à jour.",
+      "does_not_prove": "Cela ne prouve pas une antidatation : l'horloge du signataire ou de l'éditeur peut être fausse. À lire avec le contenu des révisions et tout horodatage qualifié."
+    },
+    "FILE_MODIFIED_AFTER_INTAKE": {
+      "title": "Fichier modifié après son enregistrement",
+      "shows": "Une date de modification du système de fichiers (%{modified}) est postérieure de %{delta} à l'enregistrement à l'intégration (%{intake}) ; %{count} valeur(s) concernée(s).",
+      "does_not_prove": "Cela ne prouve pas que le contenu a changé : copier, restaurer ou toucher un fichier change ses dates, pas son contenu. La comparaison de l'empreinte avec le registre indique si le contenu est identique."
+    },
+    "EVENT_IN_FUTURE": {
+      "title": "Heure postérieure à l'exécution qui l'a lue",
+      "shows": "%{count} heure(s) (première : %{time}, %{kind}) sont jusqu'à %{delta} postérieures à l'exécution %{run_id} qui les a relevées (référence : %{reference}).",
+      "does_not_prove": "Cela ne prouve pas une manipulation : une horloge d'appareil en avance, un fuseau faux ou une date prévue écrite dans le fichier donnent le même résultat."
+    },
+    "CLOCK_SKEW_SUSPECTED": {
+      "title": "Décalage d'horloge possible entre sources",
+      "shows": "Pour cet élément, %{tool_b} donne %{pairs} heures communes écartées d'environ %{skew} (%{skew_s} s) de %{tool_a}, toujours dans le même sens.",
+      "does_not_prove": "Cela n'indique ni quelle source est juste, ni qu'une source a été modifiée : des fuseaux différents, une copie faite sur une autre machine ou l'interprétation d'un lecteur peuvent causer un décalage constant."
+    },
+    "RUN_NOT_VERIFIED": {
+      "title": "Exécution écartée de la chronologie",
+      "shows": "L'exécution %{run_id} de %{tool} %{version} (%{run_dir}) n'a pas été utilisée : %{reason_text}. %{detail}",
+      "does_not_prove": "Cela ne prouve pas que les résultats de l'exécution ont été modifiés : elle peut ne pas être terminée, ou cette version ne pas lire cette version de l'outil. Ses événements manquent, la chronologie est donc incomplète pour elle."
+    },
+    "ZONE_UNKNOWN_EVENTS": {
+      "title": "Heures sans fuseau horaire",
+      "shows": "%{count} heure(s), de %{tools}, n'ont pas de fuseau horaire. Elles sont placées comme si elles étaient écrites en UTC et affichées telles qu'écrites, jamais converties.",
+      "does_not_prove": "Cela ne signifie pas que ces heures sont fausses ; leur instant réel peut différer jusqu'à 14 heures de leur place."
+    }
+  },
+  "exclusion": {
+    "chain_broken": "sa chaîne d'audit est rompue",
+    "digest_mismatch": "un résultat diffère de l'empreinte de son journal d'audit",
+    "not_finished": "l'exécution n'est pas terminée",
+    "unsupported_tool": "aucun lecteur n'existe pour cet outil",
+    "unsupported_version": "le lecteur ne prend pas en charge cette version de l'outil",
+    "unreadable": "ses résultats n'ont pas pu être lus"
+  },
   "limitations": {
     "SIGNATURE_TABLE_LIMITED": "La détection du type repose sur une table limitée de signatures courantes ; les types inconnus sont signalés comme inconnus, non comme suspects.",
     "TIMESTAMPS_FROM_FILESYSTEM": "Les dates de modification proviennent du système de fichiers de la copie examinée et peuvent différer de la source d'origine.",
     "CLEAN_RESULT_IS_NOT_AUTHENTICITY": "Un résultat sans constatation ne prouve pas qu'un fichier est authentique ni qu'il n'a pas été modifié avant son acquisition.",
-    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "Un horodatage qualifié prouve que le journal d'audit existait sous cette forme exacte à l'heure indiquée ; il ne prouve pas que la copie examinée correspond à la source d'origine."
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY": "Un horodatage qualifié prouve que le journal d'audit existait sous cette forme exacte à l'heure indiquée ; il ne prouve pas que la copie examinée correspond à la source d'origine.",
+    "TL_ZONE_UNKNOWN": "Les heures relevées sans fuseau horaire sont placées comme si elles étaient en UTC et affichées telles qu'écrites ; elles ne sont jamais converties, leur instant réel peut donc différer jusqu'à 14 heures.",
+    "TL_CLOCK_SKEW": "Les comparaisons entre sources tolèrent %{skew_s} s d'écart ; les désaccords plus faibles entre horloges ne sont pas signalés.",
+    "TL_TOOL_OUTPUTS_ONLY": "Dans cette version, les seules sources sont les résultats audités des exécutions d'outils Rakvor du dossier d'affaire ; les heures que ces outils n'ont pas extraites (autres journaux, autres appareils) ne sont pas dans la chronologie.",
+    "TL_READER_VERSIONS": "Chaque lecteur prend en charge les versions de résultats pour lesquelles il a été écrit ; les exécutions d'autres versions sont écartées et listées, jamais devinées.",
+    "TL_MAX_EVENTS": "La lecture s'est arrêtée à la limite d'événements (%{max_events}) ; les événements suivants ne sont ni dans la chronologie ni dans les signaux.",
+    "TL_CLEAN_IS_NOT_PROOF": "Une chronologie sans signal ne prouve pas que les heures sont vraies ; elle montre que les sources lues concordent dans la tolérance."
   },
   "brand": {
     "descriptor": "INVESTIGATION NUMÉRIQUE | RÉPONSE AUX INCIDENTS | SÉCURITÉ",
