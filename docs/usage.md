@@ -159,9 +159,11 @@ rv-timeline verify-case R:\case
 rv-timeline verify-log R:\case\runs\rv-timeline\20261113T115004Z-dcb88e\logs
 # OK  67 entries, chain intact: …\audit.jsonl
 #     truncation: the final entry #67 is anchored by the case log (run_finished)
+#     review log: none
 ```
 
-After viewing in the GUI, both add the number of review entries. Then hand over the whole case folder.
+`verify-case` also prints `review logs: <n> entries across the runs, all verified`; after viewing in the GUI,
+`verify-log` prints `review log: <n> entries, chain intact`. Then hand over the whole case folder.
 
 ## 3. Reading the outputs
 
@@ -312,6 +314,8 @@ A single file in PowerShell: `(Get-FileHash <file> -Algorithm SHA256).Hash.ToLow
 | `the case log is locked by <tool> (…); try again when it has finished` | Another tool is writing; wait and run again. A lock older than 10 minutes is reported as stale and never deleted automatically. |
 | `--from`/`--to` refused | Use RFC 3339 with a zone: `2026-11-01T00:00:00Z` or `2026-11-01T00:00:00-05:00`. |
 | `unknown display zone '…'` | `UTC`, a fixed offset (`-05:00`, `+0100`), `America/Bogota` or `Europe/Paris` only (no tz database). |
-| Fewer events than expected for an item | The source tool did not write that time, the reader skipped a value it could not parse (not yet reported, gap G-TL4), the window or cap left it out, or the run is excluded. Check the source tool's report for the item. |
+| Fewer events than expected for an item | The source tool did not write that time, the reader skipped a value it could not parse (`TL_TIMES_SKIPPED` in the reports; `times_skipped` and examples in the run's `run_read` audit entry), the window or cap left it out, or the run is excluded. Check the source tool's report for the item. |
+| Events carry `registry_match: differs` | The analysis run examined a copy that did not match the registry (its own report has `EVIDENCE_HASH_MISMATCH_WITH_CASE`): those times describe another file. Find the right copy and re-run that tool. |
+| A run is excluded `unreadable` with a path outside the case | A recorded output path is not a plain relative path, or a symbolic link or junction in the run folder leads out of the case folder: the build refuses to follow it. Investigate how the case folder was assembled. |
 | `warning: timestamp pending (…)` | See [Timestamps](#6-timestamps). |
 | `truncated: …` (`verify-log`) | Entries were removed from the end of the log; investigate, do not repair. |

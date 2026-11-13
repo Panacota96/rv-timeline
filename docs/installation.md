@@ -153,10 +153,9 @@ Unattended:
 .\rv-timeline-0.1.0-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS="addtopath"
 ```
 
-The installer copies the executables, README, LICENSE, NOTICE, CHANGELOG and `docs\`. The sample case
-(`examples\sample\case\`) and its scripts are in the zip and the source tree; the installer script still lists the
-template's `examples\sample\evidence\` instead (to be corrected in `packaging/windows/installer.iss`), so use the
-zip or the source tree for step 6.
+The installer copies the executables, README, LICENSE, NOTICE, CHANGELOG, `docs\` and the sample case
+(`examples\sample\case\` with its README); the sample scripts, the tampered copies and `expected_timeline.json` are
+in the zip and the source tree.
 
 <!-- forge:domain -->
 ### 5c. Native libraries
@@ -184,6 +183,15 @@ by the six released Rakvor tools on synthetic evidence ([examples/sample](../exa
 
 ```bash
 examples/sample/run.sh target/release/rv-timeline     # Linux, or Git Bash
+```
+
+```powershell
+# installer (no script installed): build on a copy of the installed sample case
+$app = "$env:LOCALAPPDATA\Programs\Rakvor\RV Timeline"
+$work = Join-Path $env:TEMP "rv-timeline-check"; Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
+Copy-Item -Recurse "$app\examples\sample\case" "$work\case"
+rv-timeline build --case-dir "$work\case" --no-timestamp --progress none; $LASTEXITCODE   # 3
+rv-timeline verify-case "$work\case"                                                      # OK
 ```
 
 <!-- forge:domain -->
@@ -292,7 +300,7 @@ EOF
 
 | What | Location |
 | --- | --- |
-| Program (installer) | `%LOCALAPPDATA%\Programs\Rakvor\RV Timeline\` (`rv-timeline.exe`, `rv-timeline-gui.exe`, `docs\`, `unins000.exe`) |
+| Program (installer) | `%LOCALAPPDATA%\Programs\Rakvor\RV Timeline\` (`rv-timeline.exe`, `rv-timeline-gui.exe`, `docs\`, `examples\sample\case\`, `unins000.exe`) |
 | Program (portable) | the folder you extracted |
 | PATH entry (installer task) | user environment variable `Path` (`HKCU\Environment`) |
 | Build outputs | always inside the case folder: `<CASE>\runs\rv-timeline\<RUN-ID>\` (`logs\`, `reports\`); `--out` is accepted and ignored |

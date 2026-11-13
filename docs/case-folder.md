@@ -108,7 +108,8 @@ announce it): a run copied into the folder by hand is listed, never used. Rules 
 | The registry is written only by the intake role | the reference digests and intake times cannot drift |
 | `--case <ID>` must match `case.json` (exit 2 otherwise) | the build is about the case you think it is |
 | The case's jurisdiction (`case.json`) sets the custody form; `--jurisdiction` is recorded as requested | the forms of one case agree |
-| Run folders are read only through `runs/<tool>/<run>` paths (no `..`, no absolute paths from the case log) | a crafted case log cannot make the build read outside the case |
+| Run folders are read only through `runs/<tool>/<run>` paths; every output path an audit log records must be a plain relative path (forward slashes, no `..`, root, drive, empty component or `:`); folders and files are resolved with symbolic links and junctions followed and must stay inside the case folder, else the run is `unreadable` | a crafted case log, audit log or link cannot make the build read outside the case |
+| Events of an item whose examined copy differed from the registry carry `registry_match: differs` | a time read from the wrong copy is never presented as the registered evidence's |
 
 ## Windows: paths
 

@@ -210,10 +210,10 @@ the same case with the same filters. Mapping and rationale: [theory.md B9](theor
 | `rakvor_run`, `rakvor_run_dir` | string | `20261113T065657Z-5588dc`, `runs/rv-certcheck/20261113T065657Z-5588dc` |
 | `rakvor_file`, `rakvor_file_sha256`, `rakvor_pointer` | string | `reports/items/00005-leaf-expired.crt/chain.json`, `6eb268b5…7ce3`, `/certificates/0/not_before` |
 | `rakvor_zone` | `explicit` / `unknown` | `explicit` |
-| `rakvor_offset_min` | integer or null | `0` |
+| `rakvor_offset_min` | integer or null | `0` (null for zone-unknown events, and for a chat zone name this version has no rules for) |
 | `rakvor_precision` | `day` … `nanosecond` | `second` |
 | `rakvor_original` | string, as the source wrote it | `2024-01-01T00:00:00Z` |
-| `rakvor_detail_<key>` | string | `rakvor_detail_issuer`, `rakvor_detail_serial`, `rakvor_detail_subject` … |
+| `rakvor_detail_<key>` | string | `rakvor_detail_issuer`, `rakvor_detail_serial`, `rakvor_detail_subject` …; `rakvor_detail_registry_match: differs` on every event of an item whose examined copy did not match the registry in that run |
 
 The file is written only with Timesketch output on (default; `--no-timesketch` turns it off). Its digests, line
 count and format are in the audit entry `timeline_written`. The GUI timeline viewer reads this file only after
@@ -252,13 +252,16 @@ citation). `verify-log` and `verify-case` check it and print the number of revie
 
 ## Limitations printed in every report
 
-Generated from `i18n/en.json` (the `limitations` section) and `report::TIMELINE_LIMITATIONS`. `TL_MAX_EVENTS` is
-printed first, and only when `--max-events` was reached; `%{skew_s}` is the build's `--clock-skew`.
+Generated from `i18n/en.json` (the `limitations` section) and `report::TIMELINE_LIMITATIONS`. Two are printed
+first, and only when they apply: `TL_TIMES_SKIPPED` when a reader met time values it could not parse (`%{count}`,
+also `times_skipped` in `statistics.json` and per run in the audit entry `run_read`), and `TL_MAX_EVENTS` when
+`--max-events` was reached. `%{skew_s}` is the build's `--clock-skew`.
 
 <!-- limitations:start (generated from i18n/en.json by src/core/tests/docs_catalogue.rs; do not edit by hand) -->
 
 | Code | Text (en.json) |
 | --- | --- |
+| `TL_TIMES_SKIPPED` | %{count} time values in the sources could not be read as a time (unknown or invalid format); they are not in the timeline, and the audit log lists them per run. |
 | `TL_MAX_EVENTS` | Reading stopped at the event limit (%{max_events}); later events are neither in the timeline nor in the signals. |
 | `TL_ZONE_UNKNOWN` | Times recorded without a time zone are placed as if they were UTC and shown as written; they are never converted, so their true instant may differ by up to 14 hours. |
 | `TL_CLOCK_SKEW` | Cross-source comparisons tolerate %{skew_s} s of difference; smaller disagreements between clocks are not reported. |
@@ -273,7 +276,7 @@ printed first, and only when `--max-events` was reached; `%{skew_s}` is the buil
 
 | File | Schema value | Schema file |
 | --- | --- | --- |
-| `statistics.json` | `rakvor.statistics/1` (+ `timeline` object: `display_zone`, `runs`, `skipped`, `runs_verified`, `runs_excluded`, `events`, `events_by_tool`, `events_by_kind`, `events_filtered_out`, `events_zone_unknown`, `signals`, `signals_by_severity`, `clock_skew_s`, `max_events`, `max_events_reached`, `from_s`, `to_s`, `tools`, `timeline_file`, `sort_spilled_chunks`) | [schemas/statistics.schema.json](../schemas/statistics.schema.json) |
+| `statistics.json` | `rakvor.statistics/1` (+ `timeline` object: `display_zone`, `runs`, `skipped`, `runs_verified`, `runs_excluded`, `events`, `events_by_tool`, `events_by_kind`, `events_filtered_out`, `events_zone_unknown`, `times_skipped`, `signals`, `signals_by_severity`, `clock_skew_s`, `max_events`, `max_events_reached`, `from_s`, `to_s`, `tools`, `timeline_file`, `sort_spilled_chunks`) | [schemas/statistics.schema.json](../schemas/statistics.schema.json) |
 | `technical.json` | `rakvor.item-technical/1` (+ `timeline`: `display_zone`, `events_total`, `events_listed`, `first_utc`, `last_utc`, `tools`, `events`, `signals`) | [schemas/item-technical.schema.json](../schemas/item-technical.schema.json) |
 | `summary.json` | `rakvor.item-summary/1` | [schemas/item-summary.schema.json](../schemas/item-summary.schema.json) |
 | `custody.json` | `rakvor.item-custody/1` | [schemas/item-custody.schema.json](../schemas/item-custody.schema.json) |

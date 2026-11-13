@@ -175,7 +175,8 @@ flowchart BT
     U["Unit tests (core)<br/>parsers · display zones and CET/CEST · ordering · external sort ·<br/>each signal rule and severity · Timesketch line · chain tamper · i18n keys"] --> R
     R["Reader tests (tests/readers.rs)<br/>discovery · every verification rule · each reader · malformed values"] --> S
     S["Sample case (tests/sample_case.rs)<br/>clean + 3 tampered copies vs expected_timeline.json"] --> I
-    I["CLI and GUI tests<br/>help, exit codes, describe, docs drift, viewer refusal, review log (headless)"] --> X
+    I["CLI and GUI tests<br/>help, exit codes, describe, docs drift, viewer refusal, review log (headless)"] --> D
+    D["determinism.rs (two builds, same bytes) ·<br/>hostile.rs (mutated, re-sealed cases) · large_case.rs (200 000 events)"] --> X
     X["Cross-checks in CI<br/>verify_chain.py · validate_reports.py · Python-profile golden case · real TSA"]
 ```
 
@@ -190,12 +191,16 @@ flowchart LR
     PR["Push / PR"] --> L["lint (Linux)<br/>fmt · cargo-deny · clippy · actionlint"]
     L --> T1["test ubuntu-latest"]
     L --> T2["test windows-latest<br/>+ Windows clippy"]
-    T1 & T2 --> S["self-test · sample build (exit 3) ·<br/>verify_chain.py · validate_reports.py ·<br/>run.sh / run.ps1 · golden case"]
+    T1 & T2 --> S["ground truth · determinism · self-test ·<br/>sample build (exit 3) · verify_chain.py ·<br/>validate_reports.py · run.sh / run.ps1 · golden case"]
+    L --> LG["large (Linux, release + overflow checks)<br/>large_case 200 000 events ·<br/>hostile 3 000 mutations"]
     T2 --> TSA["real TSA smoke test<br/>(informative)"]
     T2 --> B["release binaries<br/>(artifact)"]
 ```
 
-`ci.yml` runs on every push and pull request with read-only permissions.
+`ci.yml` runs on every push and pull request with read-only permissions. The `large` job runs
+`cargo test --release -p rv-timeline-core --test large_case -- --ignored` (a synthetic case of 200 000 events,
+small sort threshold so the external sort spills, ordered output, bounded peak memory; `RV_LARGE_EVENTS` changes
+the size) and `--test hostile` with `RV_FUZZ_ITERS=3000`, and writes both summaries to the job page.
 
 ## Releasing
 

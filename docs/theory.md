@@ -258,7 +258,7 @@ skipped with reason `self`.
 
 | # | Check | Failure → reason |
 | --- | --- | --- |
-| 1 | `run_dir` has the form `runs/<tool>/<run>` (no `..`, no absolute path) | `unreadable` |
+| 1 | `run_dir` has the form `runs/<tool>/<run>` (no `..`, no absolute path), and the run folder, resolved with symbolic links and junctions followed, stays inside the case folder | `unreadable` |
 | 2 | `logs/audit.jsonl` exists, is not empty and its chain is intact: `seq` consecutive from 1, `prev_entry_hash` links, `entry_hash` = SHA-256 of the canonical entry ([B10](#b10-the-audit-hash-chain)) | `unreadable` / `chain_broken` |
 | 3 | the audit log has a `run_finished` entry, not `cancelled` | `not_finished` |
 | 4 | `case-log.jsonl` is an intact chain | `chain_broken` |
@@ -269,7 +269,10 @@ skipped with reason `self`.
 | 9 | every output the audit log records with a digest and whose name ends in `.json`, `.csv` or `.jsonl` exists and matches **every** recorded digest (any of the six algorithms the run used) | `digest_mismatch` / `unreadable` |
 
 Each reader then reads only files the audit log records, and re-checks the digest of each file at the moment it
-reads it (`RunData::check_file`), so a file changed between verification and reading is caught too. A reader error
+reads it (`RunData::check_file`), so a file changed between verification and reading is caught too. A recorded
+output path is accepted only as a plain relative path (forward slashes; no `..`, root, drive, empty component or
+`:`), and the file, resolved, must stay inside the run folder: a symlink or junction leading out of the case is
+refused (`unreadable`). A reader error
 also excludes the run. HTML and PDF renderings are not read and not checked (the sample case even prunes them).
 
 Supported versions (the reader table): rv-hashinv **0.4.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
@@ -348,7 +351,13 @@ log, once per item and run.
 | rv-certcheck (0.2.x) | `cert.not_before`, `cert.not_after`, `cert.revoked`, `tsa.gen_time` (`chain.json`) | `c<n>` when the file holds several certificates |
 
 The parsers in [timefmt.rs](../src/core/src/readers/timefmt.rs) are strict: each accepts exactly its format and
-returns nothing otherwise; the value is then skipped (never invented). Every value keeps its **precision** (`day` for
+returns nothing otherwise; the value is then skipped (never invented) and counted: `times_skipped` (with up to 100
+examples) in the run's `run_read` audit entry, the total in `statistics.json`, and the limitation
+`TL_TIMES_SKIPPED` in every report.
+
+When the analysis run that wrote an item's outputs found that its copy **differs from the registry**
+(`evidence_verified_against_case` with `match: false`), every event of that item from that run carries the detail
+`registry_match: differs`: its times describe a file that is not bit-identical to the registered evidence. Every value keeps its **precision** (`day` for
 a date alone, `second`, `millisecond` …) and its **zone**:
 
 | Format | Example | Zone |
@@ -361,7 +370,7 @@ a date alone, `second`, `millisecond` …) and its **zone**:
 | OpenSSL text | `Nov 10 10:00:00 2026 GMT` | UTC |
 | mbox `From ` line | `From bruno@example.org Wed Nov 11 09:40:00 2026` | unknown (asctime has no zone) |
 | PNG tIME | written by rv-imgauth as UTC | explicit (UTC by the PNG specification) |
-| chat time | `02/03/2026, 10:00` converted by rv-rsmf | explicit when the examiner gave rv-rsmf `--timezone` (the zone is in `details.zone_applied`); unknown otherwise |
+| chat time | `02/03/2026, 10:00` converted by rv-rsmf | explicit when the examiner gave rv-rsmf `--timezone` (the zone is in `details.zone_applied`; `offset_min` is that zone's offset at the instant when this version knows its rules — UTC, a fixed offset, America/Bogota, Europe/Paris — and null for other names); unknown otherwise |
 
 ## B6 UTC, zones and display zones
 
@@ -531,13 +540,16 @@ present ([forensic-audit.md](forensic-audit.md), [verify.rs](../src/core/src/ver
 timeline build of the sample case:
 
 ```text
-OK  67 entries, chain intact: …/runs/rv-timeline/20261113T115004Z-dcb88e/logs\audit.jsonl
+OK  67 entries, chain intact: …/runs/rv-timeline/20261113T131620Z-d8af51/logs\audit.jsonl
     truncation: the final entry #67 is anchored by the case log (run_finished)
+    review log: none
 ```
 
 The review log (`review.jsonl`) is a second chain whose first entry carries `anchor_seq`/`anchor_hash` = the run's
 `run_finished` entry: viewing after the run cannot be added to the closed audit chain, and an edited review log, or
 one copied next to another run, fails `verify-log` and `verify-case` ([review.rs](../src/core/src/review.rs)).
+`verify-log` prints `review log: <n> entries, chain intact` (or `review log: none`); `verify-case` prints the
+review entries counted across all runs.
 Independent check: [tests/verify_chain.py](../tests/verify_chain.py) re-implements the chain in Python.
 
 ## B11 The case folder and the two chains
@@ -624,9 +636,10 @@ Fiscalía *Registro de Cadena de Custodia* or a French *scellé* record (gap G9)
 | signals, their events and parameters | absolute paths in `hashes.csv`, host, OS user (`environment.json`) |
 | `hashes.csv` digests of the case files read | the RFC 3161 token and nonce |
 
-Measured for this page: two builds of the sample case with this build gave `timeline.jsonl` with the same SHA-256
-(`e0e31940…02e40af5`, 154 lines), the second with another display zone (the zone changes the reports, not the
-file). The sample's ground truth ([examples/sample/expected_timeline.json](../examples/sample/expected_timeline.json))
+Measured for this page: builds of the sample case with this build give `timeline.jsonl` with the same SHA-256
+(`ef38f42b…afbbec28d`, 154 lines) whatever the display zone (the zone changes the reports, not the file);
+[determinism.rs](../src/core/tests/determinism.rs) checks it in CI, together with the reports' JSON once the run's
+own id, times and durations are blanked. The sample's ground truth ([examples/sample/expected_timeline.json](../examples/sample/expected_timeline.json))
 is derived by an independent Python script from the tools' outputs and compared with the engine's runs, event ids,
 times, zone-unknown count and signals by [sample_case.rs](../src/core/tests/sample_case.rs).
 

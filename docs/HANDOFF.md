@@ -27,7 +27,7 @@ flowchart LR
 | Branches | `timeline-core`: core, CLI and GUI code-complete (draft PR #3); `timeline-docs`: documentation written from that code. Merging needs the owner's approval |
 | Toolchain | Rust pinned in `rust-toolchain.toml` (1.97.0); `rust-version` = 1.88 ([development.md](development.md#toolchain-pin)) |
 | Readers | rv-hashinv 0.4.x, rv-pdfauth 0.4.x, rv-imgauth 0.3.x, rv-rsmf 0.3.x, rv-mailauth 0.2.x, rv-certcheck 0.2.x |
-| CI | `ci.yml`: lint (fmt, cargo-deny, clippy `-D warnings`, actionlint) on Linux; tests on Linux and Windows (with Windows clippy), self-test, sample build (exit 3), Python verifiers, sample scripts, golden case from the Python profile, real-TSA smoke test |
+| CI | `ci.yml`: lint (fmt, cargo-deny, clippy `-D warnings`, actionlint) on Linux; tests on Linux and Windows (with Windows clippy), ground truth, determinism, self-test, sample build (exit 3), Python verifiers, sample scripts, golden case from the Python profile, real-TSA smoke test; `large` job (200 000 events, 3 000 hostile mutations, release build with overflow checks) |
 | Releases | signed with the internal Rakvor code-signing certificate once released; the chain ends at "Rakvor Internal Code Signing Root CA", SHA-256 `DC:9B:A1:A2:FC:D4:F0:63:3C:52:14:B7:CC:EB:25:BE:D8:F3:F7:D9:EB:AF:11:15:90:25:0C:BC:AA:83:DF:60` |
 | Forge | the contract this repository follows and its validator live in [rakvor-tool-forge](https://github.com/Panacota96/rakvor-tool-forge); the pinned versions are in its [version table](https://github.com/Panacota96/rakvor-tool-forge#using-a-pinned-commit) |
 
@@ -43,7 +43,7 @@ flowchart LR
 | `src/cli`, `src/gui` (`state.rs`, `viewer.rs`, `app.rs`) | thin front ends; the GUI logs every setting (`ui_*`) and writes `review.jsonl` from the timeline viewer |
 | `i18n/` | all report and GUI wording, EN/ES/FR, same keys (signals, exclusion reasons, kind labels, limitations) |
 | `examples/sample`, `tests/make_sample_case.{sh,ps1,py}` | the sample case written by the six released tools, three tampered copies, `expected_timeline.json`, and their generator |
-| `src/core/tests/` | `readers.rs`, `sample_case.rs`, `docs_catalogue.rs` (the generated tables of `docs/reports.md`) |
+| `src/core/tests/` | `readers.rs`, `sample_case.rs`, `determinism.rs`, `hostile.rs`, `large_case.rs`, `docs_catalogue.rs` (the generated tables of `docs/reports.md`) |
 | `tests/fixtures/tsa-chains` | 34 TSA certificate chains with OpenSSL's verdicts (shared by every tool) |
 | `docs/` | theory (Part A for non-experts, Part B for experts), admissibility (draft), usage, reports, ADRs |
 | `packaging/`, `deny.toml` | Inno Setup script; licence allow-list (no GPL/AGPL/LGPL) and advisory exceptions |
@@ -100,26 +100,12 @@ logged; no GPL/AGPL/LGPL components; tools report signals, not verdicts.
 
 - The licence (`LICENSE`) and the admissibility analysis ([admissibility.md](admissibility.md)) are drafts pending a
   lawyer's review (Colombia and France); every citation marked [to verify] must be checked first.
-- **Skipped time values are not recorded.** A value a reader cannot parse is counted in `ReadOutcome.skipped` with
-  a warning, but the pipeline reads through `SourceReader::read`, which returns only the events, so the count never
-  reaches the audit log or the reports. Record it in `run_read` and print it. Gap G-TL4.
-- **rv-rsmf events carry no offset.** Chat events converted with `--timezone` are `zone: explicit` with
-  `offset_min: null` (the zone name is in `details.zone_applied`); the model says `offset_min` is null only for
-  unknown zones. Compute the offset from the zone at that instant, or document the exception in model.rs.
-- **Received-hops skew parameters.** `CLOCK_SKEW_SUSPECTED` with basis `received_hops` fills `tool_a`/`tool_b` with
-  relay host names (the wording uses `host`/`previous_host`); consider removing them for that basis.
-- **Installer and template leftovers.** `packaging/windows/installer.iss` installs the template's
-  `examples\sample\evidence\` (non-recursive) and not the sample case; `examples/sample/evidence` and
-  `expected_hashes.csv` are used only by the template pipeline's tests. The `run.rs` module header still describes
-  the template's evidence pipeline.
-- **`case_mismatch` unused.** `RunData` records when an analysis run found an item different from the registry,
-  but the readers still attribute that run's events to the evidence id without a signal; decide whether such
-  events need a flag.
-- **Screenshots** in `docs/images/` predate the last fixes (156 events, 6 signals, an empty message name):
-  regenerate with `cargo run -p rv-timeline-gui --example gui_screenshot -- docs/images`.
-- **Sample README wording** (`examples/sample/README.md`, generated with the case): `EXIF_AFTER_INTAKE` is described
-  as needing a stated zone and `EVENT_IN_FUTURE` as relative to the case's last `run.finished`; the engine also
-  flags zone-unknown EXIF values (medium) and compares with the run that read the value.
+- **Skipped time values** are counted per run (`run_read`), in `statistics.json` and as `TL_TIMES_SKIPPED`, but
+  not listed per item in the technical review (G-TL4).
+- **Template leftovers.** `examples/sample/evidence` and `expected_hashes.csv` are still used by the template
+  pipeline's tests in `run.rs` and by `tests/golden/regenerate.py`; `build` does not use them.
+- **Unknown chat zone names.** rv-rsmf events converted with a `--timezone` this version has no rules for are
+  explicit with `offset_min: null` (documented in model.rs); add rules if such zones occur in cases.
 - No measured rates for how often each signal is innocent (gap G5); no per-release validation record (G6); TSA
   revocation is never checked (G18, [ADR 0002](adr/0002-tsa-token-verification.md)); RUSTSEC-2023-0071 stays an
   exception until `cms` 0.3 ([ADR 0003](adr/0003-dependency-advisories.md)).

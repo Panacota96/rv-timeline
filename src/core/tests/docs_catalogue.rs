@@ -94,7 +94,10 @@ fn kinds_table() -> String {
 fn limitations_table() -> String {
     let en = en();
     let mut out = format!("{LIM_START}\n\n| Code | Text (en.json) |\n| --- | --- |\n");
-    for code in ["TL_MAX_EVENTS"].iter().chain(TIMELINE_LIMITATIONS.iter()) {
+    for code in ["TL_TIMES_SKIPPED", "TL_MAX_EVENTS"]
+        .iter()
+        .chain(TIMELINE_LIMITATIONS.iter())
+    {
         let text = cell(en["limitations"][*code].as_str().unwrap_or_default());
         out.push_str(&format!("| `{code}` | {text} |\n"));
     }
@@ -129,7 +132,10 @@ fn catalogue_codes_are_the_engine_codes_and_the_hops_variant() {
 #[test]
 fn every_printed_limitation_is_worded() {
     let en = en();
-    for code in ["TL_MAX_EVENTS"].iter().chain(TIMELINE_LIMITATIONS.iter()) {
+    for code in ["TL_TIMES_SKIPPED", "TL_MAX_EVENTS"]
+        .iter()
+        .chain(TIMELINE_LIMITATIONS.iter())
+    {
         assert!(
             en["limitations"][*code]
                 .as_str()

@@ -67,7 +67,7 @@ source was read for this page: every citation that does not appear in the sister
 | F10 | Known-answer self-test (hash algorithms) | `rv-timeline self-test` |
 | F11 | Sample case written by the six released tools on synthetic evidence, three tampered copies, and a ground truth derived independently | [examples/](../examples/README.md); [sample_case.rs](../src/core/tests/sample_case.rs) |
 | F12 | Independent oracles: [tests/make_sample_case.py](../tests/make_sample_case.py) derives the expected events and signals from the tools' outputs; each tool's own `verify-case` grades the tampered copies; Python chain and schema verifiers | [tests/](../tests/make_sample_case.py) |
-| F13 | Strict time parsers: one format each, a value that does not parse is skipped, never guessed; reader tests with malformed values | [timefmt.rs](../src/core/src/readers/timefmt.rs), [readers.rs](../src/core/tests/readers.rs) |
+| F13 | Strict time parsers: one format each, a value that does not parse is skipped, never guessed, and counted (`times_skipped`, `TL_TIMES_SKIPPED`); reader tests with malformed values; hostile-input test (mutated, re-sealed case folders: no panic, no event cited from outside its run, recorded paths confined to the case folder) | [timefmt.rs](../src/core/src/readers/timefmt.rs), [readers.rs](../src/core/tests/readers.rs), [hostile.rs](../src/core/tests/hostile.rs) |
 | F14 | CI on Windows and Linux | `.github/workflows/ci.yml` |
 | F15 | SBOM and build provenance | `.github/workflows/release.yml` |
 | F16 | Versioned releases with `SHA256SUMS`, signed with the internal Rakvor certificate | [installation.md](installation.md) |
@@ -75,7 +75,7 @@ source was read for this page: every citation that does not appear in the sister
 | F18 | Case folder: the build's run anchored in the case log; `verify-case` re-checks every run | [case-folder.md](case-folder.md) |
 | F19 | Every build parameter recorded: display zone, clock skew, tools, UTC window, event cap, sort threshold, Timesketch output (`run_started.details.timeline`); every run discovered, skipped (with reason), verified, read (events read / kept / outside the filters) or excluded (reason, detail) | `audit.jsonl`; `statistics.json` |
 | F20 | Review log: what the examiner viewed in the GUI after the build, hash-chained and anchored to `run_finished`; checked by `verify-log` and `verify-case` | [review.rs](../src/core/src/review.rs); `review.jsonl` |
-| F21 | Every event cites its run, output file, the file's SHA-256 as audited, and a JSON pointer or log line; stable event ids | [theory.md B4](theory.md#b4-event-model-and-id-convention) |
+| F21 | Every event cites its run, output file, the file's SHA-256 as audited, and a JSON pointer or log line; stable event ids; events of an item whose examined copy differed from the registry carry `registry_match: differs` | [theory.md B4](theory.md#b4-event-model-and-id-convention) |
 | F22 | `hashes.csv`: every case file the build read, hashed when read | [reports.md](reports.md#hashescsv-the-files-read) |
 | F23 | Times kept as written with their offset; UTC placement; **zone-unknown values never converted with a guessed zone**, flagged, counted, widened tolerance | [theory.md B6](theory.md#b6-utc-zones-and-display-zones) |
 | F24 | `timeline.jsonl` digest-recorded (`timeline_written`); the GUI viewer refuses a timeline whose digest differs and re-checks each row's hash | [viewer.rs](../src/gui/src/viewer.rs) |
@@ -432,7 +432,7 @@ Owners: **Eng.** = engineering, **Counsel**, **Examiner**, **Firm** = Rakvor man
 | G-TL1 | **Derived analysis**: each event's correctness rests on the source tool's own validation, which this tool does not repeat | CO-P10, US-2, ISO-9 | Cite the source tool and version for every event relied on; attach that tool's report and validation status | Suite-level validation record listing each tool version | Examiner + Eng. |
 | G-TL2 | Device clocks and zones are not established by the tool; zone-unknown values may be off by up to 14 h; chat zones come from the examiner's `--timezone` to rv-rsmf | CO-J4, US-1 | Record device settings at collection; state the zone basis in the report | Per-source zone evidence fields in the case folder | Examiner + Eng. |
 | G-TL3 | v0.1 reads only the six tools' audited outputs: no OS logs, no file-system creation/access times, no other timelines (plaso) | US-1, ISO-4 | State it (`TL_TOOL_OUTPUTS_ONLY`); add other sources by hand in Timesketch, clearly separated | Further readers with their own verification | Eng. |
-| G-TL4 | Time values a reader could not parse are skipped and counted by the reader, but the count is not yet written to the audit log or the reports | ISO-1, US-1 | Compare the item's events with the source tool's report when an expected time is missing | Record skipped values per run (`run_read`) and print them | Eng. |
+| G-TL4 | Time values a reader cannot parse are left out of the timeline (counted per run in `run_read` with examples, in `statistics.json` and as `TL_TIMES_SKIPPED`; not listed per item in the reports) | ISO-1, US-1 | Read `times_skipped_examples` in the audit log; compare the item's events with the source tool's report | Per-item list in the technical review; parsers for the formats met | Eng. |
 | G-TL5 | Each reader supports one minor version of its tool; runs of newer tool versions are excluded until a reader is added | ISO-10 | Use supported tool versions within a case; the exclusion is reported | Readers for new versions with their own sample case | Eng. |
 
 ## Examiner checklist before filing a report
@@ -444,7 +444,9 @@ Owners: **Eng.** = engineering, **Counsel**, **Examiner**, **Firm** = Rakvor man
 4. **The case is intact**: `rv-timeline verify-case <CASE>` (and `--rehash` where the evidence copies are
    reachable) exits 0 before and after the build.
 5. **Every run is accounted for**: no run excluded, or each `RUN_NOT_VERIFIED` explained (why the run did not
-   finish, which tool version is unsupported) and the incompleteness stated.
+   finish, which tool version is unsupported) and the incompleteness stated; `TL_TIMES_SKIPPED` absent, or the
+   skipped values (audit `run_read`) explained; no event relied on carries `registry_match: differs` without
+   saying so.
 6. **Filters disclosed**: `--tool`, `--from`/`--to`, `--max-events` and `--clock-skew` as recorded in the
    statistics report; `TL_MAX_EVENTS` absent, or explained.
 7. **Zones**: the zone basis of every source relied on is stated (device settings, rv-rsmf `--timezone`); every
