@@ -647,9 +647,9 @@ fn cap(v: &str) -> String {
     }
 }
 
-/// Collects a run's events with stable ids (`<tool>:<run_id>:<item>:<kind>:<n>`; item = evidence id, else `i<index>`,
-/// else `run`, followed by `#n` or `/<sub>` for a sub-item; n counted per item and kind in reading order) and
-/// counts the values that did not parse.
+/// Collects a run's events with stable ids (`<tool>:<run_id>:<item>[/<sub>]:<kind>:<n>`; item = evidence id, else
+/// `i<index>`, else `run`; `/<sub>` only for a sub-item; n from 0 per item/sub and kind in reading order, see
+/// [`crate::model`]) and counts the values that did not parse.
 pub struct Emitter<'a> {
     pub data: &'a RunData,
     counters: BTreeMap<(String, String), u32>,
@@ -693,7 +693,6 @@ impl<'a> Emitter<'a> {
         };
         let sub = match f.item.sub.as_str() {
             "" => String::new(),
-            x if x.starts_with('#') => x.to_string(),
             x => format!("/{x}"),
         };
         let key = if !f.item.evidence_id.is_empty() {
@@ -710,11 +709,12 @@ impl<'a> Emitter<'a> {
                 .unwrap_or(0);
             format!("i{idx}{sub}")
         };
-        let n = self
+        let counter = self
             .counters
             .entry((key.clone(), f.kind.to_string()))
             .or_insert(0);
-        *n += 1;
+        let n = *counter;
+        *counter += 1;
         let id = format!(
             "{}:{}:{}:{}:{}",
             self.data.run.tool, self.data.run.run_id, key, f.kind, n

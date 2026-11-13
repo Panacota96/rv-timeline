@@ -271,37 +271,37 @@ fn hashinv_events() {
         &ev,
         &[
             (
-                &format!("{p}:run:run.started:1"),
+                &format!("{p}:run:run.started:0"),
                 "run.started",
                 "2026-11-10T09:00:00.100Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:run:run.finished:1"),
+                &format!("{p}:run:run.finished:0"),
                 "run.finished",
                 "2026-11-10T09:00:09Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:run:run.timestamped:1"),
+                &format!("{p}:run:run.timestamped:0"),
                 "run.timestamped",
                 "2026-11-10T09:00:09Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0001:intake.registered:1"),
+                &format!("{p}:E0001:intake.registered:0"),
                 "intake.registered",
                 "2026-11-10T09:00:01Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0007:intake.registered:1"),
+                &format!("{p}:E0007:intake.registered:0"),
                 "intake.registered",
                 "2026-11-10T09:00:07Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0003:fs.modified:1"),
+                &format!("{p}:E0003:fs.modified:0"),
                 "fs.modified",
                 "2026-11-03T08:00:00Z",
                 ZoneInfo::Explicit,
@@ -309,7 +309,7 @@ fn hashinv_events() {
         ],
     );
     assert_eq!(ev.len(), 3 + 7 + 7);
-    let e = find(&ev, &format!("{p}:E0002:intake.registered:1"));
+    let e = find(&ev, &format!("{p}:E0002:intake.registered:0"));
     assert_eq!(e.item.path, "D:\\evidence\\contract.pdf");
     assert_eq!(e.item.sha256, "a2".repeat(32));
     assert_eq!(
@@ -318,7 +318,7 @@ fn hashinv_events() {
     );
     assert_eq!(e.source.pointer, "/case/intake_utc");
     assert_eq!(e.precision, Precision::Millisecond);
-    let started = find(&ev, &format!("{p}:run:run.started:1"));
+    let started = find(&ev, &format!("{p}:run:run.started:0"));
     assert_eq!(started.utc_ns, 100_000_000);
     assert_eq!(started.source.file, "logs/audit.jsonl");
     assert_eq!(started.source.pointer, "line:1/ts_utc");
@@ -332,56 +332,56 @@ fn imgauth_events() {
         &ev,
         &[
             (
-                &format!("{p}:exif.original:1"),
+                &format!("{p}:exif.original:0"),
                 "exif.original",
                 "2026-11-09T23:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:exif.digitized:1"),
+                &format!("{p}:exif.digitized:0"),
                 "exif.digitized",
                 "2026-11-09T18:00:00Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}:exif.modify:1"),
+                &format!("{p}:exif.modify:0"),
                 "exif.modify",
                 "2026-11-09T18:30:00Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}:gps.time:1"),
+                &format!("{p}:gps.time:0"),
                 "gps.time",
                 "2026-11-09T23:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:xmp.create:1"),
+                &format!("{p}:xmp.create:0"),
                 "xmp.create",
                 "2026-11-09T18:00:00Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}:xmp.modify:1"),
+                &format!("{p}:xmp.modify:0"),
                 "xmp.modify",
                 "2026-11-12T09:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:xmp.history:1"),
+                &format!("{p}:xmp.history:0"),
                 "xmp.history",
                 "2026-11-12T09:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                "rv-imgauth:20261111T100000Z-bbbbbb:E0007:png.time:1",
+                "rv-imgauth:20261111T100000Z-bbbbbb:E0007:png.time:0",
                 "png.time",
                 "2026-11-08T12:00:00Z",
                 ZoneInfo::Explicit,
             ),
         ],
     );
-    let o = find(&ev, &format!("{p}:exif.original:1"));
+    let o = find(&ev, &format!("{p}:exif.original:0"));
     assert_eq!(o.original, "2026:11:09 18:00:00 -05:00");
     assert_eq!(
         (o.offset_min, o.utc_ns, o.precision),
@@ -390,7 +390,7 @@ fn imgauth_events() {
     assert_eq!(o.source.pointer, "/tags/3/value");
     assert_eq!(o.details["model"], "EC-1");
     assert_eq!(
-        find(&ev, &format!("{p}:exif.digitized:1")).details["zone"],
+        find(&ev, &format!("{p}:exif.digitized:0")).details["zone"],
         "unknown"
     );
     // "not a date" is skipped and counted, never invented.
@@ -413,37 +413,37 @@ fn pdfauth_events() {
         &ev,
         &[
             (
-                &format!("{p}/r1:pdf.info.created:1"),
+                &format!("{p}/r1:pdf.info.created:0"),
                 "pdf.info.created",
                 "2026-11-01T14:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/r1:pdf.info.modified:1"),
+                &format!("{p}/r1:pdf.info.modified:0"),
                 "pdf.info.modified",
                 "2026-11-01T14:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/r2:pdf.info.modified:1"),
+                &format!("{p}/r2:pdf.info.modified:0"),
                 "pdf.info.modified",
                 "2026-11-05T12:00:00Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}/r1:pdf.signature.claimed:1"),
+                &format!("{p}/r1:pdf.signature.claimed:0"),
                 "pdf.signature.claimed",
                 "2026-11-01T14:30:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/r1:pdf.revision.signed:1"),
+                &format!("{p}/r1:pdf.revision.signed:0"),
                 "pdf.revision.signed",
                 "2026-11-01T14:30:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/r1:pdf.xmp.saved:1"),
+                &format!("{p}/r1:pdf.xmp.saved:0"),
                 "pdf.xmp.saved",
                 "2026-11-01T14:00:00Z",
                 ZoneInfo::Explicit,
@@ -452,7 +452,7 @@ fn pdfauth_events() {
     );
     // With objects.json, Info dates come from the raw D: strings, not from the normalised technical.json value.
     assert!(!ev.iter().any(|e| e.kind == "pdf.info.saved"));
-    let c = find(&ev, &format!("{p}/r1:pdf.info.created:1"));
+    let c = find(&ev, &format!("{p}/r1:pdf.info.created:0"));
     assert_eq!(c.original, "D:20261101090000-05'00'");
     assert_eq!(c.item.sub, "r1");
     assert_eq!(
@@ -471,56 +471,56 @@ fn mailauth_events() {
         &ev,
         &[
             (
-                &format!("{p}:E0003:mail.date:1"),
+                &format!("{p}:E0003:mail.date:0"),
                 "mail.date",
                 "2026-11-10T08:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0003:mail.hop:1"),
+                &format!("{p}:E0003:mail.hop:0"),
                 "mail.hop",
                 "2026-11-10T08:00:04Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0003:mail.hop:2"),
+                &format!("{p}:E0003:mail.hop:1"),
                 "mail.hop",
                 "2026-11-10T08:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0003:mail.attachment.modified:1"),
+                &format!("{p}:E0003:mail.attachment.modified:0"),
                 "mail.attachment.modified",
                 "2026-11-13T09:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0004#1:mail.date:1"),
+                &format!("{p}:E0004/#1:mail.date:0"),
                 "mail.date",
                 "2026-11-11T11:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:E0004#2:mail.date:1"),
+                &format!("{p}:E0004/#2:mail.date:0"),
                 "mail.date",
                 "2026-11-11T12:30:00Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}:E0004#1:mail.mbox_from:1"),
+                &format!("{p}:E0004/#1:mail.mbox_from:0"),
                 "mail.mbox_from",
                 "2026-11-11T11:00:03Z",
                 ZoneInfo::Unknown,
             ),
             (
-                &format!("{p}:E0004#2:mail.mbox_from:1"),
+                &format!("{p}:E0004/#2:mail.mbox_from:0"),
                 "mail.mbox_from",
                 "2026-11-11T11:30:02Z",
                 ZoneInfo::Unknown,
             ),
         ],
     );
-    let m = find(&ev, &format!("{p}:E0004#2:mail.date:1"));
+    let m = find(&ev, &format!("{p}:E0004/#2:mail.date:0"));
     assert_eq!(m.item.path, "D:\\evidence\\box.mbox#2@900");
     assert_eq!(
         (m.item.sub.as_str(), m.item.evidence_id.as_str()),
@@ -528,7 +528,7 @@ fn mailauth_events() {
     );
     assert_eq!(m.item.sha256, "a4".repeat(32));
     assert_eq!(m.original, "Wed, 11 Nov 2026 12:30:00 -0000");
-    let hop = find(&ev, &format!("{p}:E0003:mail.hop:1"));
+    let hop = find(&ev, &format!("{p}:E0003:mail.hop:0"));
     assert_eq!(hop.details["position"], "2");
     assert_eq!(hop.source.pointer, "/headers/hops/0/date_raw");
 }
@@ -536,43 +536,35 @@ fn mailauth_events() {
 #[test]
 fn rsmf_events() {
     let ev = events("runs/rv-rsmf/20261111T130000Z-eeeeee");
-    let p = "rv-rsmf:20261111T130000Z-eeeeee:E0005/c1";
+    let p = "rv-rsmf:20261111T130000Z-eeeeee:E0005/c1/2026-11-09";
     expect(
         &ev,
         &[
             (
+                &format!("{p}:chat.message:0"),
+                "chat.message",
+                "2026-11-09T23:00:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
                 &format!("{p}:chat.message:1"),
                 "chat.message",
-                "2026-11-09T23:00:00Z",
-                ZoneInfo::Explicit,
-            ),
-            (
-                &format!("{p}:chat.message:2"),
-                "chat.message",
-                "2026-11-09T23:05:00Z",
-                ZoneInfo::Explicit,
-            ),
-            (
-                &format!("{p}:chat.conversation.first:1"),
-                "chat.conversation.first",
-                "2026-11-09T23:00:00Z",
-                ZoneInfo::Explicit,
-            ),
-            (
-                &format!("{p}:chat.conversation.last:1"),
-                "chat.conversation.last",
                 "2026-11-09T23:05:00Z",
                 ZoneInfo::Explicit,
             ),
         ],
     );
-    let m = find(&ev, &format!("{p}:chat.message:1"));
+    let m = find(&ev, &format!("{p}:chat.message:0"));
     assert_eq!(m.original, "9/11/26, 18:00");
     assert_eq!(m.precision, Precision::Minute);
     assert_eq!(m.offset_min, None);
     assert!(m.details["zone_applied"].starts_with("America/Bogota"));
     assert_eq!(m.source.file, "rsmf/trace.json");
-    assert_eq!(m.item.sub, "c1");
+    assert_eq!(m.item.sub, "c1/2026-11-09");
+    assert!(
+        !ev.iter().any(|e| e.kind.starts_with("chat.conversation.")),
+        "no derived first/last events"
+    );
     let case = fixture();
     let out = read_run_outcome(&case, &run(&case, "runs/rv-rsmf/20261111T130000Z-eeeeee")).unwrap();
     assert_eq!(out.skipped, 1, "the garbled row is counted, not placed");
@@ -586,32 +578,32 @@ fn certcheck_events() {
         &ev,
         &[
             (
-                &format!("{p}/c1:cert.not_before:1"),
+                &format!("{p}:cert.not_before:0"),
                 "cert.not_before",
                 "2026-01-01T00:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/c1:cert.not_after:1"),
+                &format!("{p}:cert.not_after:0"),
                 "cert.not_after",
                 "2027-01-01T00:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}/c1:cert.revoked:1"),
+                &format!("{p}:cert.revoked:0"),
                 "cert.revoked",
                 "2026-06-01T12:00:00Z",
                 ZoneInfo::Explicit,
             ),
             (
-                &format!("{p}:tsa.gen_time:1"),
+                &format!("{p}:tsa.gen_time:0"),
                 "tsa.gen_time",
                 "2026-11-02T10:00:00Z",
                 ZoneInfo::Explicit,
             ),
         ],
     );
-    let r = find(&ev, &format!("{p}/c1:cert.revoked:1"));
+    let r = find(&ev, &format!("{p}:cert.revoked:0"));
     assert_eq!(r.details["reason"], "keyCompromise");
     assert_eq!(
         r.source.pointer,
@@ -653,7 +645,7 @@ fn every_kind_has_a_label_in_every_language() {
             );
         }
     }
-    assert!(kinds.len() >= 29, "{kinds:?}");
+    assert!(kinds.len() >= 27, "{kinds:?}");
     for l in rv_timeline_core::i18n::LANGS {
         let c = rv_timeline_core::i18n::catalog(l);
         for k in &kinds {

@@ -1,11 +1,13 @@
 //! rv-rsmf 0.3.x (chat exports → RSMF). Reads `rsmf/trace.json` (one row per converted event: export,
 //! source_file, line, source_time as written in the export, utc as rv-rsmf computed it, conversation, kind) and
-//! `rsmf/conversions.json` (export → item index, source kind). Sub-item: the conversation id. Events:
+//! `rsmf/conversions.json` (export → item index, source kind). Events:
 //!
 //! | Kind | Source |
 //! | --- | --- |
 //! | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` | each trace row (RSMF event type) |
-//! | `chat.conversation.first`, `chat.conversation.last` | earliest / latest row of each conversation |
+//!
+//! Sub-item: `<conversation id>/<day>` (the row's `conversation` and the stem of its `rsmf_file`). No derived
+//! events (first/last of a conversation): the ordered timeline shows them.
 //!
 //! Zone rule (never guessed here): a `source_time` with its own offset is used as written. A zone-less
 //! `source_time` with an rv-rsmf `utc` takes the offset between the two when the wall clock is ISO 8601 (Telegram);
@@ -17,7 +19,7 @@
 //!
 //! ```text
 //! rsmf/conversions.json ── exports[] (export → item_index, source) ─┐
-//! rsmf/trace.json ── rows (source_time, utc, conversation, kind) ───┴─► chat.* events per conversation
+//! rsmf/trace.json ── rows (source_time, utc, conversation, kind) ───┴─► chat.* events per conversation/day
 //! ```
 
 use super::{Emitter, Found, ReadOutcome, RunData, s, timefmt};
@@ -94,6 +96,18 @@ fn row_time(
     })
 }
 
+/// Sub-item of a trace row: `<conversation id>/<day>`, the day being the stem of the RSMF file the row went into
+/// (`c-554810aa3173` + `…/Ana-Ruiz-aa3173/2026-03-02.rsmf` → `c-554810aa3173/2026-03-02`).
+fn sub_of(conversation: &str, rsmf_file: &str) -> String {
+    let file = rsmf_file.rsplit(['/', '\\']).next().unwrap_or_default();
+    let day = file.strip_suffix(".rsmf").unwrap_or(file);
+    match (conversation.is_empty(), day.is_empty()) {
+        (_, true) => conversation.to_string(),
+        (true, false) => day.to_string(),
+        (false, false) => format!("{conversation}/{day}"),
+    }
+}
+
 pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
     let data = RunData::load(case_dir, run)?;
     let mut em = Emitter::new(&data);
@@ -114,11 +128,7 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
     let Some((trace, sha)) = data.json(rel)? else {
         return Ok(em.finish());
     };
-    // (item index, conversation) → (first, last): (utc_s, utc_ns, row index, parsed, zone_applied).
-    type Edge = (i64, u32, usize, timefmt::Parsed, Option<String>);
-    let mut edges: BTreeMap<(u64, String), (Edge, Edge)> = BTreeMap::new();
-    let rows = trace.as_array().cloned().unwrap_or_default();
-    for (i, r) in rows.iter().enumerate() {
+    for (i, r) in trace.as_array().into_iter().flatten().enumerate() {
         let export = s(&r["export"]);
         let Some((index, source)) = exports.get(export) else {
             continue;
@@ -126,7 +136,7 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
         let Some(item) = data.items.get(index) else {
             continue;
         };
-        let conv = s(&r["conversation"]).to_string();
+        let sub = sub_of(s(&r["conversation"]), s(&r["rsmf_file"]));
         let kind = match s(&r["kind"]) {
             "" | "message" => "chat.message",
             "disclaimer" => "chat.disclaimer",
@@ -147,21 +157,9 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
         if let Some((_, Some(z))) = &parsed {
             details.push(("zone_applied", format!("{z} (rv-rsmf --timezone)")));
         }
-        if let Some((p, z)) = &parsed {
-            let e: Edge = (p.utc_s, p.utc_ns, i, *p, z.clone());
-            let slot = edges
-                .entry((*index, conv.clone()))
-                .or_insert((e.clone(), e.clone()));
-            if (e.0, e.1) < (slot.0.0, slot.0.1) {
-                slot.0 = e.clone();
-            }
-            if (e.0, e.1) >= (slot.1.0, slot.1.1) {
-                slot.1 = e;
-            }
-        }
         em.push(
             Found {
-                item: item.item_ref(&conv),
+                item: item.item_ref(&sub),
                 kind,
                 original: st.to_string(),
                 file: rel,
@@ -172,39 +170,22 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
             parsed.map(|p| p.0),
         );
     }
-    for ((index, conv), (first, last)) in edges {
-        let Some(item) = data.items.get(&index) else {
-            continue;
-        };
-        for (kind, e) in [
-            ("chat.conversation.first", first),
-            ("chat.conversation.last", last),
-        ] {
-            let (_, _, i, p, z) = e;
-            let mut details = vec![("event_id", s(&rows[i]["event_id"]).to_string())];
-            if let Some(z) = z {
-                details.push(("zone_applied", format!("{z} (rv-rsmf --timezone)")));
-            }
-            em.push(
-                Found {
-                    item: item.item_ref(&conv),
-                    kind,
-                    original: s(&rows[i]["source_time"]).to_string(),
-                    file: rel,
-                    file_sha256: &sha,
-                    pointer: format!("/{i}/source_time"),
-                    details,
-                },
-                Some(p),
-            );
-        }
-    }
     Ok(em.finish())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn sub_items() {
+        assert_eq!(
+            sub_of("c-1", "001-x/Ana-Ruiz-aa3173/2026-03-02.rsmf"),
+            "c-1/2026-03-02"
+        );
+        assert_eq!(sub_of("c-1", ""), "c-1");
+        assert_eq!(sub_of("", "a\\2026-03-02.rsmf"), "2026-03-02");
+    }
 
     #[test]
     fn zone_rules() {

@@ -1,5 +1,6 @@
 //! rv-certcheck 0.2.x (certificates, CRLs, OCSP, RFC 3161 tokens). Reads each item's `chain.json`. Sub-item:
-//! `c<n>`, the n-th certificate of the item (file order). Events:
+//! `c<n>`, the n-th certificate of the item (file order, from 1) when the file holds several certificates; none
+//! when it holds one. Events:
 //!
 //! | Kind | Source |
 //! | --- | --- |
@@ -21,6 +22,15 @@ use super::{Emitter, Found, ReadOutcome, RunData, s, timefmt};
 use crate::model::{ReadError, RunRef};
 use std::path::Path;
 
+/// Sub-item of the i-th certificate (0-based) of a file holding `count`: `c<i+1>`, or none for a single one.
+fn cert_sub(count: usize, i: usize) -> String {
+    if count > 1 {
+        format!("c{}", i + 1)
+    } else {
+        String::new()
+    }
+}
+
 pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
     let data = RunData::load(case_dir, run)?;
     let mut em = Emitter::new(&data);
@@ -33,8 +43,9 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
             continue;
         };
         let certs = v["certificates"].as_array().cloned().unwrap_or_default();
+        let sub_of = |i: usize| cert_sub(certs.len(), i);
         for (i, c) in certs.iter().enumerate() {
-            let sub = format!("c{}", i + 1);
+            let sub = sub_of(i);
             for (key, kind) in [
                 ("not_before", "cert.not_before"),
                 ("not_after", "cert.not_after"),
@@ -79,7 +90,7 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
                 let sub = certs
                     .iter()
                     .position(|c| s(&c["sha256"]) == cert_sha && !cert_sha.is_empty())
-                    .map(|p| format!("c{}", p + 1))
+                    .map(sub_of)
                     .unwrap_or_default();
                 em.push(
                     Found {
@@ -125,4 +136,14 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
         }
     }
     Ok(em.finish())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn certificate_sub_items_only_for_several() {
+        assert_eq!(super::cert_sub(1, 0), "");
+        assert_eq!(super::cert_sub(3, 0), "c1");
+        assert_eq!(super::cert_sub(3, 2), "c3");
+    }
 }
