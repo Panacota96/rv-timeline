@@ -1,0 +1,39 @@
+{
+  "attachments": [
+    {
+      "creation_date_raw": null,
+      "file_name": "invoice.csv",
+      "index": 1,
+      "modification_date_raw": "Fri, 13 Nov 2026 09:00:00 +0000",
+      "sha256": "d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1"
+    }
+  ],
+  "headers": {
+    "date_raw": "Tue, 10 Nov 2026 09:00:00 +0100",
+    "from": [
+      {
+        "address": "sender@example.org",
+        "domain": "example.org",
+        "name": "Sender"
+      }
+    ],
+    "hops": [
+      {
+        "by": "mx.example.com",
+        "date_raw": "Tue, 10 Nov 2026 08:00:04 +0000",
+        "from": "smtp.example.org",
+        "header_index": 0,
+        "position": 2
+      },
+      {
+        "by": "smtp.example.org",
+        "date_raw": "Tue, 10 Nov 2026 09:00:00 +0100",
+        "from": "[192.0.2.10]",
+        "header_index": 1,
+        "position": 1
+      }
+    ],
+    "message_id": "1@example.org",
+    "msg": null
+  }
+}

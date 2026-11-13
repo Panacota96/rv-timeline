@@ -4,7 +4,7 @@
   "name": "rv-timeline",
   "module": "rv_timeline",
   "title": "RV Timeline",
-  "run_command": "scan",
+  "run_command": "build",
   "planned_command": "build",
   "case_role": "analysis",
   "created": "2026-11-11",
@@ -15,5 +15,8 @@
     "-p",
     "rv-timeline-cli",
     "--"
-  ]
+  ],
+  "sample_args": [],
+  "input_mode": "case",
+  "sample_case": "examples/sample/case"
 }

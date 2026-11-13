@@ -1,0 +1,18 @@
+{
+  "dkim": {
+    "arc": {
+      "instances": 0,
+      "reason": null,
+      "result": "none"
+    },
+    "evaluated": true,
+    "key_file": "R:\\inputs\\dkim-keys.txt",
+    "key_file_problems": [],
+    "key_file_sha256": "f5de4068b295824c6f4d9b27fd4a936ed63bcc624be6c67b24a3f0e85f09092e",
+    "keys_loaded": 4,
+    "mode": "offline",
+    "not_evaluated_reason": null,
+    "signatures": []
+  },
+  "schema": "rv-mailauth.dkim/1"
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "file": "pdf/backdated-revision.pdf",
+    "from": "rv-pdfauth/examples/sample/evidence/edited-incremental.pdf",
+    "change": "revision 3 ModDate moved before revision 2 (2026-03-04 12:15 -05:00) -> PDF_REVISION_BEFORE_PREVIOUS",
+    "sha256": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+  },
+  {
+    "file": "images/future-exif.jpg",
+    "from": "rv-imgauth/examples/sample/evidence/reference/ref-1.jpg",
+    "change": "EXIF dates (with OffsetTime +02:00) moved to 2031 -> EXIF_AFTER_INTAKE and EVENT_IN_FUTURE",
+    "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+  },
+  {
+    "file": "mail/20-date-after-first-hop.eml",
+    "from": "rv-mailauth/examples/sample/evidence/01-clean-rsa.eml",
+    "change": "Date header 47 min after both Received hops -> MAIL_DATE_AFTER_FIRST_HOP (and the DKIM signature breaks)",
+    "sha256": "4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa"
+  }
+]

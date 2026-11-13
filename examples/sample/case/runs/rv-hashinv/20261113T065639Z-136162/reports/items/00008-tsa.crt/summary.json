@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "3159fd24ec2405866a88cda9728442102876a482038cfe0fdf24b1482799712c"
+  },
+  "item": {
+    "evidence_id": "E0008",
+    "file_name": "tsa.crt",
+    "index": 8
+  },
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

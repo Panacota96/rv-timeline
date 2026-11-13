@@ -1,0 +1,5 @@
+index,path,size,sha256,md5,status,error
+1,R:\evidence\images\camera-original.jpg,121033,3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317,c3df9c7e10820de1d895fca8ff8b525d,ok,
+2,R:\evidence\images\edited-gimp.jpg,105483,1a37e10d99d05c6ff552cc2ea29b218b133e1ee319b5b477d5ca64989ddff3f5,636327633cd387f9e4f80193cd87112e,attention,
+3,R:\evidence\images\future-exif.jpg,120443,88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c,2e6a144de59544131c1f2ef04735cf27,ok,
+4,R:\evidence\images\screenshot.png,193322,ac7b0609981440312d29ab1926020de1d4889192b68d48f5b4960dc672e6bd47,99a5e4d0099230fbc2521b5e82f1216c,attention,

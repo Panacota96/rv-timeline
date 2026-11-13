@@ -1,0 +1,128 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "CONTENT_CHANGED_AFTER_SIGNATURE",
+      "params": {
+        "field": "Signature1",
+        "revisions": "3"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "The signature remains mathematically valid for the signed revision; this does not show who made the later changes or whether the signer agreed to them. Compare the signed revision with the final one.",
+          "shows": "Signature Signature1 covers an earlier revision; revision(s) 3, added afterwards, change page content or document structure, which the signature does not cover.",
+          "title": "Content changed after signing"
+        }
+      }
+    },
+    {
+      "code": "DOCMDP_VIOLATION",
+      "params": {
+        "field": "Signature1",
+        "level": "2",
+        "revisions": "3"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "The classification of changes is heuristic and some PDF viewers apply permissions differently; this shows a conflict with the declared permissions, not intent.",
+          "shows": "Signature Signature1 certifies the document with permission level 2 (1 = no changes, 2 = form filling and signing, 3 = also annotations), but revision(s) 3 contain changes outside that level.",
+          "title": "Changes not allowed by the certification signature"
+        }
+      }
+    },
+    {
+      "code": "INCREMENTAL_UPDATES",
+      "params": {
+        "revisions": "3"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental saving is normal when a PDF is filled in, signed, annotated or re-saved by many programs; it does not show who changed the file or that a change was improper.",
+          "shows": "The file contains 3 revisions: the original save plus later updates appended to the end of the file. Each earlier version can be extracted and compared.",
+          "title": "Incremental updates"
+        }
+      }
+    },
+    {
+      "code": "REVISION_TIME_GAP",
+      "params": {
+        "from_rev": "2",
+        "gap": "3 d 0 h 0 min",
+        "to_rev": "3"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "Metadata dates are written by the editing software from the computer clock and can be set freely; the gap does not prove when the changes were really made or by whom.",
+          "shows": "Revision 3 is dated 3 d 0 h 0 min after revision 2 (according to their modification dates).",
+          "title": "Time gap between revisions"
+        }
+      }
+    },
+    {
+      "code": "SIGNATURE_PRESENT_TRUST_NOT_VERIFIED",
+      "params": {
+        "field": "Signature1",
+        "signer": "O=Rakvor TEST,CN=Ana Ruiz (TEST examiner)"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "This tool does not validate the certificate chain, revocation or the signer's identity; a signature can be technically intact and still come from an untrusted or self-made certificate.",
+          "shows": "The file contains signature Signature1, signed by O=Rakvor TEST,CN=Ana Ruiz (TEST examiner). Its byte coverage and cryptographic integrity are reported separately.",
+          "title": "Digital signature present (trust not verified)"
+        }
+      }
+    },
+    {
+      "code": "VISUAL_CHANGE_BETWEEN_REVISIONS",
+      "params": {
+        "changed_ratio_max": "0.000314",
+        "from_rev": "2",
+        "pages": "1",
+        "pages_added": "-",
+        "pages_removed": "-",
+        "to_rev": "3"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental updates are normal when forms are filled, documents are signed or comments are added. It does not show who made the change, when, or with what intent.",
+          "shows": "Rendering revision 2 and revision 3 gives different images on page(s) 1 (largest changed share 0.000314); pages added: -; pages removed: -. The changed areas are outlined in the comparison images.",
+          "title": "Visible change between revisions"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3"
+  },
+  "history": {
+    "last_change_after_s": 259200,
+    "saves": 3,
+    "text": {
+      "en": "The document was saved 3 times; the last change was made 3 days after creation. This information comes from the document itself and is not proof on its own."
+    },
+    "tool_category": null,
+    "tool_label": null
+  },
+  "item": {
+    "evidence_id": "E0021",
+    "file_name": "signed-then-modified.pdf",
+    "index": 4
+  },
+  "run_id": "20261113T065644Z-0d67db",
+  "schema": "rakvor.item-summary/1",
+  "status": "problem",
+  "text": {
+    "en": {
+      "next_step": "Do not rely on this file until the examiner has explained the problem.",
+      "status": "Problem found",
+      "summary": "The file could not be fully examined or shows a serious problem."
+    }
+  }
+}

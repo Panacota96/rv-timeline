@@ -1,0 +1,272 @@
+{
+  "audit": {
+    "first_seq": 6,
+    "last_seq": 12
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T06:56:39.690Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "derived_from": null,
+  "email": {
+    "kind": "eml",
+    "mbox": null,
+    "message": {
+      "attachments": [],
+      "attachments_total": 0,
+      "bytes": 1464,
+      "dkim": {
+        "arc": {
+          "instances": 0,
+          "reason": null,
+          "result": "none"
+        },
+        "evaluated": true,
+        "key_file": "R:\\inputs\\dkim-keys.txt",
+        "key_file_problems": [],
+        "key_file_sha256": "f5de4068b295824c6f4d9b27fd4a936ed63bcc624be6c67b24a3f0e85f09092e",
+        "keys_loaded": 4,
+        "mode": "offline",
+        "not_evaluated_reason": null,
+        "signatures": [
+          {
+            "algorithm": "rsa-sha256",
+            "aligned_with_from": true,
+            "body_length": 0,
+            "canonicalization": "relaxed/relaxed",
+            "domain": "example.org",
+            "expires_at": 0,
+            "identity": "@example.org",
+            "index": 1,
+            "key_line": 3,
+            "key_source": "key_file",
+            "reason": null,
+            "result": "pass",
+            "selector": "s2026",
+            "signed_at": 1794437779,
+            "signed_headers": [
+              "from",
+              "to",
+              "subject",
+              "date",
+              "message-id",
+              "mime-version",
+              "content-type",
+              "content-transfer-encoding",
+              "from"
+            ]
+          }
+        ]
+      },
+      "headers": {
+        "auth_results": [
+          {
+            "authserv_id": "mx.acme.example",
+            "header_index": 0,
+            "methods": [
+              [
+                "dkim",
+                "pass"
+              ],
+              [
+                "spf",
+                "pass"
+              ]
+            ],
+            "raw": "mx.acme.example; dkim=pass header.d=example.org header.s=s2026; spf=pass smtp.mailfrom=example.org"
+          }
+        ],
+        "date_raw": "Tue, 10 Nov 2026 09:00:00 +0100",
+        "date_timestamp": 1794297600,
+        "date_tz_offset_min": 60,
+        "date_utc": "2026-11-10T08:00:00Z",
+        "from": [
+          {
+            "address": "bruno@example.org",
+            "domain": "example.org",
+            "name": "Bruno Proveedor"
+          }
+        ],
+        "header_count": 13,
+        "hops": [
+          {
+            "by": "mx.acme.example",
+            "date_raw": "Tue, 10 Nov 2026 08:00:04 +0000",
+            "date_utc": "2026-11-10T08:00:04Z",
+            "for_addr": null,
+            "from": "smtp.example.org",
+            "header_index": 0,
+            "id": "4F2A1",
+            "position": 2,
+            "raw": "from smtp.example.org (smtp.example.org [192.0.2.25]) by mx.acme.example with ESMTPS id 4F2A1; Tue, 10 Nov 2026 08:00:04 +0000",
+            "timestamp": 1794297604,
+            "tz_offset_min": 0,
+            "with": "ESMTPS"
+          },
+          {
+            "by": "smtp.example.org",
+            "date_raw": "Tue, 10 Nov 2026 09:00:00 +0100",
+            "date_utc": "2026-11-10T08:00:00Z",
+            "for_addr": "ana@acme.example",
+            "from": "[192.0.2.10]",
+            "header_index": 1,
+            "id": "77B1",
+            "position": 1,
+            "raw": "from [192.0.2.10] (laptop.example.org) by smtp.example.org with ESMTPSA id 77B1 for <ana@acme.example>; Tue, 10 Nov 2026 09:00:00 +0100",
+            "timestamp": 1794297600,
+            "tz_offset_min": 60,
+            "with": "ESMTPSA"
+          }
+        ],
+        "hops_total": 2,
+        "kind": "eml",
+        "message_id": "20261110090000.1@example.org",
+        "mime_parts": 1,
+        "msg": null,
+        "recipients": [
+          {
+            "address": "ana@acme.example",
+            "domain": "acme.example",
+            "name": "Ana Compras"
+          }
+        ],
+        "recipients_total": 1,
+        "reply_to": [],
+        "return_path": "bruno@example.org",
+        "sender": null,
+        "structure_problems": [],
+        "subject": "Acta de la reunión de noviembre"
+      },
+      "locator": {
+        "kind": "eml",
+        "mbox": null
+      },
+      "payment_terms": [],
+      "sha256": "d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59"
+    },
+    "message_analysis": "completed",
+    "outputs": [
+      {
+        "bytes": 2503,
+        "hashes": {
+          "md5": "b8d915a5a101147d18643b4100472c7f",
+          "sha256": "dc501dee75e7305e1f879b1e21decbfd3bd0904d5274545b3fd6a06f7951b850"
+        },
+        "kind": "headers",
+        "rel_path": "headers.json"
+      },
+      {
+        "bytes": 1119,
+        "hashes": {
+          "md5": "64883f418b95f3dae626ab496ea1c713",
+          "sha256": "a69761958a4c9227a1a2ccedaafc73e4a5d92c7045688a8daaaf309db47a0ae6"
+        },
+        "kind": "dkim",
+        "rel_path": "dkim.json"
+      }
+    ],
+    "worker": {
+      "elapsed_ms": 178,
+      "memory_mb": 1024,
+      "network": {
+        "detail": "Windows: no OS network block for the worker (a Job Object cannot restrict network access); the worker code path has no network code",
+        "isolated": false,
+        "method": "none"
+      },
+      "protocol": "rv-mailauth-worker/1",
+      "status": "completed",
+      "timeout_s": 120
+    }
+  },
+  "findings": [
+    {
+      "code": "DKIM_SIGNATURE_VALID",
+      "params": {
+        "a": "rsa-sha256",
+        "d": "example.org",
+        "key_source": "key_file",
+        "s": "s2026"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It shows only that whoever held the private key of example.org signed this content; it does not show who wrote it, that the From address is truthful, or that unsigned header fields are original.",
+          "shows": "The DKIM signature of example.org (selector s2026, rsa-sha256) verifies with the key from key_file: the signed header fields and the body are unchanged since signing.",
+          "title": "DKIM signature verifies"
+        }
+      }
+    },
+    {
+      "code": "AUTH_RESULTS_RECORDED",
+      "params": {
+        "authserv_id": "mx.acme.example",
+        "count": "1",
+        "results": "dkim=pass, spf=pass"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "These are claims written into the message by a server; anyone handling the file could have added or edited them, and they were not re-checked.",
+          "shows": "1 Authentication-Results header(s); the top one, written by mx.acme.example, states: dkim=pass, spf=pass.",
+          "title": "Receiving server's checks recorded"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "3b910e8841d5a4b560a2157d9595b08c",
+    "sha256": "d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59"
+  },
+  "item": {
+    "detected_type": "Email message (RFC 5322)",
+    "error": null,
+    "evidence_id": "E0015",
+    "extension": "eml",
+    "file_name": "01-clean-rsa.eml",
+    "index": 1,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\mail\\01-clean-rsa.eml",
+    "size": 1464,
+    "status": "ok"
+  },
+  "limitations": [
+    "DKIM_NEEDS_KEY_AT_SENDING_TIME",
+    "MISSING_SIGNATURE_PROVES_NOTHING",
+    "MSG_MAY_LACK_TRANSPORT_HEADERS",
+    "BEC_HEURISTICS_FALSE_POSITIVES",
+    "HEADERS_ARE_CLAIMS",
+    "MBOX_ESCAPING_AMBIGUOUS",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 956,
+    "finished_utc": "2026-11-13T06:56:55.616Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065654Z-2f7708",
+    "started_utc": "2026-11-13T06:56:54.660Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-mailauth",
+    "version": "0.2.0"
+  }
+}

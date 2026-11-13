@@ -1,9 +1,3 @@
-<!--
-  Template note for the docs agent of a tool scaffolded from rv-timeline: steps 1–5 and 7–11 are shared (release
-  assets, verification, installer, offline use, build from source, uninstall). Rewrite the parts between
-  forge:domain markers: native libraries the tool needs, and the expected result of the sample run.
--->
-
 # Installation and verification (Windows 10/11)
 
 RV Timeline runs **locally** on the examiner's Windows 10 or 11 PC (x64). It needs no administrator rights, no
@@ -25,7 +19,7 @@ flowchart TB
     D --> E{"5 · Install"}
     E -->|portable| F["Unblock + extract zip"]
     E -->|installer| G["Per-user setup.exe<br/>no admin"]
-    F --> H["6 · self-test + sample run<br/>expected summary, verify-log"]
+    F --> H["6 · self-test + sample case<br/>exit 3, timeline listed, verify-case"]
     G --> H
     H -->|ok| J["Ready for casework<br/>keep the outputs"]
     H -->|differs| X
@@ -37,8 +31,8 @@ flowchart TB
 | --- | --- |
 | Operating system | Windows 10 or 11, x64 (`MinVersion=10.0`, `ArchitecturesAllowed=x64compatible` in the installer). Linux/macOS: build from source. |
 | Rights | Standard user. The installer is per-user (`PrivilegesRequired=lowest`). |
-| Disk | The two executables and the docs (a few MB); outputs need about 11 report files per item for one language (19 with `--lang all`) plus the logs. |
-| Memory | Files are streamed in 1 MiB chunks: memory use does not grow with file size. |
+| Disk | The two executables and the docs (a few MB). A build writes `timeline.jsonl` (about 1 KB per event), about 11 report files per evidence item for one language (19 with `--lang all`), and the logs, inside the case folder. Past 250 000 events, sorted chunks are written temporarily under the run folder (`tmp/`, removed at the end). |
+| Memory | Bounded: events are sorted on disk past 250 000 in memory; the GUI viewer keeps a few dozen bytes per event and reads rows on demand. |
 | Graphics | None required: the GUI also runs on VMs without a GPU driver (software rendering). |
 | Network | None, except the optional timestamp request (see [step 7](#7-offline-and-air-gapped-use)). |
 
@@ -159,9 +153,9 @@ Unattended:
 .\rv-timeline-0.1.0-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS="addtopath"
 ```
 
-The installer copies the executables, README, LICENSE, NOTICE, CHANGELOG, `docs\` and the sample evidence
-(`examples\sample\evidence\`), not the sample scripts or `expected_hashes.csv` (those are in the zip and the source
-tree).
+The installer copies the executables, README, LICENSE, NOTICE, CHANGELOG, `docs\` and the sample case
+(`examples\sample\case\` with its README); the sample scripts, the tampered copies and `expected_timeline.json` are
+in the zip and the source tree.
 
 <!-- forge:domain -->
 ### 5c. Native libraries
@@ -171,7 +165,7 @@ signer are compiled in (pure Rust crates, listed in the SBOM), and the C runtime
 (`.cargo/config.toml`). There is no DLL to verify or to keep next to the executables.
 <!-- /forge:domain -->
 
-## 6. First-run self-test and sample
+## 6. First-run self-test and sample case
 
 ```powershell
 rv-timeline --version
@@ -179,40 +173,47 @@ rv-timeline self-test
 ```
 
 `self-test` prints `PASS` for md5, sha1, sha256, sha512, sha3-256 and blake3 (known answers for `"abc"`), exit code
-0. It tests the hash implementations only. Then run the synthetic sample, which exercises type detection,
-duplicates, reports and the audit chain:
+0. It tests the hash implementations only. Then build the timeline of the sample case, a real case folder written
+by the six released Rakvor tools on synthetic evidence ([examples/sample](../examples/sample/README.md)):
 
 ```powershell
-# portable zip (script included): self-test, sample scan, verify-log, hashes.csv vs expected_hashes.csv
+# portable zip or source tree: works on a copy (examples\sample\out\case), the committed case is never changed
 .\examples\sample\run.ps1 -Bin .\rv-timeline.exe
+```
 
-# installer (no script installed): run it by hand into a temporary folder
+```bash
+examples/sample/run.sh target/release/rv-timeline     # Linux, or Git Bash
+```
+
+```powershell
+# installer (no script installed): build on a copy of the installed sample case
 $app = "$env:LOCALAPPDATA\Programs\Rakvor\RV Timeline"
-$out = Join-Path $env:TEMP "rv-timeline-check"
-rv-timeline scan -i "$app\examples\sample\evidence" --hash sha256,md5 --out $out --progress none --no-timestamp
-$LASTEXITCODE                                  # 0
-rv-timeline verify-log (Get-ChildItem "$out\logs" | Select-Object -Last 1).FullName   # OK … chain intact
+$work = Join-Path $env:TEMP "rv-timeline-check"; Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
+Copy-Item -Recurse "$app\examples\sample\case" "$work\case"
+rv-timeline build --case-dir "$work\case" --no-timestamp --progress none; $LASTEXITCODE   # 3
+rv-timeline verify-case "$work\case"                                                      # OK
 ```
 
 <!-- forge:domain -->
-Expected summary: **3 items, 0 errors, findings high 0, medium 1, low 0, info 2**, exit code 0 (one
-`EXTENSION_MISMATCH` for `foto-vacaciones.jpg`, one `DUPLICATE` pair `acta.txt` / `acta-copia.txt`). The SHA-256
-column of `hashes.csv` must equal `examples\sample\expected_hashes.csv` (computed independently with Python):
+The script runs `self-test`, then `build --hash sha256,md5 --lang all --display-zone America/Bogota`, and fails
+unless: `build` exits **3** (every run verifies, but the sample plants medium- and high-severity signals),
+`reports\timeline.jsonl` exists and its SHA-256 is listed in the audit entry `timeline_written`, and `verify-log`
+and `verify-case` print OK. Expected summary (this build, real output):
 
-| File | Size | SHA-256 |
-| --- | --: | --- |
-| `acta-copia.txt` | 61 | `80e089ad6704c831e386b430adf92c5f5b72ec4428566d3580660e103c183c3c` |
-| `acta.txt` | 61 | `80e089ad6704c831e386b430adf92c5f5b72ec4428566d3580660e103c183c3c` |
-| `foto-vacaciones.jpg` | 112 | `42503ebb0f9892b30b72e11cfa0cbf5bcb5d60f667d611fa9598c9b4e835c643` |
+```text
+DONE (to review: excluded runs or medium/high signals)  run <RUN-ID>
+  case:     RV-SAMPLE-001
+  runs:     verified 7, excluded 0, skipped 0
+  events:   154 (zone unknown: 5)  items: 21
+  signals:  high 1, medium 5, low 1, info 1
+```
 
-`run.ps1` / `run.sh` make this comparison themselves: they read the tool's `logs\<RUN-ID>\hashes.csv` and compare
-size, SHA-256 and MD5 of every file with `expected_hashes.csv`, print
-`hashes.csv matches expected_hashes.csv (3 files: size, SHA-256, MD5)` and exit 3 on any difference. For the
-installer (no script installed), compare the table above with `$out\logs\<RUN-ID>\hashes.csv`, or run
-`python tests\verify_chain.py <log folder>` from the source tree, which re-hashes every file of `hashes.csv`.
+The exact events and signals are the ground truth in `examples\sample\expected_timeline.json`, derived by an
+independent Python script from the tools' own outputs; `cargo test` compares them in the source tree.
 <!-- /forge:domain -->
 
-Keep the console output and the run folder as the record of this verification.
+Keep the console output and the run folder (`examples\sample\out\case\runs\rv-timeline\<RUN-ID>`) as the record
+of this verification.
 
 ## 7. Offline and air-gapped use
 
@@ -223,12 +224,12 @@ TSA, [src/core/src/trust.rs](../src/core/src/trust.rs)). There is no telemetry, 
 | --- | --- |
 | One CLI run | `--no-timestamp` |
 | All CLI runs on this PC / session | `$env:RV_NO_TIMESTAMP = "1"` (or set it as a user environment variable) |
-| GUI | untick **4. Trust → Trusted timestamp** before *Start review* |
+| GUI | untick **4. Trust → Trusted timestamp** before *Build the timeline* |
 
 An offline run with the timestamp enabled still completes: it logs `timestamp_pending` and the statistics report
 shows a warning. Later, on a machine that can reach the TSA, run `rv-timeline timestamp <log folder>` (it
 re-verifies the chain, then appends `timestamp_obtained`). To use an internal or qualified TSA, pass `--tsa-url`
-(see [admissibility.md](admissibility.md#53-eidas--regulation-eu-9102014-as-amended-by-eu-20241183)). The network
+(see [admissibility.md](admissibility.md#63-eidas--regulation-eu-9102014-as-amended-by-eu-20241183-time-stamps)). The network
 restriction is not enforced by the OS; on a connected workstation, a Windows Firewall outbound rule for
 `rv-timeline.exe` / `rv-timeline-gui.exe` allowing only the TSA host enforces it.
 
@@ -260,7 +261,8 @@ cargo test --workspace --locked            # unit + integration tests (trust tes
 # Linux
 cargo build --release --locked -p rv-timeline-cli
 target/release/rv-timeline self-test && examples/sample/run.sh target/release/rv-timeline
-python3 tests/verify_chain.py examples/sample/out/logs/$(ls examples/sample/out/logs | tail -n 1)
+run=$(ls examples/sample/out/case/runs/rv-timeline | tail -n 1)
+python3 tests/verify_chain.py examples/sample/out/case/runs/rv-timeline/$run/logs
 # cross-profile: a case folder written by the Python profile must verify with this build
 python3 tests/golden/unpack.py tests/golden/case-by-python.zip.b64 /tmp/golden
 target/release/rv-timeline verify-case /tmp/golden/CASE-GOLDEN
@@ -280,35 +282,29 @@ Be precise about what can and cannot match bit for bit in this version (gap G22)
 | `rv-timeline.exe`, `rv-timeline-gui.exe` | **Not guaranteed**: paths are not remapped and the PE header carries link-time data. The compiler is the one pinned in `rust-toolchain.toml` (both workflows run `rustup toolchain install`, which reads that file; confirm with `environment.json` → `tool.rustc` of a release run) | Provenance attestation (step 3) binds the released binary to the workflow and commit; then compare behaviour (below) |
 | zip, installer | No (archive timestamps) | Attestation (step 3) |
 
-**Functional equivalence** — run the sample with the release binary and with your build, then compare the digests
-and findings of every item:
+**Functional equivalence** — build the sample case with the release binary and with your build (each on its own
+copy of `examples/sample/case`), then compare the timelines. `timeline.jsonl` holds no run-specific value, so the
+two files must have the **same SHA-256**; the signals must be identical too:
 
 ```bash
-python - "<release-out>/reports/<RUN-ID>" "<your-out>/reports/<RUN-ID>" <<'EOF'
-import glob, json, sys
-def load(run):
-    out = {}
-    for p in sorted(glob.glob(f"{run}/items/*/technical.json")):
-        t = json.load(open(p, encoding="utf-8"))
-        out[t["item"]["file_name"]] = (t["hashes"], t["item"]["detected_type"],
-                                       [(f["code"], f["severity"], f["params"]) for f in t["findings"]])
-    return out
-a, b = load(sys.argv[1]), load(sys.argv[2])
-print("identical findings and digests" if a == b else "DIFFERENT: " + ", ".join(k for k in a if a.get(k) != b.get(k)))
+sha256sum <release-copy>/runs/rv-timeline/*/reports/timeline.jsonl <your-copy>/runs/rv-timeline/*/reports/timeline.jsonl
+python - <release-copy>/runs/rv-timeline/*/reports/statistics.json <your-copy>/runs/rv-timeline/*/reports/statistics.json <<'EOF'
+import json, sys
+a, b = (json.load(open(p, encoding="utf-8"))["timeline"]["signals"] for p in sys.argv[1:3])
+strip = lambda s: [(x["code"], x["severity"], x["events"], x["params"]) for x in s]
+print("identical signals" if strip(a) == strip(b) else "DIFFERENT signals")
 EOF
 ```
-
-The same script compares this build with the Python profile of the tool (measured identical on the sample).
 
 ## 9. Where things live
 
 | What | Location |
 | --- | --- |
-| Program (installer) | `%LOCALAPPDATA%\Programs\Rakvor\RV Timeline\` (`rv-timeline.exe`, `rv-timeline-gui.exe`, `docs\`, `examples\sample\evidence\`, `unins000.exe`) |
+| Program (installer) | `%LOCALAPPDATA%\Programs\Rakvor\RV Timeline\` (`rv-timeline.exe`, `rv-timeline-gui.exe`, `docs\`, `examples\sample\case\`, `unins000.exe`) |
 | Program (portable) | the folder you extracted |
 | PATH entry (installer task) | user environment variable `Path` (`HKCU\Environment`) |
-| Run outputs | `--out` (default `.\rakvor-out` **relative to the current folder**): `logs\<RUN-ID>\`, `reports\<RUN-ID>\`. With `--case-dir`: `<CASE>\runs\rv-timeline\<RUN-ID>\`. The GUI uses its *Output folder* field (or the case folder) |
-| Case folder | wherever you create it with `--case-dir` (`case.json`, `case-log.jsonl`, `evidence\`, `runs\`) |
+| Build outputs | always inside the case folder: `<CASE>\runs\rv-timeline\<RUN-ID>\` (`logs\`, `reports\`); `--out` is accepted and ignored |
+| Case folder | created by rv-hashinv at intake (`case.json`, `case-log.jsonl`, `evidence\`, `runs\`); rv-timeline needs an existing one |
 | GUI settings | not persisted: each start uses the defaults; every change made before a run is recorded in that run's audit log (`ui_*`) |
 | Signing certificate | wherever you keep it; only its path, subject and SHA-256 fingerprint are logged, never the password |
 | Local data, caches, temporary files | none |
@@ -336,6 +332,7 @@ The same script compares this build with the Python profile of the tool (measure
 | SmartScreen "Windows protected your PC" (unknown publisher) | SmartScreen judges a file by the **reputation** of a publicly trusted certificate; the internal Rakvor root is not one, so the warning appears even when the signature is `Valid` (and always when `NotSigned`). Only after steps 2–4 pass: *More info → Run anyway*, or remove the downloaded-file mark first with `Unblock-File .\<file>` (do this on the zip **before** extracting it). It goes away for good only with a public certificate (see `docs/release-process.md` §5). |
 | `rv-timeline` is not recognised | PATH task not selected, or the terminal was opened before installing: open a new terminal or use the full path. |
 | `self-test` prints `FAIL` | Do not use this build for evidence; re-download and repeat steps 2–4. |
-| Sample summary differs from step 6 | Wrong version or modified sample files; compare `environment.json` with the release notes and the sample digests with `expected_hashes.csv`. |
+| Sample summary differs from step 6 | Wrong version or a modified sample case; `rv-timeline verify-case examples\sample\case` and compare `environment.json` with the release notes. |
+| Every run of the sample is excluded with `unsupported_version` | The build reads other tool versions than the sample was written with; use the matching release. |
 | GUI window blank or very slow on a VM | No GPU driver: software rendering is used; give the VM more CPU. |
 | Building from source downloads another compiler | Expected: rustup installs the pinned 1.97.0 from `rust-toolchain.toml`. Offline, install it beforehand (`rustup toolchain install 1.97.0 --profile minimal`). |

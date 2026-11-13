@@ -1,0 +1,358 @@
+{
+  "anchors": [
+    "file:R:\\anchors\\rakvor-lab-root.crt"
+  ],
+  "at": "2026-06-01T00:00:00Z",
+  "certificates": [
+    {
+      "aia_ca_issuers": [],
+      "aia_ocsp": [],
+      "aki_hex": "3d83675ed5a2edf7344c4264cad655a7d74b68b4",
+      "basic_constraints": {
+        "ca": true,
+        "critical": true,
+        "path_len": 0
+      },
+      "crl_dps": [
+        "http://pki.lab.rakvor.test/intermediate.crl"
+      ],
+      "eku": [],
+      "eku_critical": false,
+      "extensions": [
+        {
+          "critical": true,
+          "name": "basicConstraints",
+          "oid": "2.5.29.19"
+        },
+        {
+          "critical": true,
+          "name": "keyUsage",
+          "oid": "2.5.29.15"
+        },
+        {
+          "critical": false,
+          "name": "subjectKeyIdentifier",
+          "oid": "2.5.29.14"
+        },
+        {
+          "critical": false,
+          "name": "authorityKeyIdentifier",
+          "oid": "2.5.29.35"
+        },
+        {
+          "critical": false,
+          "name": "crlDistributionPoints",
+          "oid": "2.5.29.31"
+        }
+      ],
+      "issuer": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA",
+      "issuer_rdns": [
+        [
+          "C",
+          "CO"
+        ],
+        [
+          "O",
+          "Rakvor Lab"
+        ],
+        [
+          "CN",
+          "Rakvor Lab Root CA"
+        ]
+      ],
+      "key": {
+        "algorithm": "rsa",
+        "bits": 2048,
+        "curve": null,
+        "encrypted": false,
+        "spki_sha256": "46849c5829fcbe6790cf948e875b2f507f85c406d7b96ac74525ba1c93d31017"
+      },
+      "key_usage": [
+        "keyCertSign",
+        "cRLSign"
+      ],
+      "key_usage_critical": true,
+      "name_constraints": null,
+      "not_after": "2040-01-01T00:00:00Z",
+      "not_before": "2025-01-01T00:00:00Z",
+      "policy_oids": [],
+      "sans": [],
+      "self_signed": false,
+      "serial_hex": "1001",
+      "sha1": "939a6e8de48ba837830e0668f1cdca92eedfcb11",
+      "sha256": "19606dd94f4fc3cb315efd501cd3d0176edfeffe738d43fa1a4a7ed8032bebeb",
+      "signature_algorithm": "sha256WithRSAEncryption",
+      "signature_algorithm_oid": "1.2.840.113549.1.1.11",
+      "ski_hex": "5d0b747720ec3bb0dd0a25162fdeaede61fb7054",
+      "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA",
+      "subject_rdns": [
+        [
+          "C",
+          "CO"
+        ],
+        [
+          "O",
+          "Rakvor Lab"
+        ],
+        [
+          "CN",
+          "Rakvor Lab Intermediate CA"
+        ]
+      ],
+      "version": 3
+    }
+  ],
+  "errors": [],
+  "item": 4,
+  "key_match": null,
+  "kind": "certificate",
+  "openssl": "OpenSSL 3.6.3 9 Jun 2026",
+  "purpose": "any",
+  "schema": "rakvor.cert-chain/1",
+  "timestamp": null,
+  "verdicts": [
+    {
+      "anchors": [
+        "file:R:\\anchors\\rakvor-lab-root.crt"
+      ],
+      "at": "2026-06-01T00:00:00Z",
+      "at_source": "given",
+      "errors": [],
+      "nodes": [
+        {
+          "anchor": null,
+          "cert": {
+            "aia_ca_issuers": [],
+            "aia_ocsp": [],
+            "aki_hex": "3d83675ed5a2edf7344c4264cad655a7d74b68b4",
+            "basic_constraints": {
+              "ca": true,
+              "critical": true,
+              "path_len": 0
+            },
+            "crl_dps": [
+              "http://pki.lab.rakvor.test/intermediate.crl"
+            ],
+            "eku": [],
+            "eku_critical": false,
+            "extensions": [
+              {
+                "critical": true,
+                "name": "basicConstraints",
+                "oid": "2.5.29.19"
+              },
+              {
+                "critical": true,
+                "name": "keyUsage",
+                "oid": "2.5.29.15"
+              },
+              {
+                "critical": false,
+                "name": "subjectKeyIdentifier",
+                "oid": "2.5.29.14"
+              },
+              {
+                "critical": false,
+                "name": "authorityKeyIdentifier",
+                "oid": "2.5.29.35"
+              },
+              {
+                "critical": false,
+                "name": "crlDistributionPoints",
+                "oid": "2.5.29.31"
+              }
+            ],
+            "issuer": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA",
+            "issuer_rdns": [
+              [
+                "C",
+                "CO"
+              ],
+              [
+                "O",
+                "Rakvor Lab"
+              ],
+              [
+                "CN",
+                "Rakvor Lab Root CA"
+              ]
+            ],
+            "key": {
+              "algorithm": "rsa",
+              "bits": 2048,
+              "curve": null,
+              "encrypted": false,
+              "spki_sha256": "46849c5829fcbe6790cf948e875b2f507f85c406d7b96ac74525ba1c93d31017"
+            },
+            "key_usage": [
+              "keyCertSign",
+              "cRLSign"
+            ],
+            "key_usage_critical": true,
+            "name_constraints": null,
+            "not_after": "2040-01-01T00:00:00Z",
+            "not_before": "2025-01-01T00:00:00Z",
+            "policy_oids": [],
+            "sans": [],
+            "self_signed": false,
+            "serial_hex": "1001",
+            "sha1": "939a6e8de48ba837830e0668f1cdca92eedfcb11",
+            "sha256": "19606dd94f4fc3cb315efd501cd3d0176edfeffe738d43fa1a4a7ed8032bebeb",
+            "signature_algorithm": "sha256WithRSAEncryption",
+            "signature_algorithm_oid": "1.2.840.113549.1.1.11",
+            "ski_hex": "5d0b747720ec3bb0dd0a25162fdeaede61fb7054",
+            "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA",
+            "subject_rdns": [
+              [
+                "C",
+                "CO"
+              ],
+              [
+                "O",
+                "Rakvor Lab"
+              ],
+              [
+                "CN",
+                "Rakvor Lab Intermediate CA"
+              ]
+            ],
+            "version": 3
+          },
+          "depth": 0,
+          "openssl_code": 0,
+          "openssl_reason": "ok",
+          "revocation": {
+            "source": "none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)",
+            "status": "unknown"
+          },
+          "revocation_note": null,
+          "status": "ok",
+          "trust_list": null
+        },
+        {
+          "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+          "cert": {
+            "aia_ca_issuers": [],
+            "aia_ocsp": [],
+            "aki_hex": null,
+            "basic_constraints": {
+              "ca": true,
+              "critical": true,
+              "path_len": null
+            },
+            "crl_dps": [],
+            "eku": [],
+            "eku_critical": false,
+            "extensions": [
+              {
+                "critical": true,
+                "name": "basicConstraints",
+                "oid": "2.5.29.19"
+              },
+              {
+                "critical": true,
+                "name": "keyUsage",
+                "oid": "2.5.29.15"
+              },
+              {
+                "critical": false,
+                "name": "subjectKeyIdentifier",
+                "oid": "2.5.29.14"
+              }
+            ],
+            "issuer": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA",
+            "issuer_rdns": [
+              [
+                "C",
+                "CO"
+              ],
+              [
+                "O",
+                "Rakvor Lab"
+              ],
+              [
+                "CN",
+                "Rakvor Lab Root CA"
+              ]
+            ],
+            "key": {
+              "algorithm": "rsa",
+              "bits": 2048,
+              "curve": null,
+              "encrypted": false,
+              "spki_sha256": "27b1731f9da4ca7087d34b93a3a87ba71249f36b5e21090992a50cd840b6e772"
+            },
+            "key_usage": [
+              "keyCertSign",
+              "cRLSign"
+            ],
+            "key_usage_critical": true,
+            "name_constraints": null,
+            "not_after": "2045-01-01T00:00:00Z",
+            "not_before": "2025-01-01T00:00:00Z",
+            "policy_oids": [],
+            "sans": [],
+            "self_signed": true,
+            "serial_hex": "01",
+            "sha1": "7f631b24ea7175e9cf956078b25714b8c8e11205",
+            "sha256": "8be85a7dc7dbf6f9e3748b2d9483fb7c4d7c0629a4716015bd00a0dccb02cb62",
+            "signature_algorithm": "sha256WithRSAEncryption",
+            "signature_algorithm_oid": "1.2.840.113549.1.1.11",
+            "ski_hex": "3d83675ed5a2edf7344c4264cad655a7d74b68b4",
+            "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA",
+            "subject_rdns": [
+              [
+                "C",
+                "CO"
+              ],
+              [
+                "O",
+                "Rakvor Lab"
+              ],
+              [
+                "CN",
+                "Rakvor Lab Root CA"
+              ]
+            ],
+            "version": 3
+          },
+          "depth": 1,
+          "openssl_code": 0,
+          "openssl_reason": "ok",
+          "revocation": null,
+          "revocation_note": null,
+          "status": "ok",
+          "trust_list": null
+        }
+      ],
+      "notes": [
+        "OpenSSL CRL checking: off (no CRL by the target's issuer among those supplied)"
+      ],
+      "online_fetches": [],
+      "openssl_code": 0,
+      "openssl_reason": "ok",
+      "openssl_version": "OpenSSL 3.6.3 9 Jun 2026",
+      "purpose": "any",
+      "signals": [
+        {
+          "code": "CERT_CHAIN_VALID",
+          "params": {
+            "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+            "at": "2026-06-01T00:00:00Z",
+            "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+          },
+          "severity": "info"
+        },
+        {
+          "code": "REVOCATION_UNKNOWN",
+          "params": {
+            "source": "none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)",
+            "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+          },
+          "severity": "medium"
+        }
+      ],
+      "status": "valid"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "icc_sha256": null,
+  "makernote_present": false,
+  "problems": [],
+  "tags": [
+    {
+      "group": "IFD0",
+      "id": 0,
+      "name": "Make",
+      "value": "ExampleCam"
+    },
+    {
+      "group": "IFD0",
+      "id": 0,
+      "name": "Model",
+      "value": "EC-1"
+    },
+    {
+      "group": "IFD0",
+      "id": 0,
+      "name": "DateTime",
+      "value": "2026:11:09 18:30:00"
+    },
+    {
+      "group": "Exif",
+      "id": 0,
+      "name": "DateTimeOriginal",
+      "value": "2026:11:09 18:00:00"
+    },
+    {
+      "group": "Exif",
+      "id": 0,
+      "name": "OffsetTimeOriginal",
+      "value": "-05:00"
+    },
+    {
+      "group": "Exif",
+      "id": 0,
+      "name": "SubSecTimeOriginal",
+      "value": "25"
+    },
+    {
+      "group": "Exif",
+      "id": 0,
+      "name": "DateTimeDigitized",
+      "value": "2026:11:09 18:00:00"
+    },
+    {
+      "group": "GPS",
+      "id": 0,
+      "name": "GPSDateStamp",
+      "value": "2026:11:09"
+    },
+    {
+      "group": "GPS",
+      "id": 0,
+      "name": "GPSTimeStamp",
+      "value": "23:00:00"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:CreateDate",
+      "value": "2026-11-09T18:00:00"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:ModifyDate",
+      "value": "2026-11-12T10:00:00+01:00"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:MetadataDate",
+      "value": "not a date"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:CreatorTool",
+      "value": "ExampleEditor 2.0"
+    }
+  ],
+  "xmp": "<x:xmpmeta/>",
+  "xmp_history": [
+    {
+      "action": "saved",
+      "changed": "/",
+      "instance_id": "xmp.iid:1",
+      "software_agent": "ExampleEditor 2.0",
+      "when": "2026-11-12T10:00:00+01:00"
+    }
+  ]
+}

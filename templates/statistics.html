@@ -9,23 +9,68 @@
     <div>{{ t.run_id }}: <strong>{{ run.run_id }}</strong></div>
     {% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}
     <div>{{ t.actor }}: {{ run.actor }}</div>
+    {% if zone %}<div>{{ t.display_zone }}: <strong>{{ zone }}</strong></div>{% endif %}
   </div>
 </header>
 {% if run.cancelled %}<p class="note">{{ t.cancelled_note }}</p>{% endif %}
 
 <div class="kv">
-  <div>{{ t.started }}</div><div>{{ run.started_utc }}</div>
-  <div>{{ t.finished }}</div><div>{{ run.finished_utc }}</div>
+  <div>{{ t.started }}</div><div>{{ run.started_utc }}{% if run.started_display %} · {{ run.started_display }}{% endif %}</div>
+  <div>{{ t.finished }}</div><div>{{ run.finished_utc }}{% if run.finished_display %} · {{ run.finished_display }}{% endif %}</div>
   <div>{{ t.duration }}</div><div>{{ run.duration_text }}</div>
   <div>{{ t.frontend }}</div><div>{{ run.frontend }}</div>
   <div>{{ t.algorithms }}</div><div>{{ run.algorithms_text }}</div>
   <div>{{ t.items }}</div><div>{{ totals.items }}</div>
-  <div>{{ t.bytes }}</div><div>{{ totals.bytes }}</div>
+  {% if timeline %}<div>{{ t.runs_verified }}</div><div>{{ timeline.verified }}</div>
+  <div>{{ t.runs_excluded }}</div><div>{{ timeline.excluded }}</div>
+  <div>{{ t.events_total }}</div><div>{{ timeline.events }}</div>
+  <div>{{ t.events_filtered }}</div><div>{{ timeline.filtered_out }}</div>
+  <div>{{ t.events_zone_unknown }}</div><div>{{ timeline.zone_unknown }}</div>
+  <div>{{ t.signals }}</div><div>{{ timeline.signal_count }}</div>
+  <div>{{ t.window }}</div><div>{{ timeline.window_text }}</div>
+  <div>{{ t.tools_filter }}</div><div>{{ timeline.tools_text }}</div>
+  <div>{{ t.clock_skew }}</div><div>{{ timeline.clock_skew_text }}</div>
+  {% if timeline.timeline_file %}<div>{{ t.timeline_file }}</div><div class="mono"><a href="{{ timeline.timeline_file }}">{{ timeline.timeline_file }}</a></div>{% endif %}
+  {% else %}<div>{{ t.bytes }}</div><div>{{ totals.bytes }}</div>
   <div>{{ t.errors }}</div><div>{{ totals.errors }}</div>
-  <div>{{ t.throughput }}</div><div>{{ totals.throughput_text }}</div>
+  <div>{{ t.throughput }}</div><div>{{ totals.throughput_text }}</div>{% endif %}
 </div>
+{% if timeline and timeline.cap_note %}<p class="note">{{ timeline.cap_note }}</p>{% endif %}
 
-<h2>{{ t.findings_by_severity }}</h2>
+{% if timeline %}
+<h2>{{ t.runs }}</h2>
+<table><tr><th>{{ t.tool }}</th><th>{{ t.run_id }}</th><th>{{ t.status }}</th><th>{{ t.events }}</th><th>{{ t.reason }}</th></tr>
+{% for r in timeline.runs %}<tr><td>{{ r.tool }} {{ r.version }}</td><td class="mono">{{ r.run_id }}</td><td>{{ r.status_label }}</td><td>{{ r.events }}</td><td>{{ r.reason }}</td></tr>{% endfor %}
+</table>
+{% if timeline.skipped %}<h2>{{ t.runs_skipped }}</h2>
+<table><tr><th>{{ t.tool }}</th><th>{{ t.run_id }}</th><th>{{ t.reason }}</th></tr>
+{% for r in timeline.skipped %}<tr><td>{{ r.tool }}</td><td class="mono">{{ r.run_id }}</td><td>{{ r.reason }}</td></tr>{% endfor %}
+</table>{% endif %}
+
+<h2>{{ t.events_by_tool }}</h2>
+{% if timeline.by_tool %}<table><tr><th>{{ t.tool }}</th><th>{{ t.events }}</th></tr>
+{% for row in timeline.by_tool %}<tr><td>{{ row.name }}</td><td>{{ row.count }}</td></tr>{% endfor %}
+</table>{% else %}<p>{{ t.none }}</p>{% endif %}
+
+<h2>{{ t.events_by_kind }}</h2>
+{% if timeline.by_kind %}<table><tr><th>{{ t.kind }}</th><th>{{ t.events }}</th></tr>
+{% for row in timeline.by_kind %}<tr><td>{{ row.name }} <span class="mono">{{ row.kind }}</span></td><td>{{ row.count }}</td></tr>{% endfor %}
+</table>{% else %}<p>{{ t.none }}</p>{% endif %}
+
+<h2>{{ t.signals_by_severity }}</h2>
+<table><tr><th>{{ t.severity }}</th><th>{{ t.signals }}</th></tr>
+{% for row in timeline.severity_rows %}<tr><td><span class="badge sev-{{ row.key }}">{{ row.label }}</span></td><td>{{ row.count }}</td></tr>{% endfor %}
+</table>
+
+<h2>{{ t.case_signals }}</h2>
+{% if timeline.case_signals %}{% for f in timeline.case_signals %}
+<div class="finding">
+  <div><span class="badge sev-{{ f.severity }}">{{ f.severity_label }}</span> <strong>{{ f.title }}</strong> <span class="mono">{{ f.code }}</span></div>
+  <div class="kv"><div>{{ t.shows }}</div><div>{{ f.shows }}</div><div>{{ t.does_not_prove }}</div><div>{{ f.does_not_prove }}</div></div>
+</div>{% endfor %}{% else %}<p>{{ t.none }}</p>{% endif %}
+{% endif %}
+
+{% if not timeline %}<h2>{{ t.findings_by_severity }}</h2>
 <table><tr><th>{{ t.severity }}</th><th>{{ t.findings }}</th></tr>
 {% for row in severity_rows %}<tr><td><span class="badge sev-{{ row.key }}">{{ row.label }}</span></td><td>{{ row.count }}</td></tr>{% endfor %}
 </table>
@@ -45,7 +90,8 @@
 {% for row in duplicate_rows %}<tr><td class="mono">{{ row.hash }}</td><td>{% for p in row.paths %}<div>{{ p }}</div>{% endfor %}</td></tr>{% endfor %}
 </table>{% else %}<p>{{ t.none }}</p>{% endif %}
 
-{% if case %}<h2>{{ t.case_verification }}</h2>
+{% endif %}
+{% if case and not timeline %}<h2>{{ t.case_verification }}</h2>
 <div class="kv">
   <div>{{ t.case }}</div><div><strong>{{ case.case_id }}</strong></div>
   <div>{{ t.registered }}</div><div>{{ case.registered }}</div>

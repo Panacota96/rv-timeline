@@ -1,0 +1,4 @@
+# The case folders are byte-exact tool outputs whose SHA-256 values are recorded in their audit logs and case log:
+# never convert line endings.
+case/** binary
+tampered/** binary

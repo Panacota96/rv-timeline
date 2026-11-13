@@ -1,0 +1,341 @@
+{
+  "items": [
+    {
+      "evidence_id": "E0001",
+      "hashes": {
+        "md5": "e807df196b2529da959ac0285cd20f45",
+        "sha256": "1b504e1928137748678b47aab45f9ab46442c5e5fb4e9dac3c0133497a5db022"
+      },
+      "path": "R:\\evidence\\certs\\data.tsr",
+      "registered_by": {
+        "audit_seq": 6,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 2557
+    },
+    {
+      "evidence_id": "E0002",
+      "hashes": {
+        "md5": "08a9622e46838803c91cac404b20de24",
+        "sha256": "f328a2c36dab3f9a3b173d38fd6cc9fe9614cbe1fc3bf0af8117d5d05b4fc7c7"
+      },
+      "path": "R:\\evidence\\certs\\data.txt",
+      "registered_by": {
+        "audit_seq": 9,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 44
+    },
+    {
+      "evidence_id": "E0003",
+      "hashes": {
+        "md5": "a015a8a50a11e5cc5081a4e4bcd88d4b",
+        "sha256": "888c2e483ad86a072a759a3bdd58dd0242d0302394ac04d0acc309d1c4651e9e"
+      },
+      "path": "R:\\evidence\\certs\\intermediate.crl",
+      "registered_by": {
+        "audit_seq": 12,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 458
+    },
+    {
+      "evidence_id": "E0004",
+      "hashes": {
+        "md5": "643abde945484b9d7a6b464c6dd3bd31",
+        "sha256": "ae452532cb82f69f375673eab1e3a3f374b004429d940cf9552821a92f2e9c7c"
+      },
+      "path": "R:\\evidence\\certs\\intermediate.crt",
+      "registered_by": {
+        "audit_seq": 15,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1330
+    },
+    {
+      "evidence_id": "E0005",
+      "hashes": {
+        "md5": "efebfe58df5781bd87e2eb96df0b1595",
+        "sha256": "346e22485a3cb93677fa1262bd12c5870f9d656d4737004018c34c8bcf18e0c9"
+      },
+      "path": "R:\\evidence\\certs\\leaf-expired.crt",
+      "registered_by": {
+        "audit_seq": 18,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1574
+    },
+    {
+      "evidence_id": "E0006",
+      "hashes": {
+        "md5": "464eff643bd286cf0b215b6521e1ae7c",
+        "sha256": "7a16fdab1650af5675aa07f5d92d0704d18da6f87d8e76d2ff5d8b2f044e8f19"
+      },
+      "path": "R:\\evidence\\certs\\leaf-revoked.crt",
+      "registered_by": {
+        "audit_seq": 21,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1574
+    },
+    {
+      "evidence_id": "E0007",
+      "hashes": {
+        "md5": "d5dd34512fd99dcc81bbbe39e192e3ef",
+        "sha256": "c6b8c40685e81a82cdebccebd28d3505a738d1c9020b512a1a3430e704ae4950"
+      },
+      "path": "R:\\evidence\\certs\\leaf.crt",
+      "registered_by": {
+        "audit_seq": 24,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1566
+    },
+    {
+      "evidence_id": "E0008",
+      "hashes": {
+        "md5": "9fa8837d2e1780e53530f72a6c6b68db",
+        "sha256": "3159fd24ec2405866a88cda9728442102876a482038cfe0fdf24b1482799712c"
+      },
+      "path": "R:\\evidence\\certs\\tsa.crt",
+      "registered_by": {
+        "audit_seq": 27,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1261
+    },
+    {
+      "evidence_id": "E0009",
+      "hashes": {
+        "md5": "729f0ac9550c171e7b1977152fc79a64",
+        "sha256": "322fb2142f200460e463b11e657390e44bb1b8b86cfb84a76b3113cd129fc762"
+      },
+      "path": "R:\\evidence\\chat\\whatsapp-android-en\\IMG-20260302-WA0001.jpg",
+      "registered_by": {
+        "audit_seq": 30,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 189
+    },
+    {
+      "evidence_id": "E0010",
+      "hashes": {
+        "md5": "e59d7e7df7723088be26d481a367eabe",
+        "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
+      },
+      "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
+      "registered_by": {
+        "audit_seq": 33,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 773
+    },
+    {
+      "evidence_id": "E0011",
+      "hashes": {
+        "md5": "c3df9c7e10820de1d895fca8ff8b525d",
+        "sha256": "3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317"
+      },
+      "path": "R:\\evidence\\images\\camera-original.jpg",
+      "registered_by": {
+        "audit_seq": 36,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 121033
+    },
+    {
+      "evidence_id": "E0012",
+      "hashes": {
+        "md5": "636327633cd387f9e4f80193cd87112e",
+        "sha256": "1a37e10d99d05c6ff552cc2ea29b218b133e1ee319b5b477d5ca64989ddff3f5"
+      },
+      "path": "R:\\evidence\\images\\edited-gimp.jpg",
+      "registered_by": {
+        "audit_seq": 39,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 105483
+    },
+    {
+      "evidence_id": "E0013",
+      "hashes": {
+        "md5": "2e6a144de59544131c1f2ef04735cf27",
+        "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+      },
+      "path": "R:\\evidence\\images\\future-exif.jpg",
+      "registered_by": {
+        "audit_seq": 42,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 120443
+    },
+    {
+      "evidence_id": "E0014",
+      "hashes": {
+        "md5": "99a5e4d0099230fbc2521b5e82f1216c",
+        "sha256": "ac7b0609981440312d29ab1926020de1d4889192b68d48f5b4960dc672e6bd47"
+      },
+      "path": "R:\\evidence\\images\\screenshot.png",
+      "registered_by": {
+        "audit_seq": 45,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 193322
+    },
+    {
+      "evidence_id": "E0015",
+      "hashes": {
+        "md5": "3b910e8841d5a4b560a2157d9595b08c",
+        "sha256": "d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59"
+      },
+      "path": "R:\\evidence\\mail\\01-clean-rsa.eml",
+      "registered_by": {
+        "audit_seq": 48,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1464
+    },
+    {
+      "evidence_id": "E0016",
+      "hashes": {
+        "md5": "f4e8e05ccc50d543ed3703f21cb965d4",
+        "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+      },
+      "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+      "registered_by": {
+        "audit_seq": 51,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 3238
+    },
+    {
+      "evidence_id": "E0017",
+      "hashes": {
+        "md5": "827870dedf658a5968a9a8beb4900baf",
+        "sha256": "4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa"
+      },
+      "path": "R:\\evidence\\mail\\20-date-after-first-hop.eml",
+      "registered_by": {
+        "audit_seq": 54,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1464
+    },
+    {
+      "evidence_id": "E0018",
+      "hashes": {
+        "md5": "e7aedb4ea7ff49b02133b26285c29b28",
+        "sha256": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+      },
+      "path": "R:\\evidence\\pdf\\backdated-revision.pdf",
+      "registered_by": {
+        "audit_seq": 57,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 3613
+    },
+    {
+      "evidence_id": "E0019",
+      "hashes": {
+        "md5": "b28a97d821a22ccdf5726426c16b8fed",
+        "sha256": "2ada8845654ce455968242d3aa211e26339943fa82cb69e07f610915485d93b0"
+      },
+      "path": "R:\\evidence\\pdf\\edited-incremental.pdf",
+      "registered_by": {
+        "audit_seq": 60,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 3613
+    },
+    {
+      "evidence_id": "E0020",
+      "hashes": {
+        "md5": "8d2b5163663d6eaf0ff751d364efe5d6",
+        "sha256": "7446db6b551798dc8389da3e84e90bc5caf40c3008b71fc19e56afd13164c743"
+      },
+      "path": "R:\\evidence\\pdf\\original.pdf",
+      "registered_by": {
+        "audit_seq": 63,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 1648
+    },
+    {
+      "evidence_id": "E0021",
+      "hashes": {
+        "md5": "6f259789b37be1219f161c23960fd169",
+        "sha256": "a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3"
+      },
+      "path": "R:\\evidence\\pdf\\signed-then-modified.pdf",
+      "registered_by": {
+        "audit_seq": 66,
+        "run_id": "20261113T065639Z-136162",
+        "tool": "rv-hashinv",
+        "version": "0.4.1"
+      },
+      "registered_utc": "2026-11-13T06:56:39.690Z",
+      "size": 11980
+    }
+  ],
+  "schema": "rakvor.registry/1"
+}

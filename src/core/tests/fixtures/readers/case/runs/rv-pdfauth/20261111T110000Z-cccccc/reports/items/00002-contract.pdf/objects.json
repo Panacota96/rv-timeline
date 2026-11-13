@@ -1,0 +1,58 @@
+{
+  "revisions": [
+    {
+      "objects": [
+        {
+          "dict": {
+            "Pages": "2 0 R",
+            "Type": "/Catalog"
+          },
+          "id": "1 0",
+          "offset": 15,
+          "type": "/Catalog"
+        },
+        {
+          "dict": {
+            "CreationDate": "D:20261101090000-05'00'",
+            "ModDate": "D:20261101090000-05'00'",
+            "Producer": "ExampleWriter 1.0"
+          },
+          "id": "7 0",
+          "offset": 400,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "ByteRange": [
+              0,
+              10,
+              20,
+              30
+            ],
+            "Filter": "/Adobe.PPKLite",
+            "M": "D:20261101093000-05'00'",
+            "Name": "Signer Example",
+            "Type": "/Sig"
+          },
+          "id": "9 0",
+          "offset": 600,
+          "type": "/Sig"
+        }
+      ]
+    },
+    {
+      "objects": [
+        {
+          "dict": {
+            "CreationDate": "D:20261101090000-05'00'",
+            "ModDate": "D:20261105120000",
+            "Producer": "ExampleEditor 2.0"
+          },
+          "id": "7 0",
+          "offset": 1200,
+          "type": "dict"
+        }
+      ]
+    }
+  ]
+}

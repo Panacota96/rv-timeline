@@ -10,15 +10,17 @@
     <div>{{ t.item }} #{{ item.index }}</div>
     {% if item.evidence_id %}<div>{{ t.evidence_id }}: <strong>{{ item.evidence_id }}</strong></div>{% endif %}
     {% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}
+    {% if zone %}<div>{{ t.display_zone }}: <strong>{{ zone }}</strong></div>{% endif %}
   </div>
 </header>
 
 <div class="kv">
   <div>{{ t.path }}</div><div class="mono">{{ item.path }}</div>
   <div>{{ t.size }}</div><div>{{ item.size }}</div>
-  <div>{{ t.modified }}</div><div>{{ item.modified_utc }}</div>
+  {% if item.timeline %}<div>{{ t.events }}</div><div>{{ item.timeline_text }}</div>
+  {% else %}<div>{{ t.modified }}</div><div>{{ item.modified_utc }}</div>
   <div>{{ t.extension }}</div><div>{{ item.extension_text }}</div>
-  <div>{{ t.detected_type }}</div><div>{{ item.detected_text }}</div>
+  <div>{{ t.detected_type }}</div><div>{{ item.detected_text }}</div>{% endif %}
   <div>{{ t.status }}</div><div>{{ item.status_label }}</div>
   {% if case %}<div>{{ t.case }}</div><div>{{ case.case_id }}</div>
   <div>{{ t.evidence_id }}</div><div class="mono">{{ item.evidence_id or t.none }}</div>
@@ -37,6 +39,13 @@
   <div><span class="badge sev-{{ f.severity }}">{{ f.severity_label }}</span> <strong>{{ f.title }}</strong> <span class="mono">{{ f.code }}</span></div>
   <div class="kv"><div>{{ t.shows }}</div><div>{{ f.shows }}</div><div>{{ t.does_not_prove }}</div><div>{{ f.does_not_prove }}</div></div>
 </div>{% endfor %}{% else %}<p>{{ t.none }}</p>{% endif %}
+
+{% if item.timeline %}<h2>{{ t.events }}</h2>
+{% if events %}<table><tr><th>{{ t.time_utc }}</th><th>{{ t.time_display }} ({{ zone }})</th><th>{{ t.kind }}</th><th>{{ t.original }}</th><th>{{ t.source }}</th></tr>
+{% for e in events %}<tr><td class="mono">{{ e.utc }}</td><td>{{ e.display }}</td><td>{{ e.kind_label }}{% if e.sub %} <span class="mono">{{ e.sub }}</span>{% endif %}</td><td class="mono">{{ e.original }}</td><td>{{ e.tool }} · <span class="mono">{{ e.run_id }} · {{ e.file }}{% if e.pointer %} {{ e.pointer }}{% endif %}</span></td></tr>{% endfor %}
+</table>{% else %}<p>{{ t.none }}</p>{% endif %}
+{% if events_more %}<p class="note">{{ events_more }}</p>{% endif %}
+{% endif %}
 
 <h2>{{ t.method }}</h2>
 <p>{{ t.method_text }}</p>

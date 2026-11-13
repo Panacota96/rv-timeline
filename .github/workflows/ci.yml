@@ -67,18 +67,27 @@ jobs:
             grep -E "panicked at|^---- |FAILED|^failures:|assertion|Error:|error:" test.log | head -40 | while IFS= read -r l; do echo "::error title=cargo test::${l}"; done
             exit 1
           fi
+      - name: Ground truth (sample case against examples/sample/expected_timeline.json)
+        run: cargo test --locked -p rv-timeline-core --test sample_case
+      - name: Determinism (two builds of the same case give the same timeline.jsonl and reports JSON)
+        run: cargo test --locked -p rv-timeline-core --test determinism
       - name: Self-test of the hash implementations
         run: cargo run --locked -q -p rv-timeline-cli -- self-test
-      - name: Sample run
-        shell: bash
-        run: cargo run --locked -q -p rv-timeline-cli -- scan -i examples/sample/evidence --hash sha256,blake3 --lang all --out ci-out --progress none --no-timestamp
-      - name: Cross-language verification (Python re-checks the chain, hashes and JSON schemas)
+      - name: Sample run (build on a copy of the sample case; exit 3 expected, planted signals)
         shell: bash
         run: |
-          run=$(find ci-out/logs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
-          python tests/verify_chain.py "ci-out/logs/$run"
-          python tests/validate_reports.py "ci-out/reports/$run"
-      - name: Sample script (compares the tool's hashes.csv with expected_hashes.csv)
+          rm -rf ci-out && mkdir -p ci-out && cp -R examples/sample/case ci-out/case
+          code=0
+          cargo run --locked -q -p rv-timeline-cli -- build --case-dir ci-out/case --hash sha256,blake3 --lang all --progress none --no-timestamp || code=$?
+          test "$code" -eq 3
+      - name: Cross-language verification (Python re-checks the chain and JSON schemas)
+        shell: bash
+        run: |
+          run=$(find ci-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
+          test -s "ci-out/case/runs/rv-timeline/$run/reports/timeline.jsonl"
+          python tests/verify_chain.py "ci-out/case/runs/rv-timeline/$run/logs"
+          python tests/validate_reports.py "ci-out/case/runs/rv-timeline/$run/reports"
+      - name: Sample script (build on the sample case; timeline.jsonl written and listed in the audit log)
         if: runner.os == 'Linux'
         env:
           RV_NO_TIMESTAMP: "1"
@@ -86,6 +95,15 @@ jobs:
         run: |
           cargo build --locked -q -p rv-timeline-cli
           sh examples/sample/run.sh target/debug/rv-timeline
+      - name: Sample script (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          RV_NO_TIMESTAMP: "1"
+          RV_SAMPLE_OUT: sample-out-win
+        run: |
+          cargo build --locked -q -p rv-timeline-cli
+          ./examples/sample/run.ps1 -Bin target/debug/rv-timeline.exe
       - name: Cross-profile golden case (written by the Python profile; tests/golden/regenerate.py)
         shell: bash
         run: |
@@ -101,10 +119,11 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          cargo run --locked -q -p rv-timeline-cli -- scan -i examples/sample/evidence --out tsa-out --progress none | tee tsa.txt
+          rm -rf tsa-out && mkdir -p tsa-out && cp -R examples/sample/case tsa-out/case
+          cargo run --locked -q -p rv-timeline-cli -- build --case-dir tsa-out/case --progress none | tee tsa.txt || true
           grep -q "timestamp: ok" tsa.txt
-          run=$(find tsa-out/logs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
-          cargo run --locked -q -p rv-timeline-cli -- verify-log "tsa-out/logs/$run"
+          run=$(find tsa-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
+          cargo run --locked -q -p rv-timeline-cli -- verify-log "tsa-out/case/runs/rv-timeline/$run/logs"
       - name: Build release binaries (Windows)
         if: runner.os == 'Windows'
         run: cargo build --release --locked -p rv-timeline-cli -p rv-timeline-gui
@@ -116,3 +135,31 @@ jobs:
             target/release/rv-timeline.exe
             target/release/rv-timeline-gui.exe
           retention-days: 14
+
+  # Size and hostile inputs, in an optimised build that keeps overflow checks and debug assertions (Linux only:
+  # the code paths are platform-independent and the Windows job already runs the debug fuzz pass).
+  large:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS: "true"
+      CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain pinned in rust-toolchain.toml (channel and components)
+        run: rustup toolchain install && rustc --version
+      - uses: Swatinem/rust-cache@v2
+      - name: Large case (200k events, external sort, bounded memory, ordered timeline.jsonl)
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --release --locked -p rv-timeline-core --test large_case -- --ignored --nocapture 2>&1 | tee large.log
+          grep "large case:" large.log >> "$GITHUB_STEP_SUMMARY"
+      - name: Hostile inputs (3000 mutations of the sample case, re-sealed)
+        shell: bash
+        env:
+          RV_FUZZ_ITERS: "3000"
+        run: |
+          set -o pipefail
+          cargo test --release --locked -p rv-timeline-core --test hostile -- --nocapture 2>&1 | tee fuzz.log
+          grep "mutations, slowest" fuzz.log >> "$GITHUB_STEP_SUMMARY"

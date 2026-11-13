@@ -5,11 +5,12 @@
 <main>
 <header>
   <div><h1>{{ t.title_summary }}</h1><div>{{ item.file_name }}</div></div>
-  <div class="meta">{% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}{% if item.evidence_id %}<div>{{ t.evidence_id }}: {{ item.evidence_id }}</div>{% endif %}<div>{{ run.finished_utc }}</div></div>
+  <div class="meta">{% if run.case_id %}<div>{{ t.case }}: {{ run.case_id }}</div>{% endif %}{% if item.evidence_id %}<div>{{ t.evidence_id }}: {{ item.evidence_id }}</div>{% endif %}<div>{{ run.finished_utc }}</div>{% if zone %}<div>{{ t.display_zone }}: <strong>{{ zone }}</strong></div>{% endif %}</div>
 </header>
 
 <p class="status status-{{ item.status }}">{{ item.status_label }}</p>
 <p>{{ item.summary_text }}</p>
+{% if item.timeline_text %}<p>{{ item.timeline_text }}</p>{% endif %}
 
 <h2>{{ t.what_we_did }}</h2>
 <p>{{ t.method_text }}</p>

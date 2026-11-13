@@ -1,0 +1,30 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "evidence_id": "E0008",
+  "examiner": "Sample Examiner",
+  "hashes": {
+    "md5": "9fa8837d2e1780e53530f72a6c6b68db",
+    "sha256": "3159fd24ec2405866a88cda9728442102876a482038cfe0fdf24b1482799712c"
+  },
+  "intake_utc": "2026-11-13T06:56:39.690Z",
+  "item": {
+    "file_name": "tsa.crt",
+    "index": 8,
+    "path": "R:\\evidence\\certs\\tsa.crt",
+    "size": 1261
+  },
+  "jurisdiction": "co",
+  "operations": [
+    {
+      "audit_first_seq": 26,
+      "audit_last_seq": 28,
+      "end_utc": "2026-11-13T06:56:39.702Z",
+      "start_utc": "2026-11-13T06:56:39.631Z",
+      "tool": "rv-hashinv",
+      "version": "0.4.1"
+    }
+  ],
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-custody/1",
+  "transfers": []
+}

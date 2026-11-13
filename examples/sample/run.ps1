@@ -1,34 +1,33 @@
-# Runs the sample review on Windows and checks the result.
-# Fails (non-zero exit) if the self-test, the scan or verify-log fails, or if the tool's hash register
-# (logs\<RUN-ID>\hashes.csv) differs from the independently computed expected_hashes.csv.
+# Builds the timeline of the sample case on Windows and checks the result.
+# Works on a copy of examples\sample\case in examples\sample\out (or $env:RV_SAMPLE_OUT), so the committed case is
+# never changed. Fails (non-zero exit) if the self-test fails, if `build` does not end with the expected exit code,
+# if reports\timeline.jsonl is missing or not listed with its SHA-256 in the run's audit log, or if verify-log or
+# verify-case fails.
 # Usage: .\examples\sample\run.ps1 [-Bin C:\path\to\rv-timeline.exe]
 param([string]$Bin = "rv-timeline")
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$out = Join-Path $here "out"
+$out = if ($env:RV_SAMPLE_OUT) { $env:RV_SAMPLE_OUT } else { Join-Path $here "out" }
+$case = Join-Path $out "case"
+if (Test-Path $case) { Remove-Item -Recurse -Force $case }
+New-Item -ItemType Directory -Force $out | Out-Null
+Copy-Item -Recurse (Join-Path $here "case") $case
 & $Bin self-test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-# Expected exit code 0: one medium finding (extension mismatch) and one duplicate pair, no high finding.
-& $Bin scan --input (Join-Path $here "evidence") --hash sha256,md5 --lang all --case DEMO-001 --actor "Sample" --out $out --progress none
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-$run = Get-ChildItem (Join-Path $out "logs") | Sort-Object Name | Select-Object -Last 1
-& $Bin verify-log $run.FullName; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-# Compare the tool's hash register (logs\<RUN-ID>\hashes.csv) with the independently computed
-# expected_hashes.csv: same files, sizes, SHA-256 and MD5. Any difference fails the script (exit 3).
-$expected = Import-Csv (Join-Path $here "expected_hashes.csv")
-$register = Import-Csv (Join-Path $run.FullName "hashes.csv")
-$bad = 0
-if ($register.Count -ne $expected.Count) {
-  Write-Host "MISMATCH: the tool hashed $($register.Count) files, expected_hashes.csv lists $($expected.Count)"
-  $bad = 1
+# Expected exit code 3: every run verifies, but the sample plants medium- and high-severity signals
+# (EXIF_AFTER_INTAKE, MAIL_DATE_AFTER_FIRST_HOP, ...; see README.md).
+& $Bin build --case-dir $case --hash sha256,md5 --lang all --display-zone America/Bogota --actor "Sample" --progress none
+if ($LASTEXITCODE -ne 3) { Write-Host "FAIL: build exited with $LASTEXITCODE, expected 3"; exit 1 }
+$run = Get-ChildItem (Join-Path $case "runs\rv-timeline") | Sort-Object Name | Select-Object -Last 1
+$timeline = Join-Path $run.FullName "reports\timeline.jsonl"
+if (-not (Test-Path $timeline) -or (Get-Item $timeline).Length -eq 0) {
+  Write-Host "FAIL: $timeline is missing or empty"; exit 1
 }
-foreach ($row in $expected) {
-  $got = $register | Where-Object { (Split-Path -Leaf $_.path) -eq $row.file }
-  if ($null -eq $got -or @($got).Count -ne 1) { Write-Host "MISMATCH: $($row.file) not in hashes.csv"; $bad = 1; continue }
-  if ($got.size -ne $row.size -or $got.sha256 -ne $row.sha256 -or $got.md5 -ne $row.md5) {
-    Write-Host "MISMATCH $($row.file): tool $($got.size),$($got.sha256),$($got.md5), expected $($row.size),$($row.sha256),$($row.md5)"
-    $bad = 1
-  }
-}
-if ($bad) { exit 3 }
-Write-Host "hashes.csv matches expected_hashes.csv ($($expected.Count) files: size, SHA-256, MD5)"
-Write-Host "Reports: $out\reports\$($run.Name)\statistics.en.html"
+$want = (Get-FileHash -Algorithm SHA256 $timeline).Hash.ToLowerInvariant()
+$listed = Select-String -Path (Join-Path $run.FullName "logs\audit.jsonl") -SimpleMatch '"action":"timeline_written"' |
+  Where-Object { $_.Line.Contains("""sha256"":""$want""") }
+if (-not $listed) { Write-Host "FAIL: timeline.jsonl (SHA-256 $want) is not listed in the audit log"; exit 1 }
+$lines = (Get-Content $timeline | Measure-Object -Line).Lines
+Write-Host "timeline.jsonl is listed in the audit log (SHA-256 $want, $lines events)"
+& $Bin verify-log (Join-Path $run.FullName "logs"); if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $Bin verify-case $case; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "Reports: $($run.FullName)\reports\statistics.en.html"

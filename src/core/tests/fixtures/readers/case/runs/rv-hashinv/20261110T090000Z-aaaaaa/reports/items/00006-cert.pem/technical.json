@@ -1,0 +1,22 @@
+{
+  "case": {
+    "case_id": "CASE-TL-1",
+    "intake_utc": "2026-11-10T09:00:06.000Z",
+    "role": "intake",
+    "status": "registered"
+  },
+  "hashes": {
+    "sha256": "a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6"
+  },
+  "item": {
+    "evidence_id": "E0006",
+    "file_name": "cert.pem",
+    "index": 6,
+    "path": "D:\\evidence\\cert.pem"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-hashinv",
+    "version": "0.4.1"
+  }
+}

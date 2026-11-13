@@ -1,0 +1,40 @@
+{
+  "hashes": {
+    "sha256": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2"
+  },
+  "item": {
+    "evidence_id": "E0002",
+    "file_name": "contract.pdf",
+    "index": 2,
+    "path": "D:\\evidence\\contract.pdf"
+  },
+  "pdf": {
+    "revisions": [
+      {
+        "index": 1,
+        "producer": "ExampleWriter 1.0",
+        "saved_at_info": "2026-11-01T14:00:00Z",
+        "saved_at_xmp": "2026-11-01T14:00:00Z"
+      },
+      {
+        "index": 2,
+        "producer": "ExampleEditor 2.0",
+        "saved_at_info": "2026-11-05T12:00:00Z",
+        "saved_at_xmp": null
+      }
+    ],
+    "signatures": [
+      {
+        "field": "Signature1",
+        "revision": 1,
+        "signer_subject": "CN=Signer Example",
+        "signing_time": "2026-11-01T14:30:00Z"
+      }
+    ]
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-pdfauth",
+    "version": "0.4.1"
+  }
+}

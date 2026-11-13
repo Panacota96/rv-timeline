@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
+  },
+  "item": {
+    "evidence_id": "E0010",
+    "file_name": "WhatsApp Chat with Ana Ruiz.txt",
+    "index": 10
+  },
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

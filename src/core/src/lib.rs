@@ -11,12 +11,16 @@
 pub mod analyzer;
 pub mod audit;
 pub mod case;
+pub mod engine;
 pub mod env;
 pub mod events;
 pub mod hash;
 pub mod i18n;
 pub mod input;
+pub mod model;
+pub mod readers;
 pub mod report;
+pub mod review;
 pub mod run;
 pub mod time;
 pub mod trust;

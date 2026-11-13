@@ -1,0 +1,54 @@
+{
+  "certificates": [
+    {
+      "issuer": "CN=Lab CA Example",
+      "not_after": "2027-01-01T00:00:00Z",
+      "not_before": "2026-01-01T00:00:00Z",
+      "serial_hex": "01",
+      "sha256": "e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+      "subject": "CN=Lab Leaf Example"
+    }
+  ],
+  "item": 6,
+  "kind": "certificate",
+  "schema": "rakvor.cert-chain/1",
+  "timestamp": {
+    "imprint_file": "contract.pdf",
+    "info": {
+      "accuracy": "1s",
+      "gen_time": "2026-11-02T10:00:00Z",
+      "serial_hex": "0a",
+      "tsa_name": "CN=TSA Example"
+    }
+  },
+  "verdicts": [
+    {
+      "at": "2026-11-11T14:00:00Z",
+      "nodes": [
+        {
+          "cert": {
+            "issuer": "CN=Lab CA Example",
+            "not_after": "2027-01-01T00:00:00Z",
+            "not_before": "2026-01-01T00:00:00Z",
+            "serial_hex": "01",
+            "sha256": "e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+            "subject": "CN=Lab Leaf Example"
+          },
+          "depth": 0,
+          "revocation": {
+            "reason": "keyCompromise",
+            "revoked_at": "2026-06-01T12:00:00Z",
+            "source": {
+              "kind": "crl",
+              "origin": "evidence #7",
+              "sha256": "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+            },
+            "status": "revoked"
+          },
+          "status": "error"
+        }
+      ],
+      "status": "invalid"
+    }
+  ]
+}

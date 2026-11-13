@@ -1,0 +1,123 @@
+{
+  "revisions": [
+    {
+      "objects": [
+        {
+          "dict": {
+            "F1": "2 0 R",
+            "F2": "3 0 R"
+          },
+          "id": "1 0",
+          "offset": 61,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "BaseFont": "/Helvetica",
+            "Encoding": "/WinAnsiEncoding",
+            "Name": "/F1",
+            "Subtype": "/Type1",
+            "Type": "/Font"
+          },
+          "id": "2 0",
+          "offset": 102,
+          "type": "Font"
+        },
+        {
+          "dict": {
+            "BaseFont": "/Helvetica-Bold",
+            "Encoding": "/WinAnsiEncoding",
+            "Name": "/F2",
+            "Subtype": "/Type1",
+            "Type": "/Font"
+          },
+          "id": "3 0",
+          "offset": 209,
+          "type": "Font"
+        },
+        {
+          "dict": {
+            "Contents": "8 0 R",
+            "MediaBox": [
+              0,
+              0,
+              612,
+              792
+            ],
+            "Parent": "7 0 R",
+            "Resources": {
+              "Font": "1 0 R",
+              "ProcSet": [
+                "/PDF",
+                "/Text",
+                "/ImageB",
+                "/ImageC",
+                "/ImageI"
+              ]
+            },
+            "Rotate": 0,
+            "Trans": {},
+            "Type": "/Page"
+          },
+          "id": "4 0",
+          "offset": 321,
+          "type": "Page"
+        },
+        {
+          "dict": {
+            "PageMode": "/UseNone",
+            "Pages": "7 0 R",
+            "Type": "/Catalog"
+          },
+          "id": "5 0",
+          "offset": 514,
+          "type": "Catalog"
+        },
+        {
+          "dict": {
+            "Author": "Rakvor test generator",
+            "CreationDate": "D:20260216103000-05'00'",
+            "Creator": "Rakvor make_samples.py",
+            "Keywords": "",
+            "ModDate": "D:20260216103000-05'00'",
+            "Producer": "ReportLab PDF Library - (opensource)",
+            "Subject": "unspecified",
+            "Title": "SYNTHETIC TEST SAMPLE - original",
+            "Trapped": "/False"
+          },
+          "id": "6 0",
+          "offset": 582,
+          "type": "dict"
+        },
+        {
+          "dict": {
+            "Count": 1,
+            "Kids": [
+              "4 0 R"
+            ],
+            "Type": "/Pages"
+          },
+          "id": "7 0",
+          "offset": 892,
+          "type": "Pages"
+        },
+        {
+          "dict": {
+            "Filter": [
+              "/ASCII85Decode",
+              "/FlateDecode"
+            ],
+            "Length": 216
+          },
+          "id": "8 0",
+          "offset": 951,
+          "stream": {
+            "length": 216,
+            "offset": 1024
+          },
+          "type": "stream"
+        }
+      ]
+    }
+  ]
+}

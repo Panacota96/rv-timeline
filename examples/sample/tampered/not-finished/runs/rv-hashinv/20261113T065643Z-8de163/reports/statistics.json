@@ -1,0 +1,83 @@
+{
+  "audit": {
+    "entries": 10,
+    "head": "f37d52c8cdc6dc522425fb85c5d98ca051fb775bd51ad5dd4dcf72d00c84be24",
+    "log_dir": "R:\\case\\runs\\rv-hashinv\\20261113T065643Z-8de163\\logs"
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "counts": {
+      "added": 0,
+      "mismatched": 0,
+      "registered": 1,
+      "unregistered": 0,
+      "verified": 0
+    },
+    "role": "intake"
+  },
+  "duplicate_groups": [],
+  "findings_by_code": {},
+  "findings_by_severity": {
+    "high": 0,
+    "info": 0,
+    "low": 0,
+    "medium": 0
+  },
+  "items": [
+    {
+      "evidence_id": "E0011",
+      "findings": [],
+      "index": 1,
+      "path": "R:\\evidence\\images\\camera-original.jpg",
+      "report_folder": "items/00001-camera-original.jpg",
+      "size": 121033,
+      "status": "ok"
+    }
+  ],
+  "items_by_status": {
+    "ok": 1
+  },
+  "items_by_type": {
+    "JPEG image": 1
+  },
+  "limitations": [
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 15,
+    "finished_utc": "2026-11-13T06:56:43.231Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065643Z-8de163",
+    "started_utc": "2026-11-13T06:56:43.215Z"
+  },
+  "schema": "rakvor.statistics/1",
+  "timestamp": {
+    "status": "off"
+  },
+  "tool": {
+    "name": "rv-hashinv",
+    "version": "0.4.1"
+  },
+  "totals": {
+    "bytes": 121033,
+    "errors": 0,
+    "items": 1
+  }
+}

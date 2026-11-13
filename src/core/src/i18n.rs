@@ -103,15 +103,39 @@ impl Catalog {
             .to_string()
     }
 
-    /// (title, shows, does_not_prove) for a finding code.
+    /// (title, shows, does_not_prove) for a finding code; timeline signal codes are read from `signals`.
     pub fn finding(
         &self,
         code: &str,
         params: &BTreeMap<String, String>,
     ) -> (String, String, String) {
-        let f = &self.data["findings"][code];
+        let f = match &self.data["findings"][code] {
+            Value::Null => self.signal_entry(code, params),
+            f => f,
+        };
         let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
         (get("title"), get("shows"), get("does_not_prove"))
+    }
+
+    /// (title, shows, does_not_prove) for a timeline signal code.
+    pub fn signal(
+        &self,
+        code: &str,
+        params: &BTreeMap<String, String>,
+    ) -> (String, String, String) {
+        let f = self.signal_entry(code, params);
+        let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
+        (get("title"), get("shows"), get("does_not_prove"))
+    }
+
+    /// The texts of a signal: `signals.<code>.<basis>` when the signal has a `basis` param with its own wording
+    /// (e.g. `CLOCK_SKEW_SUSPECTED.received_hops`), else `signals.<code>`.
+    pub fn signal_entry(&self, code: &str, params: &BTreeMap<String, String>) -> &Value {
+        let variant = params
+            .get("basis")
+            .map(|b| &self.data["signals"][format!("{code}.{b}")])
+            .filter(|v| v.is_object());
+        variant.unwrap_or(&self.data["signals"][code])
     }
 
     pub fn limitation(&self, code: &str) -> String {
@@ -119,6 +143,27 @@ impl Catalog {
             .as_str()
             .unwrap_or(code)
             .to_string()
+    }
+
+    /// Label of a timeline event kind (`exif.original` → "Photo taken (EXIF DateTimeOriginal)"); the key itself
+    /// when the catalogue has none.
+    pub fn kind(&self, key: &str) -> String {
+        self.data["kind"][key].as_str().unwrap_or(key).to_string()
+    }
+
+    /// Whether the catalogue labels this event kind.
+    pub fn has_kind(&self, key: &str) -> bool {
+        self.data["kind"][key].is_string()
+    }
+
+    /// A limitation with `%{name}` placeholders filled.
+    pub fn limitation_with(&self, code: &str, params: &BTreeMap<String, String>) -> String {
+        fill(&self.limitation(code), params)
+    }
+
+    /// Any string of a section (`kind`, `exclusion`, …), if the catalogue has it.
+    pub fn text(&self, section: &str, key: &str) -> Option<String> {
+        self.data[section][key].as_str().map(String::from)
     }
 }
 

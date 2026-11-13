@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "7a16fdab1650af5675aa07f5d92d0704d18da6f87d8e76d2ff5d8b2f044e8f19"
+  },
+  "item": {
+    "evidence_id": "E0006",
+    "file_name": "leaf-revoked.crt",
+    "index": 6
+  },
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

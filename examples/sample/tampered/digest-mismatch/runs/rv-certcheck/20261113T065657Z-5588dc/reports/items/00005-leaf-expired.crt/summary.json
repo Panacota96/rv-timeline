@@ -1,0 +1,41 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "CERT_EXPIRED_AT_DATE",
+      "params": {
+        "at": "2026-06-01T00:00:00Z",
+        "depth": "0",
+        "not_after": "2025-01-01T00:00:00Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=expired.lab.rakvor.test"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "That a signature made with it is invalid: what matters for a signature is the validity at signing time (check again with --at signing-time or the date of signing). Expiry of old certificates is normal.",
+          "shows": "C=CO, O=Rakvor Lab, CN=expired.lab.rakvor.test was valid until 2025-01-01T00:00:00Z; the chain was checked at 2026-06-01T00:00:00Z, after that date.",
+          "title": "Certificate expired at the date checked"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "346e22485a3cb93677fa1262bd12c5870f9d656d4737004018c34c8bcf18e0c9"
+  },
+  "item": {
+    "evidence_id": "E0005",
+    "file_name": "leaf-expired.crt",
+    "index": 5
+  },
+  "run_id": "20261113T065657Z-5588dc",
+  "schema": "rakvor.item-summary/1",
+  "status": "problem",
+  "text": {
+    "en": {
+      "next_step": "Do not rely on this file until the examiner has explained the problem.",
+      "status": "Problem found",
+      "summary": "The file could not be fully examined or shows a serious problem."
+    }
+  }
+}

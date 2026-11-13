@@ -1,0 +1,22 @@
+{
+  "case": {
+    "case_id": "CASE-TL-1",
+    "intake_utc": "2026-11-10T09:00:02.000Z",
+    "role": "intake",
+    "status": "registered"
+  },
+  "hashes": {
+    "sha256": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2"
+  },
+  "item": {
+    "evidence_id": "E0002",
+    "file_name": "contract.pdf",
+    "index": 2,
+    "path": "D:\\evidence\\contract.pdf"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-hashinv",
+    "version": "0.4.1"
+  }
+}
