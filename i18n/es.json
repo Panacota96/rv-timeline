@@ -216,6 +216,11 @@
       "shows": "Para este elemento, %{tool_b} reporta %{pairs} horas comunes separadas unos %{skew} (%{skew_s} s) de %{tool_a}, siempre en el mismo sentido.",
       "does_not_prove": "No indica cuál fuente es correcta ni que alguna haya sido alterada: zonas distintas, una copia hecha en otra máquina o la interpretación de un lector pueden causar un desfase constante."
     },
+    "CLOCK_SKEW_SUSPECTED.received_hops": {
+      "title": "Relojes de los servidores en desacuerdo dentro de un mensaje",
+      "shows": "En el mensaje %{message}, el salto Received %{hop} (%{host}) tiene una hora %{skew} (%{skew_s} s) anterior a la del salto %{previous_hop} (%{previous_host}), que le entregó el mensaje, más allá de la tolerancia de %{tolerance_s} s.",
+      "does_not_prove": "No prueba que los encabezados hayan sido falsificados: un servidor con el reloj o la zona horaria mal configurados da el mismo resultado. Compárelo con los demás saltos y con los resultados de autenticación."
+    },
     "RUN_NOT_VERIFIED": {
       "title": "Ejecución dejada fuera de la línea de tiempo",
       "shows": "La ejecución %{run_id} de %{tool} %{version} (%{run_dir}) no se usó: %{reason_text}. %{detail}",

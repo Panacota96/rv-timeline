@@ -216,6 +216,11 @@
       "shows": "For this item, %{tool_b} reports %{pairs} shared times about %{skew} (%{skew_s} s) apart from %{tool_a}, always in the same direction.",
       "does_not_prove": "It does not tell which source is right, nor that either was altered: different zones, a copy made on another machine or a reader's interpretation can cause a constant offset."
     },
+    "CLOCK_SKEW_SUSPECTED.received_hops": {
+      "title": "Relay clocks disagree within one message",
+      "shows": "In message %{message}, Received hop %{hop} (%{host}) is stamped %{skew} (%{skew_s} s) before hop %{previous_hop} (%{previous_host}), which handed the message to it, beyond the %{tolerance_s} s tolerance.",
+      "does_not_prove": "It does not prove the headers were forged: a relay whose clock or time zone is wrong gives the same result. Compare with the other hops and the authentication results."
+    },
     "RUN_NOT_VERIFIED": {
       "title": "Tool run left out of the timeline",
       "shows": "The run %{run_id} of %{tool} %{version} (%{run_dir}) was not used: %{reason_text}. %{detail}",

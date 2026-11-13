@@ -216,6 +216,11 @@
       "shows": "Pour cet élément, %{tool_b} donne %{pairs} heures communes écartées d'environ %{skew} (%{skew_s} s) de %{tool_a}, toujours dans le même sens.",
       "does_not_prove": "Cela n'indique ni quelle source est juste, ni qu'une source a été modifiée : des fuseaux différents, une copie faite sur une autre machine ou l'interprétation d'un lecteur peuvent causer un décalage constant."
     },
+    "CLOCK_SKEW_SUSPECTED.received_hops": {
+      "title": "Horloges des relais en désaccord dans un même message",
+      "shows": "Dans le message %{message}, le saut Received %{hop} (%{host}) est horodaté %{skew} (%{skew_s} s) avant le saut %{previous_hop} (%{previous_host}) qui lui a transmis le message, au-delà de la tolérance de %{tolerance_s} s.",
+      "does_not_prove": "Cela ne prouve pas que les en-têtes ont été falsifiés : un relais dont l'horloge ou le fuseau horaire est faux donne le même résultat. Comparez avec les autres sauts et les résultats d'authentification."
+    },
     "RUN_NOT_VERIFIED": {
       "title": "Exécution écartée de la chronologie",
       "shows": "L'exécution %{run_id} de %{tool} %{version} (%{run_dir}) n'a pas été utilisée : %{reason_text}. %{detail}",

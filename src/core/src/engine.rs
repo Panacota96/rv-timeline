@@ -602,6 +602,23 @@ fn p(pairs: &[(&str, String)]) -> BTreeMap<String, String> {
         .collect()
 }
 
+/// How a signal names a message: its sub-item (`#3` in an mbox), else the file name of the item.
+fn message_name(sub: &str, item: Option<&ItemRef>) -> String {
+    if !sub.is_empty() {
+        return sub.to_string();
+    }
+    item.map(|i| {
+        i.path
+            .rsplit(['/', '\\'])
+            .next()
+            .unwrap_or_default()
+            .to_string()
+    })
+    .filter(|n| !n.is_empty())
+    .or_else(|| item.map(|i| i.evidence_id.clone()))
+    .unwrap_or_default()
+}
+
 fn item_only(i: &ItemRef) -> ItemRef {
     ItemRef {
         sub: String::new(),
@@ -927,6 +944,7 @@ impl SignalEngine {
                     if let Some(i) = it.as_mut() {
                         i.sub = sub.clone();
                     }
+                    let message = message_name(sub, it.as_ref());
                     out.push(Signal {
                         code: "MAIL_DATE_AFTER_FIRST_HOP".into(),
                         severity: Severity::Medium,
@@ -935,7 +953,7 @@ impl SignalEngine {
                         params: p(&[
                             ("date", d.original.clone()),
                             ("hop", first.original.clone()),
-                            ("message", sub.clone()),
+                            ("message", message.clone()),
                             ("delta_s", delta.to_string()),
                             ("delta", human_delta(delta)),
                             ("tolerance_s", tol.to_string()),
@@ -971,6 +989,7 @@ impl SignalEngine {
                     if let Some(i) = it.as_mut() {
                         i.sub = sub.clone();
                     }
+                    let message = message_name(sub, it.as_ref());
                     let pos = |h: &Hop| h.position.map(|p| p.to_string()).unwrap_or_default();
                     out.push(Signal {
                         code: "CLOCK_SKEW_SUSPECTED".into(),
@@ -979,11 +998,13 @@ impl SignalEngine {
                         item: it,
                         params: p(&[
                             ("basis", "received_hops".into()),
-                            ("tool_a", format!("{} (Received hop {})", a.by, pos(a))),
-                            ("tool_b", format!("{} (Received hop {})", b.by, pos(b))),
+                            ("tool_a", a.by.clone()),
+                            ("tool_b", b.by.clone()),
+                            ("previous_host", a.by.clone()),
+                            ("host", b.by.clone()),
                             ("previous_hop", pos(a)),
                             ("hop", pos(b)),
-                            ("message", sub.clone()),
+                            ("message", message.clone()),
                             ("skew_s", skew.to_string()),
                             ("skew", human_delta(skew)),
                             ("pairs", "1".into()),
@@ -1787,6 +1808,14 @@ pub(crate) mod tests {
         assert_eq!(s.events, vec![h1.id.clone(), h2.id.clone()]);
         assert_eq!(s.item.as_ref().unwrap().sub, "#3");
         assert_eq!(s.params["skew_s"], "1200");
+        assert_eq!(
+            (
+                s.params["host"].as_str(),
+                s.params["previous_host"].as_str()
+            ),
+            ("mx.acme.example", "smtp.example.org")
+        );
+        assert_eq!(s.params["message"], "#3");
         // In order, or out of order within the tolerance: nothing.
         let ok = hop(2, "mx.acme.example", "2026-11-11T10:00:03Z");
         assert!(codes(vec![h1.clone(), ok], vec![]).is_empty());
@@ -1832,6 +1861,8 @@ pub(crate) mod tests {
             .unwrap();
         assert_eq!(m.events, vec![d.id, h1.id]);
         assert_eq!(m.params["delta_s"], "1800");
+        // A message that is a file of its own is named by its file name.
+        assert_eq!(m.params["message"], "E0002.bin");
     }
 
     #[test]

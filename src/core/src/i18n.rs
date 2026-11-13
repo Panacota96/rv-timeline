@@ -110,7 +110,7 @@ impl Catalog {
         params: &BTreeMap<String, String>,
     ) -> (String, String, String) {
         let f = match &self.data["findings"][code] {
-            Value::Null => &self.data["signals"][code],
+            Value::Null => self.signal_entry(code, params),
             f => f,
         };
         let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
@@ -123,9 +123,19 @@ impl Catalog {
         code: &str,
         params: &BTreeMap<String, String>,
     ) -> (String, String, String) {
-        let f = &self.data["signals"][code];
+        let f = self.signal_entry(code, params);
         let get = |k: &str| fill(f[k].as_str().unwrap_or(code), params);
         (get("title"), get("shows"), get("does_not_prove"))
+    }
+
+    /// The texts of a signal: `signals.<code>.<basis>` when the signal has a `basis` param with its own wording
+    /// (e.g. `CLOCK_SKEW_SUSPECTED.received_hops`), else `signals.<code>`.
+    pub fn signal_entry(&self, code: &str, params: &BTreeMap<String, String>) -> &Value {
+        let variant = params
+            .get("basis")
+            .map(|b| &self.data["signals"][format!("{code}.{b}")])
+            .filter(|v| v.is_object());
+        variant.unwrap_or(&self.data["signals"][code])
     }
 
     pub fn limitation(&self, code: &str) -> String {

@@ -170,7 +170,11 @@ fn sev(s: crate::model::Severity) -> Severity {
 }
 
 /// Signal parameters with the localised exclusion reason (`reason_text`).
-fn localized_params(c: &Catalog, params: &BTreeMap<String, String>) -> BTreeMap<String, String> {
+/// Signal params with the localized texts the templates use (`reason_text` from `reason`).
+pub fn localized_params(
+    c: &Catalog,
+    params: &BTreeMap<String, String>,
+) -> BTreeMap<String, String> {
     let mut p = params.clone();
     if let Some(r) = params.get("reason") {
         p.insert(
