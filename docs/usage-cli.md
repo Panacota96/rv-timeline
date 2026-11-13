@@ -4,16 +4,16 @@
 
 ```mermaid
 flowchart LR
-  A[rv-timeline] --> B[scan]
+  A[rv-timeline] --> B[build]
   A --> C[verify-log]
   A --> D[self-test]
   A --> T[timestamp]
   A --> V[verify-case]
-  T --> E
-  B --> E[(logs/RUN-ID)]
-  B --> F[(reports/RUN-ID)]
-  B -. --case-dir .-> K[(CASE folder)]
+  K[(CASE folder<br/>runs of the other tools)] -- verified, read --> B
+  B --> E[(runs/rv-timeline/RUN-ID/logs)]
+  B --> F[(runs/rv-timeline/RUN-ID/reports<br/>timeline.jsonl)]
   V --> K
+  T --> E
   C --> E
 ```
 
@@ -21,25 +21,27 @@ flowchart LR
 
 ```text
 DESCRIPTION:
-  rv-timeline reviews a single file, a whole folder (bulk) or a list of files. For every file it:
-    1. opens the file read-only and hashes it in one pass with one or two algorithms;
-    2. detects the real file type from its signature (magic bytes);
-    3. flags empty files, extensions that do not match the content, programs hidden under
-       another name and duplicated content;
-    4. writes a technical report and a customer-friendly summary (HTML, PDF and JSON).
-  Each run also writes a statistics report and an audit trail under <OUT>/logs/<RUN-ID>/.
-  Every action is appended to a hash-chained log that `rv-timeline verify-log` can check later.
-
-  CASE FOLDER (--case-dir): Rakvor tools share one folder per case. rv-timeline is the intake tool:
-  it
-  registers every hashed file in evidence/registry.json (evidence ids E0001, E0002, ...) so later
-  tools
-  can prove they examined bit-identical copies. `rv-timeline verify-case <CASE>` checks it all.
+  rv-timeline reads a Rakvor case folder (the folder that holds case.json) and builds one timeline
+  of everything the other Rakvor tools recorded about the evidence: rv-hashinv (intake, file
+  times), rv-pdfauth (PDF dates and revisions), rv-imgauth (EXIF, XMP, PNG times), rv-rsmf (chat
+  messages), rv-mailauth (Date and Received hops) and rv-certcheck (validity, revocation, RFC 3161
+  times). It never opens the evidence itself. For the case it:
+    1. verifies the case log and the evidence registry (a broken case is refused, exit 3);
+    2. verifies every tool run before reading it: audit chain intact, run finished, and the
+       SHA-256 of every output it reads equal to the one in the run's audit log. A run that fails
+       is excluded (no event from it) and reported with the reason;
+    3. reads the time values of each verified run, in UTC, keeping the original wording and a
+       citation (run, output file, its SHA-256, JSON pointer) for each event;
+    4. orders all events, computes cross-source signals and writes reports/timeline.jsonl
+       (Timesketch), one report per evidence item and a statistics report.
+  The run is written inside the case, under <CASE>/runs/rv-timeline/<RUN-ID>/, and recorded in
+  the case log. Every action is appended to a hash-chained log that `rv-timeline verify-log` can
+  check later; `rv-timeline verify-case <CASE>` checks the whole case.
 
 Usage: rv-timeline <COMMAND>
 
 Commands:
-  scan         Hash, check and report on a file, a folder or a list of files
+  build        Build the timeline of a case folder from the verified runs of the other Rakvor tools
   verify-log   Verify an audit log (audit.jsonl): edited, deleted or re-ordered entries, and
                truncation
   self-test    Check every hash algorithm against known-answer test vectors
@@ -57,89 +59,119 @@ Options:
 Run `rv-timeline <COMMAND> --help` for the options, examples and exit codes of each command.
 ```
 
-## rv-timeline scan
+## rv-timeline build
 
 ```text
 DESCRIPTION:
-  rv-timeline reviews a single file, a whole folder (bulk) or a list of files. For every file it:
-    1. opens the file read-only and hashes it in one pass with one or two algorithms;
-    2. detects the real file type from its signature (magic bytes);
-    3. flags empty files, extensions that do not match the content, programs hidden under
-       another name and duplicated content;
-    4. writes a technical report and a customer-friendly summary (HTML, PDF and JSON).
-  Each run also writes a statistics report and an audit trail under <OUT>/logs/<RUN-ID>/.
-  Every action is appended to a hash-chained log that `rv-timeline verify-log` can check later.
+  rv-timeline reads a Rakvor case folder (the folder that holds case.json) and builds one timeline
+  of everything the other Rakvor tools recorded about the evidence: rv-hashinv (intake, file
+  times), rv-pdfauth (PDF dates and revisions), rv-imgauth (EXIF, XMP, PNG times), rv-rsmf (chat
+  messages), rv-mailauth (Date and Received hops) and rv-certcheck (validity, revocation, RFC 3161
+  times). It never opens the evidence itself. For the case it:
+    1. verifies the case log and the evidence registry (a broken case is refused, exit 3);
+    2. verifies every tool run before reading it: audit chain intact, run finished, and the
+       SHA-256 of every output it reads equal to the one in the run's audit log. A run that fails
+       is excluded (no event from it) and reported with the reason;
+    3. reads the time values of each verified run, in UTC, keeping the original wording and a
+       citation (run, output file, its SHA-256, JSON pointer) for each event;
+    4. orders all events, computes cross-source signals and writes reports/timeline.jsonl
+       (Timesketch), one report per evidence item and a statistics report.
+  The run is written inside the case, under <CASE>/runs/rv-timeline/<RUN-ID>/, and recorded in
+  the case log. Every action is appended to a hash-chained log that `rv-timeline verify-log` can
+  check later; `rv-timeline verify-case <CASE>` checks the whole case.
 
-  CASE FOLDER (--case-dir): Rakvor tools share one folder per case. rv-timeline is the intake tool:
-  it
-  registers every hashed file in evidence/registry.json (evidence ids E0001, E0002, ...) so later
-  tools
-  can prove they examined bit-identical copies. `rv-timeline verify-case <CASE>` checks it all.
-
-Usage: rv-timeline scan [OPTIONS]
+Usage: rv-timeline build [OPTIONS] --case-dir <DIR>
 
 Options:
-  -i, --input <PATH>
-          File or folder to review. Repeat for several.
-          
-          Folders are reviewed one level deep unless --recursive is given. Symbolic links are not
-          followed.
-          Default: none (required unless --input-list, --case-dir or --evidence is given).
-          Example: --input D:\evidence --input E:\phone-export\chat.txt
+      --case-dir <DIR>
+          The case folder to read (the one that holds case.json), written by the other Rakvor tools.
+          The timeline run is written inside it, under <DIR>/runs/rv-timeline/<RUN-ID>/.
+          Default: none (required)
+          Example: --case-dir E:\CASE-014
 
-  -L, --input-list <FILE>
-          Text file with one path per line (bulk review). Lines starting with # are ignored.
-          
-          Relative paths are resolved from the list file's folder.
-          Default: none. Example: --input-list case-014-files.txt
+      --display-zone <ZONE>
+          Zone the reports show times in, next to UTC: UTC, a fixed offset (-05:00, +01:00), or
+          America/Bogota or Europe/Paris (summer time built in). Events are always ordered by UTC;
+          an event whose source has no zone is never converted.
+          Default: UTC
+          Example: --display-zone America/Bogota
 
-  -r, --recursive
-          Also review files in subfolders.
-          
-          Default: off (only the first level of each folder). Example: -i D:\evidence --recursive
+      --tool <TOOL>
+          Only the runs of these tools, comma-separated or repeated: rv-hashinv, rv-pdfauth,
+          rv-imgauth, rv-rsmf, rv-mailauth, rv-certcheck. Other runs are skipped and logged.
+          Default: every supported tool
+          Example: --tool rv-mailauth,rv-imgauth
+
+      --from <TIME>
+          Only events at or after this instant (RFC 3339, e.g. 2026-11-01T00:00:00Z or with an
+          offset, 2026-11-01T00:00:00-05:00).
+          Default: no lower bound
+          Example: --from 2026-11-01T00:00:00Z
+
+      --to <TIME>
+          Only events at or before this instant (RFC 3339).
+          Default: no upper bound
+          Example: --to 2026-11-30T23:59:59Z
+
+      --clock-skew <SECONDS>
+          Difference in seconds tolerated between two sources' clocks before their order becomes a
+          signal (smaller differences are within clock skew).
+          Default: 300
+          Example: --clock-skew 120
+
+      --max-events <N>
+          Stop reading after this many events (the earliest of the last run read are kept). Reaching
+          it is recorded in the audit log and the reports, never silent.
+          Default: 5000000
+          Example: --max-events 100000
+
+      --no-timesketch
+          Do not write reports/timeline.jsonl (the Timesketch import file).
+          Default: off (timeline.jsonl is written and its digests logged)
+          Example: --no-timesketch
 
   -H, --hash <ALGO>
-          Hash algorithm(s): one or two of md5, sha1, sha256, sha512, sha3-256, blake3.
-          
-          Both are computed in the same read of each file. More than two is refused (exit code 2).
-          Default: sha256. Example: --hash sha256,md5   or   --hash sha256 --hash blake3
+          Hash algorithm(s) for the files this run writes (timeline.jsonl, reports, logs): one or
+          two of md5, sha1, sha256, sha512, sha3-256, blake3. More than two is refused (exit code
+          2).
+          Default: sha256
+          Example: --hash sha256,md5
 
   -o, --out <DIR>
-          Folder where logs/ and reports/ are created. Created if missing. Ignored with --case-dir.
-          
-          Default: ./rakvor-out. Example: --out E:\case-014\rv-timeline
+          Not used by build: every output goes inside the case folder (<CASE>/runs/rv-timeline/).
+          Accepted so that scripts shared with the other Rakvor tools keep working.
+          Default: ./rakvor-out (ignored)
+          Example: --out E:\case-014\rv-timeline
 
   -l, --lang <LANG>
-          Report language: en, es, fr, or all (one HTML and PDF per language). JSON is
-          language-neutral.
-          
-          Default: en. Example: --lang es   or   --lang all
+          Report language(s): en, es, fr (comma-separated), or all. JSON is language-neutral.
+          Default: en
+          Example: --lang es   or   --lang all
 
   -a, --actor <NAME>
-          Name of the examiner, written in every audit entry and report.
-          
-          Default: the operating-system user name. Example: --actor "Ana Ruiz"
+          Name of the examiner, written in every audit entry and report (alias: --examiner).
+          Default: the operating-system user name
+          Example: --actor "Ana Ruiz"
 
   -c, --case <ID>
-          Case or engagement identifier printed on the reports. With --case-dir it names the case
-          when the folder is created, and must match case.json afterwards (it can be left out).
-          Default: none. Example: --case CASE-2026-014
+          Case identifier: when given, it must match the case folder's case.json (exit 2 otherwise).
+          Default: none (the case id is read from case.json)
+          Example: --case CASE-2026-014
 
   -p, --progress <MODE>
           How progress is shown: bar, jsonl or none.
-          
-          Default: bar (hidden automatically when stderr is not a terminal).
+          Default: bar (hidden automatically when stderr is not a terminal)
           Example: --progress jsonl
 
           Possible values:
-          - bar:   Progress bar with elapsed time, throughput and ETA on stderr
+          - bar:   Progress bar with elapsed time and the runs done on stderr
           - jsonl: One JSON event per line on stdout (for scripts and other tools)
           - none:  No progress output; only the final summary
 
   -j, --jurisdiction <CC>
           Chain-of-custody form per item: co (Colombia, Fiscalía style, Spanish) or fr (France,
-          scellés, French).
-          An English copy is always added. With --case-dir the case's jurisdiction applies.
+          scellés, French); an English copy is always added. The case's own jurisdiction
+          (case.json) applies; the value given here is recorded as requested.
           Default: co
           Example: --jurisdiction fr
 
@@ -155,8 +187,8 @@ Options:
 
       --sign-cert <P12>
           Examiner's certificate (.p12/.pfx, RSA) used to sign every PDF report. The password is
-          read from
-          the environment variable named by --sign-pass-env, or asked for interactively.
+          read
+          from the environment variable named by --sign-pass-env, or asked for interactively.
           Default: none (PDFs are not signed)
           Example: --sign-cert C:\certs\ana-ruiz.p12
 
@@ -165,92 +197,78 @@ Options:
           Default: RV_SIGN_PASSWORD
           Example: --sign-pass-env CERT_PASS
 
-      --case-dir <DIR>
-          Shared case folder that links the Rakvor tools of one case (created with --case if
-          missing).
-          Outputs go to <DIR>/runs/rv-timeline/<RUN-ID>/; every hashed file is registered in
-          <DIR>/evidence/registry.json; the run is recorded in <DIR>/case-log.jsonl.
-          With no --input, every registered item is examined again.
-          Default: none (standalone run in --out)
-          Example: --case-dir E:\CASE-014 --case CASE-014
-
-  -E, --evidence <IDS>
-          Registered evidence ids to examine (needs --case-dir), comma-separated or repeated.
-          Default: none (the --input files, or every registered item)
-          Example: --evidence E0001,E0007
-
   -h, --help
           Print help (see a summary with '-h')
 
 EXAMPLES:
-  Review one file (SHA-256, English reports):
-    rv-timeline scan --input evidence/contract.pdf
-  Review a folder and its subfolders with SHA-256 + MD5, Spanish reports, for case CASE-2026-014:
-    rv-timeline scan -i D:\evidence -r --hash sha256,md5 --lang es --case CASE-2026-014
-  Review the files listed in a text file, reports in the three languages, machine-readable progress:
-    rv-timeline scan --input-list files.txt --lang all --progress jsonl > events.jsonl
-  Verify the audit log afterwards:
-    rv-timeline verify-log rakvor-out/logs/<RUN-ID>/audit.jsonl
-  Open a case folder and register the evidence (intake), then verify the whole case:
-    rv-timeline scan -i D:\evidence -r --case-dir E:\CASE-014 --case CASE-014 --jurisdiction fr
+  Build the timeline of a case (UTC, English reports):
+    rv-timeline build --case-dir E:\CASE-014
+  Show local times for Colombia as well, Spanish reports, check the case id:
+    rv-timeline build --case-dir E:\CASE-014 --case CASE-014 --display-zone America/Bogota --lang es
+  Only mail and images, one week, French and English reports, machine-readable progress:
+    rv-timeline build --case-dir E:\CASE-014 --tool rv-mailauth,rv-imgauth \
+      --from 2026-11-01T00:00:00Z --to 2026-11-08T00:00:00Z --lang fr,en --progress jsonl
+  Then verify the run's audit log and the whole case:
+    rv-timeline verify-log E:\CASE-014\runs\rv-timeline\<RUN-ID>\logs
     rv-timeline verify-case E:\CASE-014
-  Re-examine two registered items of the case:
-    rv-timeline scan --case-dir E:\CASE-014 --evidence E0001,E0002
+  Import into Timesketch: upload <CASE>/runs/rv-timeline/<RUN-ID>/reports/timeline.jsonl.
 
 EXIT CODES:
-  0    Completed; no high-severity finding.
-  1    Runtime error (input not found, output not writable, case log locked, ...).
-       See the audit log.
-  2    Usage error (unknown option, more than two hash algorithms, unsupported language).
-       With --case-dir: folder of another case or schema, --case missing when creating the
-       case, unknown evidence id.
-  3    Completed with at least one high-severity finding (e.g. unreadable file, program under
-       another name, evidence that differs from the case registry), or the case folder fails
-       verification (nothing is written to it).
+  0    Timeline built; every run verified and no medium- or high-severity signal.
+  1    Runtime error (case log locked by another tool, output not writable, signing
+       certificate unreadable, ...). See the audit log.
+  2    Usage error (unknown option, more than two hash algorithms, unsupported language,
+       unknown display zone or tool, --from/--to not RFC 3339 or in the wrong order,
+       --max-events 0, a folder that is not a case folder, --case of another case).
+  3    Timeline built with at least one run excluded (not verified: chain broken, digest
+       mismatch, not finished, unsupported tool version, unreadable) or at least one medium- or
+       high-severity signal to review; or the case folder fails verification (nothing is written
+       to it).
   130  Cancelled with Ctrl+C. Partial reports and the cancellation are written to the audit log.
 
 FILES WRITTEN:
-  <OUT>/logs/<RUN-ID>/audit.jsonl         Hash-chained log of every action (one JSON object per
-  line).
-  <OUT>/logs/<RUN-ID>/audit.log           The same actions, human-readable.
-  <OUT>/logs/<RUN-ID>/hashes.csv          Hash register: index, path, size, digests, status.
-  <OUT>/logs/<RUN-ID>/environment.json    Tool and dependency versions, OS, host, user, command
-  line.
-  <OUT>/reports/<RUN-ID>/statistics.json  Run statistics (+ statistics.<LANG>.html and .pdf).
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/technical.json|.<LANG>.html|.<LANG>.pdf   Technical
-  review.
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/summary.json|.<LANG>.html|.<LANG>.pdf     Customer
-  summary.
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/custody.json|.<es|fr>.html|.pdf|.en.html|.pdf  Custody
-  form.
-  <OUT>/logs/<RUN-ID>/timestamp-<SEQ>.tsr|.json  RFC 3161 token for the audit chain head.
-  With --case-dir <CASE>, logs/ and reports/ go to <CASE>/runs/rv-timeline/<RUN-ID>/, plus:
-  <CASE>/case.json                        Case id, jurisdiction, creation (written once).
-  <CASE>/case-log.jsonl                   Hash-chained case log of every tool: case_created,
-                                          run_started, evidence_registered, run_finished.
-  <CASE>/evidence/registry.json|.csv      Evidence registry: E0001..., path, size, hashes.
+  Inside the case folder, <RUN> = <CASE>/runs/rv-timeline/<RUN-ID>:
+  <RUN>/logs/audit.jsonl              Hash-chained log of every action (one JSON object per line):
+                                      runs discovered, verified, read, excluded or skipped, events
+                                      ordered, timeline written (with its digests), signals.
+  <RUN>/logs/audit.log                The same actions, human-readable.
+  <RUN>/logs/environment.json         Tool and dependency versions, OS, host, user, command line.
+  <RUN>/logs/timestamp-<SEQ>.tsr|.json  RFC 3161 token for the audit chain head.
+  <RUN>/reports/timeline.jsonl        Every event, one JSON object per line, Timesketch import
+                                      format (message, datetime, timestamp_desc + the citation).
+                                      Its digests are in the audit log (timeline_written).
+                                      Not written with --no-timesketch.
+  <RUN>/reports/statistics.json       Runs (verified, excluded with reason, skipped), events per
+                                      tool and kind, signals (+ statistics.<LANG>.html and .pdf).
+  <RUN>/reports/items/<NNNNN>-<NAME>/technical.json|.<LANG>.html|.<LANG>.pdf  Item timeline.
+  <RUN>/reports/items/<NNNNN>-<NAME>/summary.json|.<LANG>.html|.<LANG>.pdf    Customer summary.
+  <RUN>/reports/items/<NNNNN>-<NAME>/custody.json|.<es|fr>.html|.pdf|.en.html|.pdf  Custody form.
+  <CASE>/case-log.jsonl               run_started and run_finished of this run are appended.
+  Nothing else in the case folder changes: the other tools' runs and the evidence are only read.
 
 FORENSIC NOTES:
-  - Evidence is opened read-only and never modified; modification times are compared before and
-  after.
-  - Work on a verified copy (write-blocked image or export), not on original media.
-  - Each audit entry stores the SHA-256 of the previous one; editing, deleting or re-ordering any
-    line is detected by `verify-log`. Removing the last lines is detected only against a record
-    kept outside the log: the RFC 3161 timestamp or, with --case-dir, the case log. Keep the log
-    folder with the reports.
-  - A file without findings is not proven authentic; read the Limitations section of each report.
-  - MD5 and SHA-1 are accepted for compatibility with older case files; pair them with SHA-256 or
-  BLAKE3.
-  - The chain head is timestamped by an RFC 3161 authority (proves when the log existed). Offline?
-  The run
-    finishes with `timestamp_pending`; run `rv-timeline timestamp <LOG>` later.
+  - Verification comes before reading: a run whose audit chain is broken, that did not finish,
+    or whose output differs from the digest in its own audit log is excluded, never read. The
+    exclusion and its reason are in the audit log, the statistics report and a RUN_NOT_VERIFIED
+    signal.
+  - In this version the only sources are the outputs of Rakvor tool runs in the case folder; the
+    evidence files are not opened. A time no tool recorded is not in the timeline.
+  - Times are kept as the source wrote them (original) and placed in UTC. A source without a
+    time zone (e.g. EXIF without OffsetTime) is never converted with a guessed zone: the event
+    is placed as if it were UTC, marked zone unknown and counted (ZONE_UNKNOWN_EVENTS).
+    --display-zone only adds a local-time column; ordering is always by UTC.
+  - A signal shows that events from different sources disagree in time (e.g. an EXIF date after
+    the intake, a mail Date after its first hop). It does not show who changed what, or that a
+    file was tampered with: clocks can be wrong or skewed (--clock-skew), and every signal says
+    what it does not prove. An empty signal list does not prove the evidence is authentic.
+  - --tool, --from/--to and --max-events narrow the timeline; what was left out is recorded in
+    the audit log and printed in the reports, never silent.
+  - Each audit entry stores the SHA-256 of the previous one; the run's audit head is recorded in
+    the case log, so the two chains vouch for each other. The chain head is timestamped by an
+    RFC 3161 authority; offline, the run finishes with `timestamp_pending`: run
+    `rv-timeline timestamp <LOG>` later.
   - With --sign-cert every PDF is signed with the examiner's certificate; the password is never
-  logged.
-  - Case folder: every tool re-verifies case-log.jsonl and the registry digest before
-    writing, and refuses a broken case (exit 3). Appends happen under case-log.lock; a lock
-    older than 10 minutes is reported as stale and never deleted automatically.
-  - Each run's audit.jsonl records case_linked (the case-log entry it started from); the case
-    log records the run's final audit head, so the two chains vouch for each other.
+    logged.
 ```
 
 ## rv-timeline verify-log
@@ -430,11 +448,13 @@ Options:
 
 DESCRIPTION:
   Prints what this tool is, what it accepts and how to launch it, validated by
-  schemas/describe.schema.json. RV Hub reads it to list the tool, start its GUI on a case
-  folder (rv-timeline-gui.exe --case-dir <CASE> [FILES...]) and suggest the tool for a file.
-  Fields: schema, tool, title, version, role (intake), main_verb (scan), accepts
-  (extensions and signatures; "*" = any file), case_formats, log_formats, cli_exe,
-  gui_exe, exit_codes. Nothing is read or written; no audit log is created.
+  schemas/describe.schema.json. RV Hub reads it to list the tool and start its GUI on a case
+  folder (rv-timeline-gui.exe --case-dir <CASE>). rv-timeline's input is a case folder, not
+  evidence files: the files it reads are the case's JSON documents and JSON Lines logs and the
+  other tools' JSON outputs, so it is never suggested for an evidence file.
+  Fields: schema, tool, title, version, role (analysis), main_verb (build), accepts (json,
+  jsonl; no signature), case_formats, log_formats, cli_exe, gui_exe, exit_codes. Nothing is
+  read or written; no audit log is created.
 
 EXAMPLES:
   rv-timeline describe --json

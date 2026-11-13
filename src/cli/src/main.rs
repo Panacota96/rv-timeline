@@ -3,13 +3,15 @@
 
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
+use rv_timeline_core::engine::{self, DisplayZone};
+use rv_timeline_core::model::TimelineOptions;
 use rv_timeline_core::trust::{self, DEFAULT_TSA};
 use rv_timeline_core::{
-    CASE_ROLE, Event, HashAlgo, RunConfig, TOOL_NAME, TOOL_VERSION, audit, case, hash, i18n, run,
-    verify,
+    CASE_ROLE, Event, HashAlgo, RunConfig, TOOL_NAME, TOOL_VERSION, audit, case, hash, i18n,
+    readers, run, verify,
 };
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -20,84 +22,97 @@ const EXIT_USAGE: u8 = 2;
 const EXIT_FINDINGS: u8 = 3;
 const EXIT_CANCELLED: u8 = 130;
 
-const ABOUT: &str = "Inventory digital evidence: hash every file with one or two algorithms, detect its real type, flag anomalies and write court-ready reports with a tamper-evident audit log.";
+const ABOUT: &str = "Build one cited timeline of a Rakvor case folder from the runs of the other Rakvor tools: every run verified first, every time in UTC with its original wording, cross-source signals, a Timesketch file and court-ready reports with a tamper-evident audit log.";
 
 const LONG_ABOUT: &str = "\
 DESCRIPTION:
-  rv-timeline reviews a single file, a whole folder (bulk) or a list of files. For every file it:
-    1. opens the file read-only and hashes it in one pass with one or two algorithms;
-    2. detects the real file type from its signature (magic bytes);
-    3. flags empty files, extensions that do not match the content, programs hidden under
-       another name and duplicated content;
-    4. writes a technical report and a customer-friendly summary (HTML, PDF and JSON).
-  Each run also writes a statistics report and an audit trail under <OUT>/logs/<RUN-ID>/.
-  Every action is appended to a hash-chained log that `rv-timeline verify-log` can check later.
+  rv-timeline reads a Rakvor case folder (the folder that holds case.json) and builds one timeline
+  of everything the other Rakvor tools recorded about the evidence: rv-hashinv (intake, file
+  times), rv-pdfauth (PDF dates and revisions), rv-imgauth (EXIF, XMP, PNG times), rv-rsmf (chat
+  messages), rv-mailauth (Date and Received hops) and rv-certcheck (validity, revocation, RFC 3161
+  times). It never opens the evidence itself. For the case it:
+    1. verifies the case log and the evidence registry (a broken case is refused, exit 3);
+    2. verifies every tool run before reading it: audit chain intact, run finished, and the
+       SHA-256 of every output it reads equal to the one in the run's audit log. A run that fails
+       is excluded (no event from it) and reported with the reason;
+    3. reads the time values of each verified run, in UTC, keeping the original wording and a
+       citation (run, output file, its SHA-256, JSON pointer) for each event;
+    4. orders all events, computes cross-source signals and writes reports/timeline.jsonl
+       (Timesketch), one report per evidence item and a statistics report.
+  The run is written inside the case, under <CASE>/runs/rv-timeline/<RUN-ID>/, and recorded in
+  the case log. Every action is appended to a hash-chained log that `rv-timeline verify-log` can
+  check later; `rv-timeline verify-case <CASE>` checks the whole case.";
 
-  CASE FOLDER (--case-dir): Rakvor tools share one folder per case. rv-timeline is the intake tool: it
-  registers every hashed file in evidence/registry.json (evidence ids E0001, E0002, ...) so later tools
-  can prove they examined bit-identical copies. `rv-timeline verify-case <CASE>` checks it all.";
-
-const SCAN_AFTER_HELP: &str = "\
+const BUILD_AFTER_HELP: &str = "\
 EXAMPLES:
-  Review one file (SHA-256, English reports):
-    rv-timeline scan --input evidence/contract.pdf
-  Review a folder and its subfolders with SHA-256 + MD5, Spanish reports, for case CASE-2026-014:
-    rv-timeline scan -i D:\\evidence -r --hash sha256,md5 --lang es --case CASE-2026-014
-  Review the files listed in a text file, reports in the three languages, machine-readable progress:
-    rv-timeline scan --input-list files.txt --lang all --progress jsonl > events.jsonl
-  Verify the audit log afterwards:
-    rv-timeline verify-log rakvor-out/logs/<RUN-ID>/audit.jsonl
-  Open a case folder and register the evidence (intake), then verify the whole case:
-    rv-timeline scan -i D:\\evidence -r --case-dir E:\\CASE-014 --case CASE-014 --jurisdiction fr
+  Build the timeline of a case (UTC, English reports):
+    rv-timeline build --case-dir E:\\CASE-014
+  Show local times for Colombia as well, Spanish reports, check the case id:
+    rv-timeline build --case-dir E:\\CASE-014 --case CASE-014 --display-zone America/Bogota --lang es
+  Only mail and images, one week, French and English reports, machine-readable progress:
+    rv-timeline build --case-dir E:\\CASE-014 --tool rv-mailauth,rv-imgauth \\
+      --from 2026-11-01T00:00:00Z --to 2026-11-08T00:00:00Z --lang fr,en --progress jsonl
+  Then verify the run's audit log and the whole case:
+    rv-timeline verify-log E:\\CASE-014\\runs\\rv-timeline\\<RUN-ID>\\logs
     rv-timeline verify-case E:\\CASE-014
-  Re-examine two registered items of the case:
-    rv-timeline scan --case-dir E:\\CASE-014 --evidence E0001,E0002
+  Import into Timesketch: upload <CASE>/runs/rv-timeline/<RUN-ID>/reports/timeline.jsonl.
 
 EXIT CODES:
-  0    Completed; no high-severity finding.
-  1    Runtime error (input not found, output not writable, case log locked, ...).
-       See the audit log.
-  2    Usage error (unknown option, more than two hash algorithms, unsupported language).
-       With --case-dir: folder of another case or schema, --case missing when creating the
-       case, unknown evidence id.
-  3    Completed with at least one high-severity finding (e.g. unreadable file, program under
-       another name, evidence that differs from the case registry), or the case folder fails
-       verification (nothing is written to it).
+  0    Timeline built; every run verified and no medium- or high-severity signal.
+  1    Runtime error (case log locked by another tool, output not writable, signing
+       certificate unreadable, ...). See the audit log.
+  2    Usage error (unknown option, more than two hash algorithms, unsupported language,
+       unknown display zone or tool, --from/--to not RFC 3339 or in the wrong order,
+       --max-events 0, a folder that is not a case folder, --case of another case).
+  3    Timeline built with at least one run excluded (not verified: chain broken, digest
+       mismatch, not finished, unsupported tool version, unreadable) or at least one medium- or
+       high-severity signal to review; or the case folder fails verification (nothing is written
+       to it).
   130  Cancelled with Ctrl+C. Partial reports and the cancellation are written to the audit log.
 
 FILES WRITTEN:
-  <OUT>/logs/<RUN-ID>/audit.jsonl         Hash-chained log of every action (one JSON object per line).
-  <OUT>/logs/<RUN-ID>/audit.log           The same actions, human-readable.
-  <OUT>/logs/<RUN-ID>/hashes.csv          Hash register: index, path, size, digests, status.
-  <OUT>/logs/<RUN-ID>/environment.json    Tool and dependency versions, OS, host, user, command line.
-  <OUT>/reports/<RUN-ID>/statistics.json  Run statistics (+ statistics.<LANG>.html and .pdf).
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/technical.json|.<LANG>.html|.<LANG>.pdf   Technical review.
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/summary.json|.<LANG>.html|.<LANG>.pdf     Customer summary.
-  <OUT>/reports/<RUN-ID>/items/<NNNNN>-<NAME>/custody.json|.<es|fr>.html|.pdf|.en.html|.pdf  Custody form.
-  <OUT>/logs/<RUN-ID>/timestamp-<SEQ>.tsr|.json  RFC 3161 token for the audit chain head.
-  With --case-dir <CASE>, logs/ and reports/ go to <CASE>/runs/rv-timeline/<RUN-ID>/, plus:
-  <CASE>/case.json                        Case id, jurisdiction, creation (written once).
-  <CASE>/case-log.jsonl                   Hash-chained case log of every tool: case_created,
-                                          run_started, evidence_registered, run_finished.
-  <CASE>/evidence/registry.json|.csv      Evidence registry: E0001..., path, size, hashes.
+  Inside the case folder, <RUN> = <CASE>/runs/rv-timeline/<RUN-ID>:
+  <RUN>/logs/audit.jsonl              Hash-chained log of every action (one JSON object per line):
+                                      runs discovered, verified, read, excluded or skipped, events
+                                      ordered, timeline written (with its digests), signals.
+  <RUN>/logs/audit.log                The same actions, human-readable.
+  <RUN>/logs/environment.json         Tool and dependency versions, OS, host, user, command line.
+  <RUN>/logs/timestamp-<SEQ>.tsr|.json  RFC 3161 token for the audit chain head.
+  <RUN>/reports/timeline.jsonl        Every event, one JSON object per line, Timesketch import
+                                      format (message, datetime, timestamp_desc + the citation).
+                                      Its digests are in the audit log (timeline_written).
+                                      Not written with --no-timesketch.
+  <RUN>/reports/statistics.json       Runs (verified, excluded with reason, skipped), events per
+                                      tool and kind, signals (+ statistics.<LANG>.html and .pdf).
+  <RUN>/reports/items/<NNNNN>-<NAME>/technical.json|.<LANG>.html|.<LANG>.pdf  Item timeline.
+  <RUN>/reports/items/<NNNNN>-<NAME>/summary.json|.<LANG>.html|.<LANG>.pdf    Customer summary.
+  <RUN>/reports/items/<NNNNN>-<NAME>/custody.json|.<es|fr>.html|.pdf|.en.html|.pdf  Custody form.
+  <CASE>/case-log.jsonl               run_started and run_finished of this run are appended.
+  Nothing else in the case folder changes: the other tools' runs and the evidence are only read.
 
 FORENSIC NOTES:
-  - Evidence is opened read-only and never modified; modification times are compared before and after.
-  - Work on a verified copy (write-blocked image or export), not on original media.
-  - Each audit entry stores the SHA-256 of the previous one; editing, deleting or re-ordering any
-    line is detected by `verify-log`. Removing the last lines is detected only against a record
-    kept outside the log: the RFC 3161 timestamp or, with --case-dir, the case log. Keep the log
-    folder with the reports.
-  - A file without findings is not proven authentic; read the Limitations section of each report.
-  - MD5 and SHA-1 are accepted for compatibility with older case files; pair them with SHA-256 or BLAKE3.
-  - The chain head is timestamped by an RFC 3161 authority (proves when the log existed). Offline? The run
-    finishes with `timestamp_pending`; run `rv-timeline timestamp <LOG>` later.
-  - With --sign-cert every PDF is signed with the examiner's certificate; the password is never logged.
-  - Case folder: every tool re-verifies case-log.jsonl and the registry digest before
-    writing, and refuses a broken case (exit 3). Appends happen under case-log.lock; a lock
-    older than 10 minutes is reported as stale and never deleted automatically.
-  - Each run's audit.jsonl records case_linked (the case-log entry it started from); the case
-    log records the run's final audit head, so the two chains vouch for each other.";
+  - Verification comes before reading: a run whose audit chain is broken, that did not finish,
+    or whose output differs from the digest in its own audit log is excluded, never read. The
+    exclusion and its reason are in the audit log, the statistics report and a RUN_NOT_VERIFIED
+    signal.
+  - In this version the only sources are the outputs of Rakvor tool runs in the case folder; the
+    evidence files are not opened. A time no tool recorded is not in the timeline.
+  - Times are kept as the source wrote them (original) and placed in UTC. A source without a
+    time zone (e.g. EXIF without OffsetTime) is never converted with a guessed zone: the event
+    is placed as if it were UTC, marked zone unknown and counted (ZONE_UNKNOWN_EVENTS).
+    --display-zone only adds a local-time column; ordering is always by UTC.
+  - A signal shows that events from different sources disagree in time (e.g. an EXIF date after
+    the intake, a mail Date after its first hop). It does not show who changed what, or that a
+    file was tampered with: clocks can be wrong or skewed (--clock-skew), and every signal says
+    what it does not prove. An empty signal list does not prove the evidence is authentic.
+  - --tool, --from/--to and --max-events narrow the timeline; what was left out is recorded in
+    the audit log and printed in the reports, never silent.
+  - Each audit entry stores the SHA-256 of the previous one; the run's audit head is recorded in
+    the case log, so the two chains vouch for each other. The chain head is timestamped by an
+    RFC 3161 authority; offline, the run finishes with `timestamp_pending`: run
+    `rv-timeline timestamp <LOG>` later.
+  - With --sign-cert every PDF is signed with the examiner's certificate; the password is never
+    logged.";
 
 #[derive(Parser)]
 #[command(name = TOOL_NAME, version = TOOL_VERSION, about = ABOUT, long_about = LONG_ABOUT, max_term_width = 100,
@@ -109,9 +124,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Hash, check and report on a file, a folder or a list of files.
-    #[command(long_about = LONG_ABOUT, after_long_help = SCAN_AFTER_HELP)]
-    Scan(Box<ScanArgs>),
+    /// Build the timeline of a case folder from the verified runs of the other Rakvor tools.
+    #[command(long_about = LONG_ABOUT, after_long_help = BUILD_AFTER_HELP)]
+    Build(Box<BuildArgs>),
     /// Verify an audit log (audit.jsonl): edited, deleted or re-ordered entries, and truncation.
     #[command(after_long_help = "\
 CHECKS:
@@ -245,11 +260,13 @@ EXIT CODES:
 const DESCRIBE_AFTER_HELP: &str = "\
 DESCRIPTION:
   Prints what this tool is, what it accepts and how to launch it, validated by
-  schemas/describe.schema.json. RV Hub reads it to list the tool, start its GUI on a case
-  folder (rv-timeline-gui.exe --case-dir <CASE> [FILES...]) and suggest the tool for a file.
-  Fields: schema, tool, title, version, role (intake), main_verb (scan), accepts
-  (extensions and signatures; \"*\" = any file), case_formats, log_formats, cli_exe,
-  gui_exe, exit_codes. Nothing is read or written; no audit log is created.
+  schemas/describe.schema.json. RV Hub reads it to list the tool and start its GUI on a case
+  folder (rv-timeline-gui.exe --case-dir <CASE>). rv-timeline's input is a case folder, not
+  evidence files: the files it reads are the case's JSON documents and JSON Lines logs and the
+  other tools' JSON outputs, so it is never suggested for an evidence file.
+  Fields: schema, tool, title, version, role (analysis), main_verb (build), accepts (json,
+  jsonl; no signature), case_formats, log_formats, cli_exe, gui_exe, exit_codes. Nothing is
+  read or written; no audit log is created.
 
 EXAMPLES:
   rv-timeline describe --json
@@ -259,7 +276,7 @@ EXIT CODES:
 
 #[derive(Clone, Copy, ValueEnum)]
 enum ProgressMode {
-    /// Progress bar with elapsed time, throughput and ETA on stderr.
+    /// Progress bar with elapsed time and the runs done on stderr.
     Bar,
     /// One JSON event per line on stdout (for scripts and other tools).
     Jsonl,
@@ -268,38 +285,90 @@ enum ProgressMode {
 }
 
 #[derive(Args)]
-struct ScanArgs {
-    /// File or folder to review. Repeat for several.
-    ///
-    /// Folders are reviewed one level deep unless --recursive is given. Symbolic links are not followed.
-    /// Default: none (required unless --input-list, --case-dir or --evidence is given).
-    /// Example: --input D:\evidence --input E:\phone-export\chat.txt
+struct BuildArgs {
+    /// The case folder to read (the one that holds case.json), written by the other Rakvor tools.
+    /// The timeline run is written inside it, under <DIR>/runs/rv-timeline/<RUN-ID>/.
+    /// Default: none (required)
+    /// Example: --case-dir E:\CASE-014
+    #[arg(long, value_name = "DIR", verbatim_doc_comment)]
+    case_dir: PathBuf,
+
+    /// Zone the reports show times in, next to UTC: UTC, a fixed offset (-05:00, +01:00), or
+    /// America/Bogota or Europe/Paris (summer time built in). Events are always ordered by UTC;
+    /// an event whose source has no zone is never converted.
+    /// Default: UTC
+    /// Example: --display-zone America/Bogota
     #[arg(
-        short,
-        long = "input",
-        value_name = "PATH",
-        required_unless_present_any = ["input_list", "case_dir", "evidence"],
+        long,
+        value_name = "ZONE",
+        default_value = "UTC",
+        verbatim_doc_comment,
+        hide_default_value = true
+    )]
+    display_zone: String,
+
+    /// Only the runs of these tools, comma-separated or repeated: rv-hashinv, rv-pdfauth,
+    /// rv-imgauth, rv-rsmf, rv-mailauth, rv-certcheck. Other runs are skipped and logged.
+    /// Default: every supported tool
+    /// Example: --tool rv-mailauth,rv-imgauth
+    #[arg(
+        long = "tool",
+        value_name = "TOOL",
+        value_delimiter = ',',
         verbatim_doc_comment
     )]
-    inputs: Vec<PathBuf>,
+    tools: Vec<String>,
 
-    /// Text file with one path per line (bulk review). Lines starting with # are ignored.
-    ///
-    /// Relative paths are resolved from the list file's folder.
-    /// Default: none. Example: --input-list case-014-files.txt
-    #[arg(short = 'L', long, value_name = "FILE", verbatim_doc_comment)]
-    input_list: Option<PathBuf>,
+    /// Only events at or after this instant (RFC 3339, e.g. 2026-11-01T00:00:00Z or with an
+    /// offset, 2026-11-01T00:00:00-05:00).
+    /// Default: no lower bound
+    /// Example: --from 2026-11-01T00:00:00Z
+    #[arg(long, value_name = "TIME", verbatim_doc_comment)]
+    from: Option<String>,
 
-    /// Also review files in subfolders.
-    ///
-    /// Default: off (only the first level of each folder). Example: -i D:\evidence --recursive
-    #[arg(short, long, verbatim_doc_comment)]
-    recursive: bool,
+    /// Only events at or before this instant (RFC 3339).
+    /// Default: no upper bound
+    /// Example: --to 2026-11-30T23:59:59Z
+    #[arg(long, value_name = "TIME", verbatim_doc_comment)]
+    to: Option<String>,
 
-    /// Hash algorithm(s): one or two of md5, sha1, sha256, sha512, sha3-256, blake3.
-    ///
-    /// Both are computed in the same read of each file. More than two is refused (exit code 2).
-    /// Default: sha256. Example: --hash sha256,md5   or   --hash sha256 --hash blake3
+    /// Difference in seconds tolerated between two sources' clocks before their order becomes a
+    /// signal (smaller differences are within clock skew).
+    /// Default: 300
+    /// Example: --clock-skew 120
+    #[arg(
+        long,
+        value_name = "SECONDS",
+        default_value_t = 300,
+        verbatim_doc_comment,
+        hide_default_value = true
+    )]
+    clock_skew: u64,
+
+    /// Stop reading after this many events (the earliest of the last run read are kept). Reaching
+    /// it is recorded in the audit log and the reports, never silent.
+    /// Default: 5000000
+    /// Example: --max-events 100000
+    #[arg(
+        long,
+        value_name = "N",
+        default_value_t = 5_000_000,
+        value_parser = clap::value_parser!(u64).range(1..),
+        verbatim_doc_comment,
+        hide_default_value = true
+    )]
+    max_events: u64,
+
+    /// Do not write reports/timeline.jsonl (the Timesketch import file).
+    /// Default: off (timeline.jsonl is written and its digests logged)
+    /// Example: --no-timesketch
+    #[arg(long, verbatim_doc_comment)]
+    no_timesketch: bool,
+
+    /// Hash algorithm(s) for the files this run writes (timeline.jsonl, reports, logs): one or
+    /// two of md5, sha1, sha256, sha512, sha3-256, blake3. More than two is refused (exit code 2).
+    /// Default: sha256
+    /// Example: --hash sha256,md5
     #[arg(
         short = 'H',
         long = "hash",
@@ -311,9 +380,10 @@ struct ScanArgs {
     )]
     hashes: Vec<String>,
 
-    /// Folder where logs/ and reports/ are created. Created if missing. Ignored with --case-dir.
-    ///
-    /// Default: ./rakvor-out. Example: --out E:\case-014\rv-timeline
+    /// Not used by build: every output goes inside the case folder (<CASE>/runs/rv-timeline/).
+    /// Accepted so that scripts shared with the other Rakvor tools keep working.
+    /// Default: ./rakvor-out (ignored)
+    /// Example: --out E:\case-014\rv-timeline
     #[arg(
         short,
         long,
@@ -324,9 +394,9 @@ struct ScanArgs {
     )]
     out: PathBuf,
 
-    /// Report language: en, es, fr, or all (one HTML and PDF per language). JSON is language-neutral.
-    ///
-    /// Default: en. Example: --lang es   or   --lang all
+    /// Report language(s): en, es, fr (comma-separated), or all. JSON is language-neutral.
+    /// Default: en
+    /// Example: --lang es   or   --lang all
     #[arg(
         short,
         long,
@@ -337,21 +407,26 @@ struct ScanArgs {
     )]
     lang: String,
 
-    /// Name of the examiner, written in every audit entry and report.
-    ///
-    /// Default: the operating-system user name. Example: --actor "Ana Ruiz"
-    #[arg(short, long, value_name = "NAME", verbatim_doc_comment)]
+    /// Name of the examiner, written in every audit entry and report (alias: --examiner).
+    /// Default: the operating-system user name
+    /// Example: --actor "Ana Ruiz"
+    #[arg(
+        short,
+        long,
+        alias = "examiner",
+        value_name = "NAME",
+        verbatim_doc_comment
+    )]
     actor: Option<String>,
 
-    /// Case or engagement identifier printed on the reports. With --case-dir it names the case
-    /// when the folder is created, and must match case.json afterwards (it can be left out).
-    /// Default: none. Example: --case CASE-2026-014
+    /// Case identifier: when given, it must match the case folder's case.json (exit 2 otherwise).
+    /// Default: none (the case id is read from case.json)
+    /// Example: --case CASE-2026-014
     #[arg(short, long = "case", value_name = "ID", verbatim_doc_comment)]
     case_id: Option<String>,
 
     /// How progress is shown: bar, jsonl or none.
-    ///
-    /// Default: bar (hidden automatically when stderr is not a terminal).
+    /// Default: bar (hidden automatically when stderr is not a terminal)
     /// Example: --progress jsonl
     #[arg(
         short,
@@ -364,8 +439,9 @@ struct ScanArgs {
     )]
     progress: ProgressMode,
 
-    /// Chain-of-custody form per item: co (Colombia, Fiscalía style, Spanish) or fr (France, scellés, French).
-    /// An English copy is always added. With --case-dir the case's jurisdiction applies.
+    /// Chain-of-custody form per item: co (Colombia, Fiscalía style, Spanish) or fr (France,
+    /// scellés, French); an English copy is always added. The case's own jurisdiction
+    /// (case.json) applies; the value given here is recorded as requested.
     /// Default: co
     /// Example: --jurisdiction fr
     #[arg(short, long, value_name = "CC", default_value = "co", value_parser = ["co", "fr"], verbatim_doc_comment, hide_default_value = true, hide_possible_values = true)]
@@ -383,8 +459,8 @@ struct ScanArgs {
     #[arg(long, env = "RV_NO_TIMESTAMP", value_parser = clap::builder::FalseyValueParser::new(), verbatim_doc_comment, hide_env = true)]
     no_timestamp: bool,
 
-    /// Examiner's certificate (.p12/.pfx, RSA) used to sign every PDF report. The password is read from
-    /// the environment variable named by --sign-pass-env, or asked for interactively.
+    /// Examiner's certificate (.p12/.pfx, RSA) used to sign every PDF report. The password is read
+    /// from the environment variable named by --sign-pass-env, or asked for interactively.
     /// Default: none (PDFs are not signed)
     /// Example: --sign-cert C:\certs\ana-ruiz.p12
     #[arg(long, value_name = "P12", verbatim_doc_comment)]
@@ -401,33 +477,12 @@ struct ScanArgs {
         hide_default_value = true
     )]
     sign_pass_env: String,
-
-    /// Shared case folder that links the Rakvor tools of one case (created with --case if missing).
-    /// Outputs go to <DIR>/runs/rv-timeline/<RUN-ID>/; every hashed file is registered in
-    /// <DIR>/evidence/registry.json; the run is recorded in <DIR>/case-log.jsonl.
-    /// With no --input, every registered item is examined again.
-    /// Default: none (standalone run in --out)
-    /// Example: --case-dir E:\CASE-014 --case CASE-014
-    #[arg(long, value_name = "DIR", verbatim_doc_comment)]
-    case_dir: Option<PathBuf>,
-
-    /// Registered evidence ids to examine (needs --case-dir), comma-separated or repeated.
-    /// Default: none (the --input files, or every registered item)
-    /// Example: --evidence E0001,E0007
-    #[arg(
-        short = 'E',
-        long = "evidence",
-        value_name = "IDS",
-        requires = "case_dir",
-        verbatim_doc_comment
-    )]
-    evidence: Vec<String>,
 }
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
     ExitCode::from(match cli.command {
-        Command::Scan(a) => scan(*a),
+        Command::Build(a) => build(*a),
         Command::VerifyLog { log, tsa_ca } => verify_log(log, tsa_ca),
         Command::VerifyCase { case, rehash } => verify_case(case, rehash),
         Command::SelfTest => self_test(),
@@ -452,62 +507,169 @@ fn main() -> ExitCode {
 
 fn usage_error(msg: &str) -> u8 {
     eprintln!(
-        "error: {}\n\nFor more information, try 'rv-timeline scan --help'.",
+        "error: {}\n\nFor more information, try 'rv-timeline build --help'.",
         msg
     );
     EXIT_USAGE
 }
 
-fn scan(a: ScanArgs) -> u8 {
+/// Tools the built-in readers understand (the values --tool accepts).
+fn supported_tools() -> Vec<String> {
+    readers::all()
+        .iter()
+        .map(|r| r.tool().to_string())
+        .collect()
+}
+
+/// Checks every option and the case folder before anything is written: usage problems give exit 2,
+/// a case that fails verification exit 3.
+fn options(a: &BuildArgs) -> Result<(Vec<HashAlgo>, Vec<String>, TimelineOptions), u8> {
     let mut algos = Vec::new();
     for h in &a.hashes {
         match HashAlgo::parse(h) {
             Some(x) => algos.push(x),
             None => {
-                return usage_error(&format!(
+                return Err(usage_error(&format!(
                     "unknown hash algorithm '{}': use md5, sha1, sha256, sha512, sha3-256 or blake3",
                     h
-                ));
+                )));
             }
         }
     }
-    if let Err(e) = hash::validate_selection(&algos) {
-        return usage_error(&e);
-    }
-    let langs = match i18n::parse_langs(&a.lang) {
-        Ok(l) => l,
-        Err(e) => return usage_error(&e),
-    };
-    let evidence_ids = match case::parse_evidence_ids(&a.evidence) {
-        Ok(ids) => ids,
-        Err(e) => return usage_error(&e.message),
-    };
-    if let Some(dir) = &a.case_dir {
-        // Case problems found before the run map to their own exit codes (2 usage, 3 broken case).
-        if let Err(e) = case::preflight(dir, a.case_id.as_deref(), &evidence_ids) {
-            return match e.exit_code() {
-                EXIT_USAGE => usage_error(&e.message),
-                code => {
-                    eprintln!("error: {}", e.message);
-                    code
-                }
-            };
+    hash::validate_selection(&algos).map_err(|e| usage_error(&e))?;
+    let langs = i18n::parse_langs(&a.lang).map_err(|e| usage_error(&e))?;
+    let zone = DisplayZone::parse(&a.display_zone).map_err(|e| usage_error(&e))?;
+    let known = supported_tools();
+    let mut tools: Vec<String> = Vec::new();
+    for t in a.tools.iter().map(|t| t.trim()).filter(|t| !t.is_empty()) {
+        if !known.iter().any(|k| k == t) {
+            return Err(usage_error(&format!(
+                "unknown tool '{}': use {}",
+                t,
+                known.join(", ")
+            )));
+        }
+        if !tools.iter().any(|x| x == t) {
+            tools.push(t.to_string());
         }
     }
+    let time = |name: &str, v: &Option<String>| -> Result<Option<i64>, u8> {
+        match v {
+            None => Ok(None),
+            Some(s) => engine::parse_rfc3339(s).map(Some).ok_or_else(|| {
+                usage_error(&format!(
+                    "{} '{}' is not an RFC 3339 time: use e.g. 2026-11-01T00:00:00Z",
+                    name, s
+                ))
+            }),
+        }
+    };
+    let from_s = time("--from", &a.from)?;
+    let to_s = time("--to", &a.to)?;
+    if let (Some(f), Some(t)) = (from_s, to_s)
+        && f > t
+    {
+        return Err(usage_error("--from is later than --to"));
+    }
+    let dir = &a.case_dir;
+    if !dir.join(case::CASE_FILE).is_file() {
+        return Err(usage_error(&format!(
+            "{} is not a case folder (no {}): rv-timeline reads a case written by the other Rakvor tools and never creates one",
+            dir.display(),
+            case::CASE_FILE
+        )));
+    }
+    // Case problems found before the run map to their own exit codes (2 another case, 3 broken case).
+    if let Err(e) = case::preflight(dir, a.case_id.as_deref(), &[]) {
+        return Err(match e.exit_code() {
+            EXIT_USAGE => usage_error(&e.message),
+            code => {
+                eprintln!("error: {}", e.message);
+                code
+            }
+        });
+    }
+    let opts = TimelineOptions {
+        case_dir: dir.clone(),
+        display_zone: zone.name(),
+        tools,
+        from_s,
+        to_s,
+        clock_skew_s: a.clock_skew,
+        max_events: a.max_events,
+        timesketch: !a.no_timesketch,
+    };
+    Ok((algos, langs, opts))
+}
+
+/// What the run's own audit log says about it (read back for the summary, so the summary never
+/// says more than the log).
+#[derive(Default)]
+struct AuditFacts {
+    events: u64,
+    runs_verified: u64,
+    zone_unknown: u64,
+    skipped: u64,
+    excluded: Vec<String>,
+    timeline_written: bool,
+}
+
+fn audit_facts(log_dir: &Path, own_run_id: &str) -> AuditFacts {
+    let mut f = AuditFacts::default();
+    let text = std::fs::read_to_string(log_dir.join("audit.jsonl")).unwrap_or_default();
+    for line in text.lines() {
+        let Ok(e) = serde_json::from_str::<serde_json::Value>(line) else {
+            continue;
+        };
+        let d = &e["details"];
+        match e["action"].as_str().unwrap_or_default() {
+            "run_excluded" => f.excluded.push(format!(
+                "{} ({}{}{})",
+                d["run_dir"].as_str().unwrap_or("-"),
+                d["reason"].as_str().unwrap_or("-"),
+                if d["detail"].as_str().unwrap_or("").is_empty() {
+                    ""
+                } else {
+                    ": "
+                },
+                d["detail"].as_str().unwrap_or("")
+            )),
+            // This run is in the case log too and is skipped as "self": not counted.
+            "run_skipped" if d["run_id"].as_str() != Some(own_run_id) => f.skipped += 1,
+            "timeline_written" => f.timeline_written = true,
+            "signals_computed" => f.zone_unknown = d["zone_unknown_events"].as_u64().unwrap_or(0),
+            "run_finished" => {
+                f.events = d["events"].as_u64().unwrap_or(0);
+                f.runs_verified = d["runs_verified"].as_u64().unwrap_or(0);
+            }
+            _ => {}
+        }
+    }
+    f
+}
+
+fn build(a: BuildArgs) -> u8 {
+    let (algos, langs, opts) = match options(&a) {
+        Ok(x) => x,
+        Err(code) => return code,
+    };
 
     let cancel = Arc::new(AtomicBool::new(false));
     let c = cancel.clone();
     let _ = ctrlc::set_handler(move || c.store(true, Ordering::SeqCst));
 
     let cfg = RunConfig {
-        inputs: a.inputs,
-        input_list: a.input_list,
-        recursive: a.recursive,
+        inputs: vec![],
+        input_list: None,
+        recursive: false,
         algorithms: algos,
-        out_dir: a.out,
+        out_dir: a.out.clone(),
         langs,
-        actor: a.actor.unwrap_or_else(rv_timeline_core::env::os_user),
-        case_id: a.case_id,
+        actor: a
+            .actor
+            .clone()
+            .unwrap_or_else(rv_timeline_core::env::os_user),
+        case_id: a.case_id.clone(),
         frontend: "cli".into(),
         preamble: vec![],
         command_line: std::env::args().collect(),
@@ -524,8 +686,8 @@ fn scan(a: ScanArgs) -> u8 {
             .as_ref()
             .and_then(|_| password(&a.sign_pass_env)),
         sign_cert: a.sign_cert.clone(),
-        case_dir: a.case_dir.clone(),
-        evidence_ids,
+        case_dir: Some(a.case_dir.clone()),
+        evidence_ids: vec![],
         case_role: CASE_ROLE,
     };
 
@@ -533,17 +695,25 @@ fn scan(a: ScanArgs) -> u8 {
         ProgressMode::Bar => {
             let b = ProgressBar::with_draw_target(Some(0), ProgressDrawTarget::stderr_with_hz(8));
             b.set_style(
-                ProgressStyle::with_template("{spinner} [{elapsed_precise}] {wide_bar} {binary_bytes}/{binary_total_bytes} {binary_bytes_per_sec} ETA {eta} {msg}")
-                    .unwrap_or_else(|_| ProgressStyle::default_bar()),
+                ProgressStyle::with_template(
+                    "{spinner} [{elapsed_precise}] {wide_bar} {pos}/{len} runs {msg}",
+                )
+                .unwrap_or_else(|_| ProgressStyle::default_bar()),
             );
             Some(b)
         }
         _ => None,
     };
     let jsonl = matches!(a.progress, ProgressMode::Jsonl);
+    let mut excluded_runs = 0u64;
     // A closed stdout (e.g. `| head`) must never abort a forensic run half-way: stop printing, keep working.
     let mut stdout_open = true;
     let mut sink = |e: &Event| {
+        if let Event::ItemFinished { status, .. } = e
+            && status == "excluded"
+        {
+            excluded_runs += 1;
+        }
         if jsonl && stdout_open {
             let mut out = std::io::stdout().lock();
             stdout_open = writeln!(out, "{}", serde_json::to_string(e).unwrap_or_default())
@@ -552,23 +722,18 @@ fn scan(a: ScanArgs) -> u8 {
         }
         if let Some(b) = &bar {
             match e {
-                Event::RunStarted {
-                    total_bytes,
-                    total_items,
+                Event::RunStarted { total_items, .. } => b.set_length(*total_items),
+                Event::Progress { done, .. } => b.set_position(*done),
+                Event::ItemFinished {
+                    path,
+                    status,
+                    findings,
                     ..
-                } => {
-                    b.set_length(*total_bytes);
-                    b.set_message(format!("0/{} files", total_items));
-                }
-                Event::Progress {
-                    done,
-                    total,
-                    bytes_done,
-                    ..
-                } => {
-                    b.set_position(*bytes_done);
-                    b.set_message(format!("{}/{} files", done, total));
-                }
+                } if status == "excluded" => b.println(format!(
+                    "warning: run excluded (not verified): {} ({})",
+                    path,
+                    findings.join(", ")
+                )),
                 Event::Error { path, message } => b.println(format!(
                     "warning: {}: {}",
                     path.as_deref().unwrap_or("-"),
@@ -583,71 +748,79 @@ fn scan(a: ScanArgs) -> u8 {
             }
         }
     };
-    let result = run(&cfg, &mut sink, &cancel);
+    let result = run::run_timeline(&cfg, &opts, &mut sink, &cancel);
     if let Some(b) = &bar {
         b.finish_and_clear();
     }
-    match result {
+    let s = match result {
         Err(e) => {
             eprintln!("error: {}", e);
-            EXIT_ERROR
+            return EXIT_ERROR;
         }
-        Ok(s) => {
-            if !jsonl {
-                let out = format!(
-                    "{status}  run {id}\n  items: {items}  bytes: {bytes}  errors: {errors}  elapsed: {elapsed}\n  findings: high {h}, medium {m}, low {l}, info {i}\n  timestamp: {ts}\n  report: {report}\n  logs:   {logs}",
-                    status = if s.cancelled {
-                        "CANCELLED"
-                    } else if s.high > 0 {
-                        "DONE (high-severity findings)"
-                    } else {
-                        "DONE"
-                    },
-                    id = s.run_id,
-                    items = s.items,
-                    bytes = s.bytes,
-                    errors = s.errors,
-                    elapsed = rv_timeline_core::time::human_duration(s.elapsed_ms),
-                    h = s.high,
-                    m = s.medium,
-                    l = s.low,
-                    i = s.info,
-                    ts = format!(
-                        "{} {}",
-                        s.timestamp["status"].as_str().unwrap_or("off"),
-                        s.timestamp["gen_time"].as_str().unwrap_or("")
-                    )
-                    .trim(),
-                    report = s
-                        .report_dir
-                        .join(format!("statistics.{}.html", cfg.langs[0]))
-                        .display(),
-                    logs = s.log_dir.display()
-                );
-                let _ = writeln!(std::io::stdout(), "{}", out);
-                if let Some(c) = &s.case {
-                    let t = &c.tally;
-                    let _ = writeln!(
-                        std::io::stdout(),
-                        "  case:   {} ({}) registered {} (new {}), verified {}, mismatched {}, not in registry {}",
-                        c.case_id,
-                        c.role,
-                        t.registered,
-                        t.added,
-                        t.verified,
-                        t.mismatched,
-                        t.unregistered
-                    );
-                }
-            }
-            if s.cancelled {
-                EXIT_CANCELLED
-            } else if s.high > 0 {
-                EXIT_FINDINGS
+        Ok(s) => s,
+    };
+    let facts = audit_facts(&s.log_dir, &s.run_id);
+    let excluded = excluded_runs.max(facts.excluded.len() as u64);
+    let to_review = excluded > 0 || s.high > 0 || s.medium > 0;
+    if jsonl {
+        // stdout carries only JSON events; exclusions are repeated on stderr for the operator.
+        for x in &facts.excluded {
+            eprintln!("warning: run excluded (not verified): {}", x);
+        }
+    } else {
+        let timeline = if facts.timeline_written {
+            s.report_dir.join("timeline.jsonl").display().to_string()
+        } else {
+            "not written (--no-timesketch)".into()
+        };
+        let mut out = format!(
+            "{status}  run {id}\n  case:     {case}\n  runs:     verified {verified}, excluded {excluded}, skipped {skipped}\n  events:   {events} (zone unknown: {zu})  items: {items}  elapsed: {elapsed}\n  signals:  high {h}, medium {m}, low {l}, info {i}\n  timeline: {timeline}\n  timestamp: {ts}\n  report:   {report}\n  logs:     {logs}",
+            status = if s.cancelled {
+                "CANCELLED"
+            } else if to_review {
+                "DONE (to review: excluded runs or medium/high signals)"
             } else {
-                EXIT_OK
-            }
+                "DONE"
+            },
+            id = s.run_id,
+            case = s
+                .case
+                .as_ref()
+                .map(|c| c.case_id.clone())
+                .unwrap_or_default(),
+            verified = facts.runs_verified,
+            skipped = facts.skipped,
+            events = facts.events,
+            zu = facts.zone_unknown,
+            items = s.items,
+            elapsed = rv_timeline_core::time::human_duration(s.elapsed_ms),
+            h = s.high,
+            m = s.medium,
+            l = s.low,
+            i = s.info,
+            ts = format!(
+                "{} {}",
+                s.timestamp["status"].as_str().unwrap_or("off"),
+                s.timestamp["gen_time"].as_str().unwrap_or("")
+            )
+            .trim(),
+            report = s
+                .report_dir
+                .join(format!("statistics.{}.html", cfg.langs[0]))
+                .display(),
+            logs = s.log_dir.display()
+        );
+        for x in &facts.excluded {
+            out.push_str(&format!("\n  excluded: {}", x));
         }
+        let _ = writeln!(std::io::stdout(), "{}", out);
+    }
+    if s.cancelled {
+        EXIT_CANCELLED
+    } else if to_review {
+        EXIT_FINDINGS
+    } else {
+        EXIT_OK
     }
 }
 
@@ -828,18 +1001,19 @@ fn describe() -> serde_json::Value {
         "title": "RV Timeline",
         "version": TOOL_VERSION,
         "role": CASE_ROLE.name(),
-        "main_verb": "scan",
-        // The intake tool hashes and registers every file, whatever its type.
-        "accepts": {"extensions": ["*"], "signatures": ["*"]},
+        "main_verb": "build",
+        // The input is a case folder: the files read directly are the case's JSON documents and JSON Lines
+        // logs and the other tools' JSON outputs. No evidence signature: never suggested for an evidence file.
+        "accepts": {"extensions": ["json", "jsonl"], "signatures": []},
         "case_formats": [case::SCHEMA_CASE],
         "log_formats": ["rakvor.audit/1"],
         "cli_exe": format!("{}.exe", TOOL_NAME),
         "gui_exe": format!("{}-gui.exe", TOOL_NAME),
         "exit_codes": {
-            "0": "Completed; no high-severity finding.",
-            "1": "Runtime error (input not found, output not writable, case log locked, ...).",
-            "2": "Usage error (unknown option, bad value, case folder of another case or schema).",
-            "3": "Completed with at least one high-severity finding, or the case folder fails verification.",
+            "0": "Timeline built; every run verified and no medium- or high-severity signal.",
+            "1": "Runtime error (case log locked, output not writable, ...).",
+            "2": "Usage error (unknown option, bad value, not a case folder, case folder of another case).",
+            "3": "Timeline built with an excluded run or a medium/high-severity signal to review, or the case folder fails verification.",
             "130": "Cancelled with Ctrl+C; partial reports and the cancellation are in the audit log."
         }
     })
@@ -852,7 +1026,7 @@ fn docs_cli() -> String {
     let mut out = String::from(
         "# Command-line reference\n\n<!-- Generated by `rv-timeline docs-cli`. Do not edit by hand: CI fails if this file differs. -->\n\n",
     );
-    out.push_str("```mermaid\nflowchart LR\n  A[rv-timeline] --> B[scan]\n  A --> C[verify-log]\n  A --> D[self-test]\n  A --> T[timestamp]\n  A --> V[verify-case]\n  T --> E\n  B --> E[(logs/RUN-ID)]\n  B --> F[(reports/RUN-ID)]\n  B -. --case-dir .-> K[(CASE folder)]\n  V --> K\n  C --> E\n```\n\n");
+    out.push_str("```mermaid\nflowchart LR\n  A[rv-timeline] --> B[build]\n  A --> C[verify-log]\n  A --> D[self-test]\n  A --> T[timestamp]\n  A --> V[verify-case]\n  K[(CASE folder<br/>runs of the other tools)] -- verified, read --> B\n  B --> E[(runs/rv-timeline/RUN-ID/logs)]\n  B --> F[(runs/rv-timeline/RUN-ID/reports<br/>timeline.jsonl)]\n  V --> K\n  T --> E\n  C --> E\n```\n\n");
     out.push_str(&format!(
         "## rv-timeline\n\n```text\n{}\n```\n\n",
         root.render_long_help().to_string().trim_end()
