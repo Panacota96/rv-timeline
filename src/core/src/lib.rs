@@ -18,6 +18,7 @@ pub mod hash;
 pub mod i18n;
 pub mod input;
 pub mod model;
+pub mod outputs;
 pub mod readers;
 pub mod report;
 pub mod review;

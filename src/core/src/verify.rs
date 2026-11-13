@@ -7,6 +7,8 @@
 //!   `case-log.jsonl` records the run's final audit head and entry count (`audit_head`, `audit_entries`).
 //!
 //! Entries after the last anchored one cannot be proven complete; the report says how many there are.
+//! Then every output file the log records (reports, hash register, environment.json, …) is re-hashed and compared
+//! with the digests recorded (`outputs.rs`): an edited, deleted or replaced output is a problem.
 //! Without a timestamp or a case record, truncation is not detectable and the report says so.
 //! Same rules and wording as the Python profile (`core/verify.py`).
 //!
@@ -37,6 +39,8 @@ pub struct LogVerification {
     pub warnings: Vec<String>,
     /// Entries of the run's `review.jsonl` when it is present and verifies (None when there is none).
     pub review_entries: Option<u64>,
+    /// The re-hash of the outputs the log records (None when the chain is broken: nothing it records is trusted).
+    pub outputs: Option<crate::outputs::OutputsCheck>,
 }
 
 fn read_entries(path: &Path) -> Vec<Value> {
@@ -124,6 +128,10 @@ pub fn verify_log_with(
     if let Some(case) = case_of_log_dir(&dir) {
         case_anchor(&case, &entries, n, &mut v, &mut anchors);
     }
+    let outputs = crate::outputs::verify_recorded_outputs(&dir, &entries);
+    v.problems
+        .extend(outputs.problems.iter().map(ToString::to_string));
+    v.outputs = Some(outputs);
 
     // The review log (viewing after the run): chain integrity and the link to this run's audit chain.
     match crate::review::verify(&dir) {
