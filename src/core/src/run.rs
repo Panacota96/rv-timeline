@@ -1,9 +1,14 @@
-//! The pipeline both front-ends call: intake → hash + analyze each item → duplicates →
-//! hashes.csv → per-item reports → statistics report. Every step is written to the audit log.
+//! The pipelines both front-ends call.
 //!
-//! With `case_dir` the run works inside a shared case folder (see `case.rs`): outputs go to
-//! `<CASE>/runs/<tool>/<RUN-ID>/`, the case log records run_started / run_finished, and depending on
-//! [`CaseRole`] every item is registered (intake) or verified against the registry (analysis).
+//! - [`run_timeline`] (`build`, rv-timeline's main verb): opens and verifies the case folder, announces the run in
+//!   the case log, then discovers the case's tool runs → verifies each (audit chain, case log, output digests;
+//!   excluded runs keep their reason) → reads the verified ones with the readers (unparseable times counted) →
+//!   filters and caps → sorts (external merge sort past the threshold) → writes `reports/timeline.jsonl`, the
+//!   signals, per-item and statistics reports → closes the run in the case log. Outputs go to
+//!   `<CASE>/runs/rv-timeline/<RUN-ID>/`; every step is an audit entry.
+//! - [`run`]: the forge template's generic per-item pipeline (hash + analyze each input, duplicates, hashes.csv,
+//!   per-item and statistics reports). Neither front-end calls it in this version; it stays, with its tests, as
+//!   the template's reference for the shared report and case-folder code.
 
 use crate::analyzer::{Finding, Severity, analyze};
 use crate::audit::AuditLog;

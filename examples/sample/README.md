@@ -79,7 +79,9 @@ follow too): which values are events (one per time value a tool wrote, nothing d
 id `<tool>:<run_id>:<evidence_id>[/<sub>]:<kind>:<n>` (n from 0 per run, item/sub and kind, in file order); and the
 signal rules, with `clock_skew_s` = 300:
 
-- `EXIF_AFTER_INTAKE`: an EXIF date with a stated zone later than the item's `intake.registered`.
+- `EXIF_AFTER_INTAKE`: an `exif.original` (DateTimeOriginal) more than 300 s after the item's intake (the earliest
+  of its `intake.registered` events and the registry's `registered_utc`). High when the EXIF date states its zone,
+  or when a zone-less one is late beyond the largest UTC offset (14 h); medium for a smaller zone-less gap.
 - `FILE_MODIFIED_AFTER_INTAKE`: an `fs.modified` later than the item's `intake.registered`, either by more than 300 s
   or by any amount when it differs from the one the intake run recorded (cites every run that saw it). The sample's
   touch is 3 s after the intake.
@@ -87,7 +89,9 @@ signal rules, with `clock_skew_s` = 300:
 - `MAIL_DATE_AFTER_FIRST_HOP`: a message's Date more than 300 s after its first (position 1) hop.
 - `CLOCK_SKEW_SUSPECTED` (basis `received_hops`): a hop more than 300 s earlier than the hop before it (the servers'
   clocks disagree). The engine's other basis (two tools a constant offset apart) does not occur in the sample.
-- `EVENT_IN_FUTURE`: an occurrence (not a validity bound such as `cert.not_after`) after the case's last `run.finished`.
+- `EVENT_IN_FUTURE` (medium): a time more than 300 s (plus 14 h when its zone is unknown) after the end of the
+  run that recorded it: that run's own `run.finished`, else the start encoded in its run id. `run.*` kinds and
+  validity bounds (`cert.not_after`, `crl.next_update`, `ocsp.next_update`) never count.
 - `ZONE_UNKNOWN_EVENTS`: one case-level signal (no item) with the count of zone-unknown events (here 5: the two
   EXIF dates of screenshot.png and the three mbox `From ` lines).
 - `RUN_NOT_VERIFIED`: one per excluded run (tampered copies only): medium for `chain_broken` and `digest_mismatch`, low
