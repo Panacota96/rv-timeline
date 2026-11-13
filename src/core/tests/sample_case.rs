@@ -153,13 +153,7 @@ fn clean_case_matches_ground_truth() {
                 .as_ref()
                 .map(|i| format!("{}{}", i.evidence_id, i.sub))
                 .unwrap_or_default();
-            sig(&s.code, &it)
-                + " "
-                + &serde_json::to_value(s.severity)
-                    .unwrap()
-                    .as_str()
-                    .unwrap()
-                    .to_string()
+            sig(&s.code, &it) + " " + serde_json::to_value(s.severity).unwrap().as_str().unwrap()
         })
         .collect();
     problems.extend(diff("signal", &want_sig, &got_sig));

@@ -196,9 +196,9 @@ pub enum Severity {
 pub struct Signal {
     /// `EXIF_AFTER_INTAKE`, `MAIL_DATE_AFTER_FIRST_HOP`, `PDF_REVISION_BEFORE_PREVIOUS`, `FILE_MODIFIED_AFTER_INTAKE`,
     /// `EVENT_IN_FUTURE`, `CLOCK_SKEW_SUSPECTED`, `RUN_NOT_VERIFIED`, `ZONE_UNKNOWN_EVENTS`.
-    /// `CLOCK_SKEW_SUSPECTED` has two bases (param `basis`): `tools`, two tools reading the same facts a constant offset
-    /// apart, or `received_hops`: a message's Received hop stamped more than the tolerance before the hop before
-    /// it. `ZONE_UNKNOWN_EVENTS` is one case-level signal (no item) with the count.
+    /// `CLOCK_SKEW_SUSPECTED` has two bases (param `basis`): `tools`, two tools reading the same facts a constant
+    /// offset apart; `received_hops`, a message's Received hop stamped more than the tolerance before the hop
+    /// before it. `ZONE_UNKNOWN_EVENTS` is one case-level signal (no item) with the count.
     pub code: String,
     pub severity: Severity,
     /// Ids of the events involved (empty for run-level signals).
