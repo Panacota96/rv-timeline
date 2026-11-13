@@ -113,4 +113,4 @@ Your choices are part of the evidence record. Before the build starts, the GUI w
 
 A GUI build of the same case with the same settings gives the same `timeline.jsonl` (same SHA-256) and signals as
 `rv-timeline build`; `environment.json` records `"frontend": "gui"` and the settings used. The screenshots on this
-page come from `cargo run -p rv-timeline-gui --example gui_screenshot` on the sample case.
+page come from `cargo run -p rv-timeline-gui --example gui_screenshot -- docs/images` on a copy of the sample case.
