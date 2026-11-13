@@ -1,102 +1,122 @@
 # Architecture
 
-One engine, two front-ends. The engine (`src/core`) does all the work and never prints; the CLI and
-the GUI only turn user input into a `RunConfig` and render the `Event`s the engine emits. This is why
-both interfaces always produce identical logs and reports.
+One engine, two front-ends. The engine (`src/core`) does all the work and never prints; the CLI and the GUI only
+turn user input into a `RunConfig` plus `TimelineOptions` and render the `Event`s the engine emits, so both
+interfaces produce identical logs, timelines and reports. Inside the engine, the forensic pipeline (hashing, audit
+chain, case folder, reports, trust) is shared with every Rakvor tool; the timeline adds the **readers** (one per
+tool, with run discovery and verification) and the **engine** (ordering, signals, Timesketch output), driven by
+`run::run_timeline`.
 
 ```mermaid
 flowchart TB
-    subgraph Front-ends
-        CLI["rv-timeline (src/cli)<br/>clap · indicatif"]
-        GUI["rv-timeline-gui (src/gui)<br/>egui · wgpu"]
+    subgraph Front["Front-ends"]
+        CLI["rv-timeline (src/cli)<br/>build · verify-log · verify-case · timestamp<br/>self-test · describe · docs-cli (hidden)"]
+        GUI["rv-timeline-gui (src/gui)<br/>state.rs rules · viewer.rs (index of timeline.jsonl) · app.rs (egui)"]
     end
     subgraph Core["rv_timeline_core (src/core)"]
-        RUN["run.rs<br/>pipeline"]
-        IN["input.rs"]
-        H["hash.rs"]
-        AN["analyzer.rs<br/>(domain logic)"]
-        AU["audit.rs"]
-        CA["case.rs<br/>case folder"]
-        REP["report/<br/>JSON · HTML · PDF"]
-        I18N["i18n.rs"]
+        RUN["run.rs<br/>run_timeline → timeline_pipeline"]
+        subgraph Timeline["timeline"]
+            MOD["model.rs<br/>frozen data model"]
+            RD["readers/<br/>discover_runs · verify_run · 6 readers · timefmt"]
+            EN["engine.rs<br/>DisplayZone · EventSorter · SignalEngine · timesketch_line"]
+        end
+        subgraph Shared["shared forensic pipeline"]
+            H["hash.rs"]
+            AU["audit.rs · review.rs · verify.rs"]
+            CA["case.rs"]
+            TR["trust.rs (byte-identical)"]
+            REP["report/ (JSON · HTML · PDF)"]
+            I18N["i18n.rs + i18n/*.json"]
+        end
     end
-    CLI -- RunConfig --> RUN
-    GUI -- "RunConfig (+ UI actions)" --> RUN
+    CLI -- "RunConfig + TimelineOptions" --> RUN
+    GUI -- "same (+ ui_* actions)" --> RUN
     RUN -- "Event stream" --> CLI
-    RUN -- "Event stream (mpsc)" --> GUI
-    RUN --> IN & H & AN & AU & REP & CA
-    CA --> AU
+    RUN -- "Event stream (channel)" --> GUI
+    RUN --> RD --> EN
+    RUN --> H & AU & CA & REP & TR
+    RD --> MOD
+    EN --> MOD
     REP --> I18N
+    GUI -. "read back a finished build<br/>(digest-checked)" .-> AU
 ```
 
 ## Modules
 
-| Module | Responsibility | Replace when building a new tool? |
-| --- | --- | --- |
-| `input.rs` | Files, folders, list files → sorted, de-duplicated, absolute paths. Symlinks not followed. | No |
-| `hash.rs` | One read loop (1 MiB chunks) feeding 1–2 digests; known-answer self-test. | No |
-| `analyzer.rs` | Signature detection and per-item findings. | **Yes — this is the domain logic** |
-| `audit.rs` | Append-only hash-chained `audit.jsonl` + `audit.log`; `verify`. | No |
-| `case.rs` | Shared case folder: `case.json`, hash-chained `case-log.jsonl` under a lock, evidence registry, `verify_case`. Role = `CASE_ROLE` (intake here, analysis in scaffolded tools). See [case-folder.md](case-folder.md). | No (flip `CASE_ROLE`) |
-| `report/` | View models → minijinja HTML, built-in PDF writer, schema-versioned JSON. | Adapt wording/fields |
-| `events.rs` | Typed events; ETA computation. | No |
-| `env.rs` | `environment.json` (versions, OS, host, user, command line). | No |
-| `run.rs` | Orchestration, cancellation, duplicates, `hashes.csv`. | Small changes |
+| Module | Responsibility |
+| --- | --- |
+| `model.rs` | The data model shared by readers, engine, outputs and front-ends: `TimeEvent`, `ItemRef`, `SourceRef`, `RunRef`, `Signal`, `Timeline`, `TimelineOptions`, the `SourceReader` trait. Frozen for v0.1; its module doc holds the **conventions** (event ids, what counts as an event, kinds per tool, zones). |
+| `readers/mod.rs` | `discover_runs` (case log, then unannounced folders), `verify_run` (chain, finished, case-log anchor, reader version, output digests), `RunData` (a run's audit log, recorded digests, items; `check_file` re-checks a digest when reading), `Emitter` (event ids and skipped-value count), the reader table. |
+| `readers/timefmt.rs` | Strict parsers: RFC 3339/ISO 8601, RFC 5322, EXIF (+ OffsetTime, SubSecTime), PDF dates, X.509, OpenSSL text; precision and zone kept. |
+| `readers/<tool>.rs` | One reader per tool (hashinv, pdfauth, imgauth, rsmf, mailauth, certcheck). |
+| `engine.rs` | `DisplayZone` (UTC, fixed offsets, America/Bogota, Europe/Paris with CET/CEST), formatting, `cmp_events` and `keep`, `EventSorter` (external merge sort past 250 000 events), `SignalEngine` (incremental cross-source signals), `timesketch_line`. |
+| `run.rs` | Orchestration: case link, discovery, verify-then-read loop with filters and cap, ordering, `timeline.jsonl`, `hashes.csv` of the files read, signals, item reports, timestamp, statistics, case-log `run_finished`; cancellation. (The module also keeps the shared evidence pipeline the forge template provides; `build` does not use it.) |
+| `audit.rs`, `review.rs`, `verify.rs` | Append-only hash-chained `audit.jsonl`; the review log of GUI viewing anchored to `run_finished`; `verify-log` (chain, timestamps, truncation anchors, review log). |
+| `case.rs` | Shared case folder: `case.json`, hash-chained `case-log.jsonl` under a lock, the registry (read only: analysis role), `verify_case`. See [case-folder.md](case-folder.md). |
+| `trust.rs` | RFC 3161 client and verifier, PDF signing — byte-identical in every Rakvor tool ([ADR 0002](adr/0002-tsa-token-verification.md)). |
+| `report/` | View models → minijinja HTML (`templates/`), built-in PDF writer, schema-versioned JSON; the timeline sections (runs, events, signals) of the statistics and item reports. |
+| `hash.rs`, `env.rs`, `events.rs`, `i18n.rs` | Digests and the known-answer self-test; `environment.json`; typed progress events; the EN/ES/FR catalogues. |
+| `src/gui/src/state.rs`, `viewer.rs` | Every rule the window enforces (settings validation, `ui_*` actions, review log), and the read-back of a finished build: digest checks of `statistics.json` and `timeline.jsonl`, a compact line index, rows read on demand with their hash re-checked — headless-testable. |
 
-## One run, step by step
+## One build, step by step
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant UI as CLI / GUI
-    participant R as run.rs
-    participant A as audit.jsonl
-    participant FS as Evidence (read-only)
-    participant O as reports/
-    UI->>R: run(config, sink, cancel)
-    R->>A: run_started, UI actions, environment_recorded
-    R->>R: collect inputs
-    R->>A: inputs_resolved
-    R-->>UI: RunStarted{total_items,total_bytes}
-    loop each item
-        R->>A: item_started
-        R->>FS: open read-only, read 1 MiB chunks
-        R-->>UI: Progress{elapsed_ms, eta_ms} (≤ every 150 ms)
-        R->>A: item_hashed{digests, mtime_unchanged}
-        R->>A: item_analyzed{findings, status}
-        R-->>UI: ItemFinished
-    end
-    R->>A: duplicate_group(s), hash_register_written
-    R->>O: per-item technical + summary (JSON/HTML/PDF)
-    R->>A: item_reports_written{file digests}
-    R->>O: statistics (JSON/HTML/PDF)
-    R->>A: statistics_report_written, run_finished
-    R-->>UI: RunFinished
+flowchart TD
+    S["build --case-dir CASE"] --> C{"case log, case.json,<br/>registry intact?"}
+    C -- no --> X3["exit 3, nothing written"]
+    C -- yes --> L["run_started (case log + audit), case_linked"]
+    L --> D["discover runs, sort by (tool, run id)"]
+    D --> LOOP{"for each run"}
+    LOOP -- "self / --tool / cap" --> SK["run_skipped"]
+    LOOP --> V{"verify_run"}
+    V -- fails --> EX["run_excluded (reason)"]
+    V -- ok --> RD["reader: events<br/>(digest re-checked per file)"]
+    RD --> F["keep(): tool, window; cap"]
+    F --> SG["SignalEngine.observe_batch"]
+    F --> SO["EventSorter.push<br/>(spill past 250 000)"]
+    SK & EX & SO --> LOOP
+    LOOP -- done --> M["merge → timeline.jsonl,<br/>per-item accumulators"]
+    M --> HC["hashes.csv (files read)"]
+    HC --> SF["SignalEngine.finish (+ RUN_NOT_VERIFIED, ZONE_UNKNOWN_EVENTS)"]
+    SF --> IR["item reports"]
+    IR --> TS["RFC 3161 timestamp (or pending)"]
+    TS --> ST["statistics report, run_finished,<br/>case-log run_finished"]
 ```
 
-## Run states (as the GUI sees them)
+Memory stays bounded whatever the case size: the sorter keeps at most 250 000 events in memory and spills sorted
+chunks to `<RUN>/tmp/`; the signal engine keeps only the few kinds it compares (intake, `exif.original`,
+`fs.modified`, mail dates and hops, PDF revision times, the first value per tool for skew); item reports keep at
+most 200 events per item; the GUI viewer keeps an index of a few dozen bytes per event.
+
+## Build states (as the GUI sees them)
 
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
-    Idle --> Running: Start (inputs ≥ 1, algorithms 1–2)
-    Running --> Finished: RunFinished
-    Running --> Cancelled: Cancel → partial reports
-    Running --> Failed: error (e.g. output not writable)
-    Finished --> Running: Start again (new run ID)
-    Cancelled --> Running
-    Failed --> Running
+    Idle --> Ready: case folder chosen and verified
+    Ready --> Running: Build the timeline
+    Running --> Done: run_finished
+    Running --> Cancelled: Cancel (partial reports, run_cancelled)
+    Running --> Failed: error (run_failed)
+    Ready --> Viewing: Open the latest timeline
+    Done --> Viewing: Open the timeline view (digests checked)
+    Viewing --> Refused: a digest differs (ui_timeline_refused)
+    Viewing --> Done: Back
+    Done --> Ready: change a setting
+    Cancelled --> Ready
+    Failed --> Ready
 ```
 
 ## Concurrency and cancellation
 
-- The GUI runs the engine on a worker thread and receives events through a channel, so the window stays
-  responsive; the elapsed-time label is refreshed every 200 ms from the window clock.
-- Cancellation is an `AtomicBool` checked after every 1 MiB chunk: large images stop within milliseconds.
-  The engine still writes `hashes.csv`, partial reports and `run_cancelled` to the audit log.
-- Files are processed sequentially on purpose: the order of audit entries equals the order of work, which is
-  easier to explain in court. Hashing is I/O-bound on typical evidence drives.
+The build runs on one worker thread (GUI) or the main thread (CLI); runs are verified and read one after the other,
+in a fixed order, so the audit log and the event ids are deterministic. The case log is shared with other tools and
+written only under `case-log.lock`. Cancellation (Ctrl+C, GUI *Cancel*) is checked between runs: the current run
+finishes, `run_cancelled` is recorded, partial reports are written and the exit code is 130.
 
 ## Why Rust
 
-See [ADR 0001](adr/0001-language.md).
+Same language as the other Rakvor tools, whose shared code this tool reuses (`trust.rs` byte for byte; the
+case-folder and audit-chain rules), a single static executable per front-end, and memory safety for parsers that read
+attacker-influenced outputs. Decision record: [ADR 0001](adr/0001-language.md). Timeline design decisions:
+[ADR 0004](adr/0004-timeline-design-decisions.md).
