@@ -42,7 +42,8 @@ def main() -> int:
         return 2
     pdfs: list[Path] = []
     for a in map(Path, sys.argv[1:]):
-        pdfs += sorted(a.rglob("*.pdf")) if a.is_dir() else [a]
+        # Item folders are named after the evidence (`00018-report.pdf/`): only files are PDFs.
+        pdfs += sorted(p for p in a.rglob("*.pdf") if p.is_file()) if a.is_dir() else [a]
     if not pdfs:
         print("no PDF found")
         return 3

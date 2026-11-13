@@ -8,7 +8,7 @@ use std::path::Path;
 const TOOL: &str = "rv-timeline";
 const TITLE: &str = "RV Timeline";
 const ROLE: &str = "analysis";
-const MAIN_VERB: &str = "scan";
+const MAIN_VERB: &str = "build";
 const LOG_FORMATS: &[&str] = &["rakvor.audit/1"];
 
 fn root() -> &'static Path {
