@@ -95,7 +95,9 @@ pub struct TimeEvent {
     #[serde(default)]
     pub utc_ns: u32,
     pub zone: ZoneInfo,
-    /// Offset of the original time from UTC, in minutes (None when `zone` is Unknown).
+    /// Offset of the original time from UTC, in minutes (None when `zone` is Unknown). One exception: a zone
+    /// applied by the converting tool under a name this version has no rules for (rv-rsmf `--timezone`, named in
+    /// `details.zone_applied`) is Explicit with None.
     pub offset_min: Option<i32>,
     pub precision: Precision,
     /// The time exactly as the source wrote it (e.g. `Tue, 10 Nov 2026 11:00:00 +0100`, `2026:11:10 10:00:00`).

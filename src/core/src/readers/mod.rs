@@ -216,6 +216,13 @@ fn check_chain(entries: &[(usize, Map<String, Value>)]) -> Result<(), String> {
     Ok(())
 }
 
+/// A field of an audit or case-log entry, `Null` when absent. (Indexing a `Map` with `[]` panics on a missing key;
+/// an adversary can delete any key of a re-sealed entry.)
+pub(crate) fn at<'a>(e: &'a Map<String, Value>, key: &str) -> &'a Value {
+    static NULL: Value = Value::Null;
+    e.get(key).unwrap_or(&NULL)
+}
+
 fn s(v: &Value) -> &str {
     v.as_str().unwrap_or_default()
 }
@@ -237,7 +244,7 @@ pub fn discover_runs(case_dir: &Path) -> Result<Vec<RunRef>, ReadError> {
             if e.get("action").and_then(Value::as_str) != Some("run_started") {
                 continue;
             }
-            let d = &e["details"];
+            let d = &at(e, "details");
             let run_dir = s(&d["run_dir"]).to_string();
             if runs.iter().any(|r| r.run_dir == run_dir) {
                 continue;
@@ -281,7 +288,7 @@ pub fn discover_runs(case_dir: &Path) -> Result<Vec<RunRef>, ReadError> {
                         .find(|(_, e)| {
                             e.get("action").and_then(Value::as_str) == Some("run_started")
                         })
-                        .map(|(_, e)| s(&e["details"]["version"]).to_string())
+                        .map(|(_, e)| s(&at(&e, "details")["version"]).to_string())
                 })
                 .unwrap_or_default();
             extra.push(RunRef {
@@ -329,7 +336,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
         .rev()
         .find(|(_, e)| e.get("action").and_then(Value::as_str) == Some("run_finished"))
         .ok_or_else(|| err("not_finished", "logs/audit.jsonl has no run_finished entry"))?;
-    if fin.1["details"]["cancelled"] == Value::Bool(true) {
+    if at(&fin.1, "details")["cancelled"] == Value::Bool(true) {
         return Err(err("not_finished", "the run was cancelled"));
     }
     // The case log: intact, announces the run as completed, and holds the run's final audit head.
@@ -338,7 +345,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
     check_chain(&log).map_err(|e| err("chain_broken", format!("case-log.jsonl {e}")))?;
     let announced = log.iter().any(|(_, e)| {
         e.get("action").and_then(Value::as_str) == Some("run_started")
-            && s(&e["details"]["run_dir"]) == run.run_dir
+            && s(&at(e, "details")["run_dir"]) == run.run_dir
     });
     if !announced {
         return Err(err(
@@ -351,7 +358,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
         .rev()
         .find(|(_, e)| {
             e.get("action").and_then(Value::as_str) == Some("run_finished")
-                && s(&e["details"]["run_dir"]) == run.run_dir
+                && s(&at(e, "details")["run_dir"]) == run.run_dir
         })
         .ok_or_else(|| {
             err(
@@ -359,7 +366,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
                 "the case log has no run_finished for this run",
             )
         })?;
-    let d = &finished.1["details"];
+    let d = at(&finished.1, "details");
     let exit_failed = d["exit_code"].as_i64().is_some_and(|c| c != 0);
     if s(&d["status"]) != "completed" || exit_failed {
         return Err(err(
@@ -389,7 +396,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
             "chain_broken",
             format!(
                 "logs/audit.jsonl line {line}: {} after the recorded end of the run",
-                s(&e["action"])
+                s(at(e, "action"))
             ),
         ));
     }
@@ -407,14 +414,14 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
         .iter()
         .find(|(_, e)| e.get("action").and_then(Value::as_str) == Some("run_started"));
     if let Some((_, e)) = started
-        && s(&e["details"]["version"]) != run.tool_version
+        && s(&at(e, "details")["version"]) != run.tool_version
     {
         return Err(err(
             "unsupported_version",
             format!(
                 "case log says {}, the run's audit log says {}",
                 run.tool_version,
-                s(&e["details"]["version"])
+                s(&at(e, "details")["version"])
             ),
         ));
     }
@@ -436,7 +443,8 @@ pub struct RunItem {
     pub sha256: String,
     /// (line, value) of `item_started.details.modified_utc`.
     pub modified: Option<(usize, String)>,
-    /// `evidence_verified_against_case.match == false`.
+    /// `evidence_verified_against_case.match == false`: the copy this run examined did not match the registry.
+    /// Every event of the item then carries `registry_match: differs` (see [`Emitter::push`]).
     pub case_mismatch: bool,
 }
 
@@ -536,7 +544,7 @@ impl RunData {
                 }
                 digests.insert(p, h);
             }
-            let d = &e["details"];
+            let d = &at(e, "details");
             let Some(index) = d["index"].as_u64() else {
                 continue;
             };
@@ -774,6 +782,15 @@ impl<'a> Emitter<'a> {
         if p.zone == ZoneInfo::Unknown {
             details.insert("zone".into(), "unknown".into());
         }
+        // The run examined a copy whose hashes differ from the case registry: its times describe that copy.
+        let mismatch = self.data.items.values().any(|i| {
+            i.case_mismatch
+                && ((!f.item.evidence_id.is_empty() && i.evidence_id == f.item.evidence_id)
+                    || (!f.item.path.is_empty() && i.path == f.item.path))
+        });
+        if mismatch {
+            details.insert("registry_match".into(), "differs".into());
+        }
         self.out.events.push(TimeEvent {
             id,
             utc_s: p.utc_s,
@@ -797,19 +814,19 @@ impl<'a> Emitter<'a> {
         for (line, e) in &data.audit {
             let action = e.get("action").and_then(Value::as_str).unwrap_or_default();
             let (kind, value, pointer) = match action {
-                "run_started" => ("run.started", s(&e["ts_utc"]), "ts_utc"),
-                "run_finished" => ("run.finished", s(&e["ts_utc"]), "ts_utc"),
+                "run_started" => ("run.started", s(at(e, "ts_utc")), "ts_utc"),
+                "run_finished" => ("run.finished", s(at(e, "ts_utc")), "ts_utc"),
                 "timestamp_obtained" => (
                     "run.timestamped",
-                    s(&e["details"]["gen_time"]),
+                    s(&at(e, "details")["gen_time"]),
                     "details/gen_time",
                 ),
                 _ => continue,
             };
-            let mut details = vec![("actor", s(&e["actor"]).to_string())];
+            let mut details = vec![("actor", s(at(e, "actor")).to_string())];
             if action == "timestamp_obtained" {
-                details.push(("tsa", s(&e["details"]["tsa"]).to_string()));
-                details.push(("covers_seq", e["details"]["covers_seq"].to_string()));
+                details.push(("tsa", s(&at(e, "details")["tsa"]).to_string()));
+                details.push(("covers_seq", at(e, "details")["covers_seq"].to_string()));
             }
             let f = Found {
                 item: ItemRef::default(),
@@ -909,6 +926,52 @@ mod tests {
         ] {
             assert!(!safe_run_dir(bad), "{bad}");
         }
+    }
+
+    #[test]
+    fn events_of_an_item_that_differs_from_the_registry_say_so() {
+        let mut items = BTreeMap::new();
+        for (index, id, mismatch) in [(1, "E0001", true), (2, "E0002", false)] {
+            items.insert(
+                index,
+                RunItem {
+                    index,
+                    path: format!("R:/evidence/{id}.jpg"),
+                    evidence_id: id.into(),
+                    case_mismatch: mismatch,
+                    ..Default::default()
+                },
+            );
+        }
+        let data = RunData {
+            run: RunRef::default(),
+            dir: PathBuf::new(),
+            root: PathBuf::new(),
+            audit: vec![],
+            audit_sha256: String::new(),
+            digests: BTreeMap::new(),
+            items,
+            output_items: BTreeMap::new(),
+        };
+        let mut em = Emitter::new(&data);
+        for i in [1, 2] {
+            em.push(
+                Found {
+                    item: data.items[&i].item_ref(""),
+                    kind: "fs.modified",
+                    original: "2026-01-01T00:00:00Z".into(),
+                    file: "logs/audit.jsonl",
+                    file_sha256: "",
+                    pointer: "line:1".into(),
+                    details: vec![],
+                },
+                timefmt::rfc3339("2026-01-01T00:00:00Z"),
+            );
+        }
+        let o = em.finish();
+        let by_id = |id: &str| o.events.iter().find(|e| e.item.evidence_id == id).unwrap();
+        assert_eq!(by_id("E0001").details["registry_match"], "differs");
+        assert!(!by_id("E0002").details.contains_key("registry_match"));
     }
 
     #[test]

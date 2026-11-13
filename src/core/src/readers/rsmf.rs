@@ -12,7 +12,9 @@
 //! Zone rule (never guessed here): a `source_time` with its own offset is used as written. A zone-less
 //! `source_time` with an rv-rsmf `utc` takes the offset between the two when the wall clock is ISO 8601 (Telegram);
 //! a locale format (WhatsApp, CSV) uses rv-rsmf's `utc`, as *explicit* when the examiner gave `--timezone` (named in
-//! `zone_applied`, offset not restated) and as *zone unknown* otherwise (rv-rsmf then read it as UTC). A
+//! `zone_applied`; `offset_min` is that zone's offset at the instant when rv-timeline knows the zone — UTC, a fixed
+//! `±HH:MM`, America/Bogota, Europe/Paris — and None for other zone names) and as *zone unknown* otherwise (rv-rsmf
+//! then read it as UTC). A
 //! `source_time` with one `:` (no seconds) is minute precision.
 //!
 //! Not mapped: edit and reaction times inside the RSMF files (the trace lists events only).
@@ -22,7 +24,7 @@
 //! rsmf/trace.json ── rows (source_time, utc, conversation, kind) ───┴─► chat.* events per conversation/day
 //! ```
 
-use super::{Emitter, Found, ReadOutcome, RunData, s, timefmt};
+use super::{Emitter, Found, ReadOutcome, RunData, at, s, timefmt};
 use crate::model::{Precision, ReadError, RunRef, ZoneInfo};
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -34,7 +36,7 @@ fn timezone_option(data: &RunData) -> Option<String> {
         if e.get("action").and_then(Value::as_str) != Some("conversion_started") {
             return None;
         }
-        e["details"]["options"]["timezone"]
+        at(e, "details")["options"]["timezone"]
             .as_str()
             .map(String::from)
     })
@@ -78,7 +80,10 @@ fn row_time(
         Some(z) => (
             timefmt::Parsed {
                 zone: ZoneInfo::Explicit,
-                offset_min: None,
+                // The examiner's zone at that instant, when this version knows the zone's rules.
+                offset_min: crate::engine::DisplayZone::parse(z)
+                    .ok()
+                    .map(|d| d.offset_at(u.utc_s)),
                 precision,
                 ..u
             },
@@ -206,12 +211,39 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            (p.zone, p.precision, z.as_deref()),
+            (p.zone, p.offset_min, p.precision, z.as_deref()),
             (
                 ZoneInfo::Explicit,
+                Some(-300),
                 Precision::Minute,
                 Some("America/Bogota")
             )
+        );
+        // Europe/Paris follows its DST rules at the instant (CEST in July, CET in November).
+        let (p, _) = row_time(
+            "10/07/26, 12:00",
+            "2026-07-10T10:00:00Z",
+            Some("Europe/Paris"),
+        )
+        .unwrap();
+        assert_eq!(p.offset_min, Some(120));
+        let (p, _) = row_time(
+            "10/11/26, 11:00",
+            "2026-11-10T10:00:00Z",
+            Some("Europe/Paris"),
+        )
+        .unwrap();
+        assert_eq!(p.offset_min, Some(60));
+        // A zone name this version has no rules for: explicit (the examiner applied it), offset not restated.
+        let (p, z) = row_time(
+            "10/11/26, 19:00",
+            "2026-11-10T10:00:00Z",
+            Some("Asia/Tokyo"),
+        )
+        .unwrap();
+        assert_eq!(
+            (p.zone, p.offset_min, z.as_deref()),
+            (ZoneInfo::Explicit, None, Some("Asia/Tokyo"))
         );
         // Without --timezone: unknown.
         let (p, _) = row_time("10/11/26, 10:00:00", "2026-11-10T10:00:00Z", None).unwrap();

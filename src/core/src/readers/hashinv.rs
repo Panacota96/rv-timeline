@@ -12,7 +12,7 @@
 //! Not mapped: creation/access times (rv-hashinv records only the modification time); items already
 //! registered by an earlier run (their intake event comes from that run).
 
-use super::{Emitter, Found, ReadOutcome, RunData, s, timefmt};
+use super::{Emitter, Found, ReadOutcome, RunData, at, s, timefmt};
 use crate::model::{ReadError, RunRef};
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -55,7 +55,7 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
         );
     }
     for (line, e) in &data.audit {
-        let d = &e["details"];
+        let d = &at(e, "details");
         if e.get("action").and_then(Value::as_str) != Some("evidence_registered")
             || d["new"] != Value::Bool(true)
         {
@@ -67,7 +67,7 @@ pub fn read(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
         if done.contains(&item.index) {
             continue;
         }
-        let t = s(&e["ts_utc"]);
+        let t = s(at(e, "ts_utc"));
         em.push(
             Found {
                 item: item.item_ref(""),

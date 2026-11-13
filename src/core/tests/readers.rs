@@ -557,7 +557,8 @@ fn rsmf_events() {
     let m = find(&ev, &format!("{p}:chat.message:0"));
     assert_eq!(m.original, "9/11/26, 18:00");
     assert_eq!(m.precision, Precision::Minute);
-    assert_eq!(m.offset_min, None);
+    // The examiner's zone (rv-rsmf --timezone America/Bogota) restated as its offset at that instant.
+    assert_eq!(m.offset_min, Some(-300));
     assert!(m.details["zone_applied"].starts_with("America/Bogota"));
     assert_eq!(m.source.file, "rsmf/trace.json");
     assert_eq!(m.item.sub, "c1/2026-11-09");

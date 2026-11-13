@@ -36,6 +36,8 @@ const REASONS: [&str; 6] = [
 ];
 /// Wall-clock budget of one mutation (discover + verify + read + engine), generous for slow CI runners.
 const BUDGET: Duration = Duration::from_secs(20);
+/// Budget of a full `build` (reports in every format, written to disk; slower on Windows with on-access scanning).
+const PIPELINE_BUDGET: Duration = Duration::from_secs(120);
 
 fn sample() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/sample/case")
@@ -576,7 +578,7 @@ fn hostile_case_folders_never_panic_hang_or_escape() {
 
     let mut rng = Rng(seed | 1);
     let mut failures: Vec<String> = Vec::new();
-    let mut slowest = Duration::ZERO;
+    let (mut slowest, mut slowest_build) = (Duration::ZERO, Duration::ZERO);
     for i in 0..iters {
         let what = rng.below(100);
         let pipeline = i % 100 == 0;
@@ -701,18 +703,26 @@ fn hostile_case_folders_never_panic_hang_or_escape() {
             (f, d, None)
         };
 
-        let t0 = Instant::now();
+        let mut took = Duration::ZERO;
+        let mut took_build = Duration::ZERO;
         let r = std::panic::catch_unwind(AssertUnwindSafe(|| {
+            let t0 = Instant::now();
             check_case(&case, only.as_deref())?;
+            took = t0.elapsed();
             if pipeline {
+                let t1 = Instant::now();
                 check_pipeline(&case)?;
+                took_build = t1.elapsed();
             }
             Ok::<(), String>(())
         }));
-        let took = t0.elapsed();
         slowest = slowest.max(took);
+        slowest_build = slowest_build.max(took_build);
         let problem = match r {
             Ok(Ok(())) if took > BUDGET => Some(format!("took {took:?}")),
+            Ok(Ok(())) if took_build > PIPELINE_BUDGET => {
+                Some(format!("build took {took_build:?}"))
+            }
             Ok(Ok(())) => None,
             Ok(Err(e)) => Some(e),
             Err(p) => Some(format!("PANIC {}", panic_text(p))),
@@ -737,7 +747,7 @@ fn hostile_case_folders_never_panic_hang_or_escape() {
         let _ = std::fs::remove_dir_all(case.join("runs/rv-timeline"));
     }
     eprintln!(
-        "{iters} mutations, slowest {slowest:?}, {} failures",
+        "{iters} mutations, slowest {slowest:?} (full build: {slowest_build:?}), {} failures",
         failures.len()
     );
     assert!(
@@ -952,4 +962,61 @@ fn an_unparseable_time_is_counted_never_placed() {
     assert_eq!(stats["limitations"][0], "TL_TIMES_SKIPPED");
     let jsonl = std::fs::read_to_string(s.report_dir.join("timeline.jsonl")).unwrap();
     assert!(!jsonl.contains("2026:13:45"));
+}
+
+/// Every key of every entry of every run's audit log deleted in turn, then re-sealed (the fuzz loop found a
+/// panic on a missing `ts_utc`): the run is verified or excluded, never a panic.
+#[test]
+fn audit_entries_missing_any_key_never_panic() {
+    let tmp = tempfile::tempdir().unwrap();
+    let case = tmp.path().join("case");
+    copy_dir(&sample(), &case);
+    let log_original = std::fs::read(case.join("case-log.jsonl")).unwrap();
+    for run in readers::discover_runs(&case).unwrap() {
+        let audit_p = case.join(&run.run_dir).join("logs/audit.jsonl");
+        let original = std::fs::read(&audit_p).unwrap();
+        let entries = read_lines(&audit_p);
+        // The first entries, the run's last ones and every distinct action once keep the loop short.
+        let mut seen = std::collections::BTreeSet::new();
+        let picked: Vec<usize> = (0..entries.len())
+            .filter(|&i| {
+                i < 3
+                    || i + 3 >= entries.len()
+                    || seen.insert(entries[i]["action"].as_str().unwrap_or("").to_string())
+            })
+            .collect();
+        for i in picked {
+            let keys: Vec<String> = entries[i]
+                .keys()
+                .chain(
+                    entries[i]
+                        .get("details")
+                        .and_then(Value::as_object)
+                        .into_iter()
+                        .flat_map(|d| d.keys()),
+                )
+                .cloned()
+                .collect();
+            for k in keys {
+                let mut e = entries.clone();
+                if e[i].remove(&k).is_none()
+                    && let Some(Value::Object(d)) = e[i].get_mut("details")
+                {
+                    d.remove(&k);
+                }
+                write_lines(&audit_p, &e);
+                reseal_run(&case, &run.run_dir, None);
+                let r = std::panic::catch_unwind(|| check_case(&case, Some(&run.run_dir)));
+                assert!(
+                    matches!(r, Ok(Ok(()))),
+                    "{} line {}: without {k}: {:?}",
+                    run.run_dir,
+                    i + 1,
+                    r.map_err(panic_text)
+                );
+                std::fs::write(&audit_p, &original).unwrap();
+                std::fs::write(case.join("case-log.jsonl"), &log_original).unwrap();
+            }
+        }
+    }
 }
