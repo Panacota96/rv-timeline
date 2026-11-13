@@ -1,14 +1,15 @@
 # Forensic audit trail
 
-Everything RV Timeline does is written to `<OUT>/logs/<RUN-ID>/`. The folder is designed so that a second
-examiner, months later, can check **what was done, to which files, by whom, with which tool version**, and
-that the record was not altered.
+Everything RV Timeline does is written to `<CASE>/runs/rv-timeline/<RUN-ID>/logs/`. The folder is designed so that
+a second examiner, months later, can check **which tool runs were read or left out, which files were read, by
+whom, with which tool version and options**, and that the record was not altered.
 
 | File | Content |
 | --- | --- |
 | `audit.jsonl` | One JSON object per action, hash-chained (authoritative) |
 | `audit.log` | The same actions as readable text (convenience copy) |
-| `hashes.csv` | Hash register: `index,path,size,<algo1>[,<algo2>],status,error` |
+| `hashes.csv` | Register of the case files the build read: `index,path,size,<algo1>[,<algo2>],status,error` ([reports.md](reports.md#hashescsv-the-files-read)) |
+| `review.jsonl` | GUI viewing after the build, hash-chained and anchored to `run_finished` (when any) |
 | `environment.json` | Tool version, compiler, target, every dependency version, OS, host, OS user, working folder, command line |
 
 ## The hash chain
@@ -17,8 +18,8 @@ that the record was not altered.
 flowchart LR
     G["GENESIS<br/>000…000"] --> E1
     E1["#1 run_started<br/>prev = GENESIS<br/>entry_hash = H1"] --> E2
-    E2["#2 environment_recorded<br/>prev = H1<br/>entry_hash = H2"] --> E3
-    E3["#3 inputs_resolved<br/>prev = H2<br/>entry_hash = H3"] --> EN["… #N run_finished"]
+    E2["#2 case_linked<br/>prev = H1<br/>entry_hash = H2"] --> E3
+    E3["#3 environment_recorded<br/>prev = H2<br/>entry_hash = H3"] --> EN["… #N run_finished"]
 ```
 
 Each entry has: `seq`, `ts_utc`, `run_id`, `actor`, `action`, optional `item`, `details`,
@@ -34,8 +35,8 @@ Editing a value changes that entry's hash; deleting or re-ordering breaks `seq` 
 Verify with either implementation:
 
 ```bash
-rv-timeline verify-log rakvor-out/logs/<RUN-ID>          # exit 0 intact, 3 broken or truncated
-python tests/verify_chain.py rakvor-out/logs/<RUN-ID>   # independent re-implementation (chain + hashes.csv)
+rv-timeline verify-log <CASE>/runs/rv-timeline/<RUN-ID>/logs          # exit 0 intact, 3 broken or truncated
+python tests/verify_chain.py <CASE>/runs/rv-timeline/<RUN-ID>/logs   # independent re-implementation (chain + hashes.csv)
 ```
 
 > The chain proves the log is **internally consistent**. On its own it does not prove *when* it was written —
@@ -63,9 +64,10 @@ flowchart LR
 | RFC 3161 timestamp | `timestamp-<K>.json` / `.tsr` next to the log | entry `#K` still exists and its `entry_hash` is the head the token signs; every `timestamp_obtained` entry still has its token file |
 | Case log | `<CASE>/case-log.jsonl`, for a run in `<CASE>/runs/<tool>/<RUN-ID>/logs` | `run_finished` of this run records `audit_entries` and `audit_head`: entry `#M` exists with that hash, and only `timestamp_obtained` follows it |
 
-The output names the last anchored entry. A standalone run timestamps the head **before** writing
+The output names the last anchored entry. A build is always in a case folder, so the case log anchors its last
+entry. (For comparison, a standalone run of another tool timestamps the head **before** writing
 `timestamp_obtained`, `statistics_report_written` and `run_finished`, so those 3 entries are reported as
-"cannot be proven complete"; a run in a case folder is anchored to its last entry by the case log. Without either
+"cannot be proven complete".) Without either
 record `verify-log` prints `truncation not detectable without a timestamp or case record` (exit 0: nothing
 contradicts the log, but nothing vouches for its length). Deleting the timestamp files **and** the entries that
 refer to them is detectable only through the case log or a head kept elsewhere.
@@ -119,7 +121,7 @@ sequenceDiagram
 custody — with **your own** certificate. The password comes from the environment variable named by
 `--sign-pass-env` (default `RV_SIGN_PASSWORD`) or an interactive prompt; it is never written to any log.
 The log records `signing_certificate_loaded` with the certificate subject and SHA-256 fingerprint; a wrong password
-stops the run (`run_failed`, exit 1) before any evidence is read. HTML and JSON reports are not signed: their
+stops the build (`run_failed`, exit 1) before any run is read. HTML and JSON reports are not signed: their
 digests are in the audit chain, which is timestamped.
 
 ## Chain-of-custody form per item
@@ -134,48 +136,63 @@ physical transfers. This is a working aid, not legal advice: check it against th
 
 | Action | When | Key details |
 | --- | --- | --- |
-| `run_started` | first | tool, version, frontend, algorithms, langs, inputs, case |
-| `ui_*` | GUI only, before the run | input added/removed, hash selection, language, recursive, start clicked |
+| `ui_*` | GUI only, before the build (audit preamble) | case folder, display zone, tools, window, clock skew, max events, Timesketch, languages, trust settings, start clicked |
+| `run_started` | first | tool, version, frontend, algorithms, langs, case folder, `timeline` options (display zone, clock skew, tools, from/to, max events, sort threshold, Timesketch) |
+| `case_linked` | | case id, role `analysis`, case-log seq and head at start, registry SHA-256 and item count |
 | `environment_recorded` | | digests of `environment.json` |
-| `inputs_resolved` | | number of items and bytes |
-| `item_started` | each item | index, size, modified time |
-| `item_hashed` | each item | digests, bytes read, `mtime_unchanged` |
-| `item_error` | unreadable item | error message |
-| `item_analyzed` | each item | detected type, extension, findings, status |
-| `item_cancelled` / `run_cancelled` | on cancel | processed count |
-| `duplicate_group` | after the loop | hash, item indexes |
-| `hash_register_written` | | digests of `hashes.csv` |
+| `signing_certificate_loaded` | with `--sign-cert` | subject, SHA-256 fingerprint |
+| `runs_discovered` | | every run found (tool, version, run id, folder) |
+| `run_skipped` | per run not considered | reason `self`, `tool_filter` or `max_events` |
+| `run_verified` | per run that passed verification | the run |
+| `run_read` | per run read | events read, kept, outside the filters |
+| `event_cap_reached` | when `--max-events` is reached | events dropped, total kept |
+| `run_excluded` | per run left out | reason (`chain_broken`, `digest_mismatch`, `not_finished`, `unsupported_tool`, `unsupported_version`, `unreadable`) and detail |
+| `run_cancelled` | on cancel | runs processed of the total |
+| `events_ordered` | | events, order `utc_s, utc_ns, id`, sort `memory` / `external`, chunks, threshold |
+| `timeline_written` | unless `--no-timesketch` | digests of `timeline.jsonl`, lines, format, display zone |
+| `hash_register_written` | | digests of `hashes.csv`, rows |
+| `signals_computed` | | count, by code, by severity, clock skew, zone-unknown events |
+| `item_timeline` | each item | evidence id, events, events listed, tools, signal codes |
 | `item_reports_written` | each item | digests of every report file |
+| `timestamp_obtained` / `timestamp_pending` | | token or reason |
 | `statistics_report_written` | | digests of statistics files |
-| `run_finished` / `run_failed` | last | totals, severities, elapsed |
+| `run_finished` / `run_failed` | last | items, events, runs verified / excluded, signals, cap reached, severities, elapsed, cancelled |
+
+The case log receives `run_started` and `run_finished` (with `audit_entries` and `audit_head`) for the build.
 
 ## Evidence handling
 
 ```mermaid
 flowchart LR
     O[("Original media")] -->|write blocker + imaging tool| C[("Verified working copy")]
-    C -->|read-only open| T["RV Timeline"]
-    T --> L["logs/"]
-    T --> R["reports/"]
-    L & R --> K["Case file<br/>(keep together)"]
+    C -->|intake| H["RV HashInv<br/>registry"]
+    C -->|analysis| A["analysis tools<br/>runs/&lt;tool&gt;/"]
+    H --> CF[("Case folder")]
+    A --> CF
+    CF -->|"verify, then read<br/>(never write)"| T["RV Timeline"]
+    T --> RT["runs/rv-timeline/RUN-ID/<br/>logs + reports"]
+    RT --> CF
 ```
 
-- Files are opened with read-only access; modification times are compared before and after hashing
-  (`mtime_unchanged` in `item_hashed`).
-- Symbolic links are never followed (no escape outside the selected folders).
-- The tool does not replace imaging tools or write blockers: run it on a verified copy.
+- RV Timeline never opens the evidence files: its sources are the case folder's records and the tool runs'
+  recorded outputs.
+- It never writes into another tool's run or into the registry; it only creates its own run folder and appends
+  two entries to the case log, under the case lock.
+- Every run is verified before it is read, and every output file's digest is re-checked when it is read
+  ([theory.md B3](theory.md#b3-run-discovery-and-verification)).
 
 ## Mapping to ISO/IEC 27037:2012
 
 | 27037 principle / activity | How RV Timeline supports it |
 | --- | --- |
-| Auditability (5.3.2) | Every action logged with actor, UTC time and chain hash; `verify-log` checks the chain and its end against the timestamp and the case log |
-| Repeatability (5.3.3) | `environment.json` records exact tool and dependency versions; same input → same hashes |
-| Reproducibility (5.3.4) | Independent verifier (`tests/verify_chain.py`), standard algorithms, and a second implementation of the tool (the other profile) that numbers, hashes and verifies identically |
-| Justifiability (5.3.5) | Every finding states what it shows and what it does **not** prove; limitations in every report |
-| Preservation (7.1.4) | Read-only access; hashes of every file and of every report produced |
-| Documentation / chain of custody | Hash register, reports, and log folder form the record of the examination |
+| Auditability (5.3.2) | Every action logged with actor, UTC time and chain hash; every run's status and reason; `verify-log` checks the chain and its end against the timestamp and the case log |
+| Repeatability (5.3.3) | `environment.json` and `run_started` record the tool, dependency versions and every option; same case and options → same `timeline.jsonl` bytes |
+| Reproducibility (5.3.4) | Independent verifier (`tests/verify_chain.py`); the sample's ground truth derived by an independent script ([examples/sample](../examples/sample/README.md)) |
+| Justifiability (5.3.5) | Every signal states what it shows and what it does **not** prove; limitations in every report |
+| Preservation (7.1.4) | Evidence never opened; other runs never written; digests of every file read (`hashes.csv`) and of every output produced |
+| Documentation / chain of custody | Runs read, files read, timeline, reports and log folder form the record of this step of the examination |
 
 Colombian practice (Ley 906 de 2004, Manual de cadena de custodia) and French practice (Code de procédure
 pénale, art. 156 ff. for expertise) both expect the examiner to document the method and preserve integrity;
-the log folder plus the reports are that documentation for this step of the examination.
+the log folder plus the reports are that documentation for this step of the examination
+([admissibility.md](admissibility.md)).
