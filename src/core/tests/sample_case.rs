@@ -125,38 +125,11 @@ fn clean_case_matches_ground_truth() {
         ));
     }
 
-    let sig = |code: &str, item: &str| format!("{code} {item}");
-    let want_sig: BTreeSet<String> = c["signals"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|s| {
-            let item = &s["item"];
-            let it = if item.is_null() {
-                String::new()
-            } else {
-                format!(
-                    "{}{}",
-                    item["evidence_id"].as_str().unwrap_or(""),
-                    item["sub"].as_str().unwrap_or("")
-                )
-            };
-            sig(s["code"].as_str().unwrap(), &it) + " " + s["severity"].as_str().unwrap()
-        })
-        .collect();
-    let got_sig: BTreeSet<String> = t
-        .signals
-        .iter()
-        .map(|s| {
-            let it = s
-                .item
-                .as_ref()
-                .map(|i| format!("{}{}", i.evidence_id, i.sub))
-                .unwrap_or_default();
-            sig(&s.code, &it) + " " + serde_json::to_value(s.severity).unwrap().as_str().unwrap()
-        })
-        .collect();
-    problems.extend(diff("signal", &want_sig, &got_sig));
+    problems.extend(diff(
+        "signal",
+        &want_signals(&c["signals"]),
+        &got_signals(&t),
+    ));
 
     assert!(
         problems.is_empty(),
@@ -203,5 +176,88 @@ fn tampered_copies_exclude_the_right_run() {
             t.signals.iter().any(|s| s.code == "RUN_NOT_VERIFIED"),
             "{name}: RUN_NOT_VERIFIED"
         );
+        // Every signal (RUN_NOT_VERIFIED included) with its item and severity.
+        let problems = diff("signal", &want_signals(&want["signals"]), &got_signals(&t));
+        assert!(problems.is_empty(), "{name}:\n{}", problems.join("\n"));
     }
+}
+
+/// Every signal of the clean case and the tampered copies renders in en/es/fr with each `%{placeholder}` of its
+/// texts filled by a non-empty param (a missing one would print e.g. "In message , ...").
+#[test]
+fn every_signal_fills_its_placeholders() {
+    let exp = expected();
+    let mut dirs = vec![root().join("examples/sample/case")];
+    for name in exp["tampered"].as_object().unwrap().keys() {
+        dirs.push(root().join("examples/sample/tampered").join(name));
+    }
+    let mut problems = Vec::new();
+    for dir in dirs {
+        let t = build(&dir, &exp);
+        for s in &t.signals {
+            for lang in rv_timeline_core::i18n::LANGS {
+                let c = rv_timeline_core::i18n::catalog(lang);
+                let p = rv_timeline_core::report::localized_params(c, &s.params);
+                let entry = c.signal_entry(&s.code, &p);
+                for key in ["title", "shows", "does_not_prove"] {
+                    let Some(text) = entry[key].as_str() else {
+                        problems.push(format!("{lang} {}: no {key}", s.code));
+                        continue;
+                    };
+                    for part in text.split("%{").skip(1) {
+                        let name = part.split('}').next().unwrap_or_default();
+                        if p.get(name).is_none_or(|v| v.trim().is_empty()) {
+                            problems.push(format!("{lang} {} {key}: %{{{name}}} is empty", s.code));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    problems.sort();
+    problems.dedup();
+    assert!(problems.is_empty(), "{}", problems.join("\n"));
+}
+
+/// `code item severity` of the signals in the ground truth.
+fn want_signals(signals: &Value) -> BTreeSet<String> {
+    signals
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|s| {
+            let item = &s["item"];
+            let it = if item.is_null() {
+                String::new()
+            } else {
+                format!(
+                    "{}{}",
+                    item["evidence_id"].as_str().unwrap_or(""),
+                    item["sub"].as_str().unwrap_or("")
+                )
+            };
+            format!(
+                "{} {} {}",
+                s["code"].as_str().unwrap(),
+                it,
+                s["severity"].as_str().unwrap()
+            )
+        })
+        .collect()
+}
+
+/// `code item severity` of the signals the engine produced.
+fn got_signals(t: &rv_timeline_core::model::Timeline) -> BTreeSet<String> {
+    t.signals
+        .iter()
+        .map(|s| {
+            let it = s
+                .item
+                .as_ref()
+                .map(|i| format!("{}{}", i.evidence_id, i.sub))
+                .unwrap_or_default();
+            let sev = serde_json::to_value(s.severity).unwrap();
+            format!("{} {} {}", s.code, it, sev.as_str().unwrap())
+        })
+        .collect()
 }

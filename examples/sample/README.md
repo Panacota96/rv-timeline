@@ -90,7 +90,8 @@ signal rules, with `clock_skew_s` = 300:
 - `EVENT_IN_FUTURE`: an occurrence (not a validity bound such as `cert.not_after`) after the case's last `run.finished`.
 - `ZONE_UNKNOWN_EVENTS`: one case-level signal (no item) with the count of zone-unknown events (here 5: the two
   EXIF dates of screenshot.png and the three mbox `From ` lines).
-- `RUN_NOT_VERIFIED`: one per excluded run (tampered copies only).
+- `RUN_NOT_VERIFIED`: one per excluded run (tampered copies only): medium for `chain_broken` and `digest_mismatch`, low
+  otherwise (the engine's severities). Each tampered copy's full signal list is in `tampered.<copy>.signals`.
 
 Severities are proposals; codes and items are the ground truth (`src/core/tests/sample_case.rs` compares runs, event
 ids and times, the zone-unknown count and each signal's code, item and severity). Left out on purpose: the DKIM `t=`

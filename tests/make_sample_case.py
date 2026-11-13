@@ -613,7 +613,7 @@ EXIF_EVENT_KINDS = {"exif.original", "exif.digitized", "exif.modify"}
 SEVERITY = {  # proposed severities (the engine owns them; the codes, events and items are the ground truth)
     "EXIF_AFTER_INTAKE": "high", "FILE_MODIFIED_AFTER_INTAKE": "medium", "PDF_REVISION_BEFORE_PREVIOUS": "medium",
     "MAIL_DATE_AFTER_FIRST_HOP": "medium", "EVENT_IN_FUTURE": "medium", "CLOCK_SKEW_SUSPECTED": "low",
-    "RUN_NOT_VERIFIED": "high", "ZONE_UNKNOWN_EVENTS": "info",
+    "ZONE_UNKNOWN_EVENTS": "info",
 }
 
 
@@ -737,7 +737,9 @@ def build_signals(events: list[dict], runs: list[dict], registry: dict, excluded
         add("ZONE_UNKNOWN_EVENTS", [], "", count=len(unk),
             tools=", ".join(sorted({e["source"]["tool"] for e in unk})))
     for x in excluded:
-        sig.append({"code": "RUN_NOT_VERIFIED", "severity": SEVERITY["RUN_NOT_VERIFIED"], "events": [],
+        # The engine's severity: medium when the run's own record is inconsistent, low when it is just missing.
+        sev = "medium" if x["reason"] in ("chain_broken", "digest_mismatch") else "low"
+        sig.append({"code": "RUN_NOT_VERIFIED", "severity": sev, "events": [],
                     "item": None, "params": {"tool": x["tool"], "run_id": x["run_id"], "reason": x["reason"]}})
     return sig
 
@@ -800,7 +802,7 @@ def cmd_expected(clean: Path, tampered: Path, versions: Path, out: Path) -> None
                              "reason": t["reason"], "what": t["what"]},
             "verify_case_exit": TAMPERED_VERIFY[name],
             "runs": s["runs"], "events_total": s["events_total"],
-            "signals": [g for g in s["signals"] if g["code"] == "RUN_NOT_VERIFIED"],
+            "signals": s["signals"],
             "signals_total": len(s["signals"]),
             "signal_codes": sorted({g["code"] for g in s["signals"]}),
         }

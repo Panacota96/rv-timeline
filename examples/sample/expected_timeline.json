@@ -5165,8 +5165,108 @@
       "events_total": 132,
       "signals": [
         {
+          "code": "FILE_MODIFIED_AFTER_INTAKE",
+          "severity": "medium",
+          "events": [
+            "rv-hashinv:20261113T065643Z-8de163:E0011:fs.modified:0",
+            "rv-hashinv:20261113T065639Z-136162:E0011:intake.registered:0"
+          ],
+          "item": {
+            "evidence_id": "E0011",
+            "path": "R:\\evidence\\images\\camera-original.jpg",
+            "sub": "",
+            "sha256": "3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317"
+          },
+          "params": {
+            "delta_s": "3",
+            "runs": "1"
+          }
+        },
+        {
+          "code": "MAIL_DATE_AFTER_FIRST_HOP",
+          "severity": "medium",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.date:0",
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1"
+          ],
+          "item": {
+            "evidence_id": "E0016",
+            "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+            "sub": "#3",
+            "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+          },
+          "params": {
+            "delta_s": "5400"
+          }
+        },
+        {
+          "code": "CLOCK_SKEW_SUSPECTED",
+          "severity": "low",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1",
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:0"
+          ],
+          "item": {
+            "evidence_id": "E0016",
+            "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+            "sub": "#3",
+            "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+          },
+          "params": {
+            "basis": "received_hops",
+            "skew_s": "1200",
+            "hosts": "smtp.example.org -> mx.acme.example"
+          }
+        },
+        {
+          "code": "MAIL_DATE_AFTER_FIRST_HOP",
+          "severity": "medium",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0017:mail.date:0",
+            "rv-mailauth:20261113T065654Z-2f7708:E0017:mail.hop:1"
+          ],
+          "item": {
+            "evidence_id": "E0017",
+            "path": "R:\\evidence\\mail\\20-date-after-first-hop.eml",
+            "sub": "",
+            "sha256": "4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa"
+          },
+          "params": {
+            "delta_s": "2820"
+          }
+        },
+        {
+          "code": "PDF_REVISION_BEFORE_PREVIOUS",
+          "severity": "medium",
+          "events": [
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r2:pdf.info.modified:0",
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r3:pdf.info.modified:0"
+          ],
+          "item": {
+            "evidence_id": "E0018",
+            "path": "R:\\evidence\\pdf\\backdated-revision.pdf",
+            "sub": "",
+            "sha256": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+          },
+          "params": {
+            "revision": "3",
+            "previous": "2",
+            "delta_s": "97200"
+          }
+        },
+        {
+          "code": "ZONE_UNKNOWN_EVENTS",
+          "severity": "info",
+          "events": [],
+          "item": null,
+          "params": {
+            "count": "3",
+            "tools": "rv-mailauth"
+          }
+        },
+        {
           "code": "RUN_NOT_VERIFIED",
-          "severity": "high",
+          "severity": "medium",
           "events": [],
           "item": null,
           "params": {
@@ -5266,8 +5366,94 @@
       "events_total": 131,
       "signals": [
         {
-          "code": "RUN_NOT_VERIFIED",
+          "code": "FILE_MODIFIED_AFTER_INTAKE",
+          "severity": "medium",
+          "events": [
+            "rv-hashinv:20261113T065643Z-8de163:E0011:fs.modified:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0011:fs.modified:0",
+            "rv-hashinv:20261113T065639Z-136162:E0011:intake.registered:0"
+          ],
+          "item": {
+            "evidence_id": "E0011",
+            "path": "R:\\evidence\\images\\camera-original.jpg",
+            "sub": "",
+            "sha256": "3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317"
+          },
+          "params": {
+            "delta_s": "3",
+            "runs": "2"
+          }
+        },
+        {
+          "code": "EXIF_AFTER_INTAKE",
           "severity": "high",
+          "events": [
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0",
+            "rv-hashinv:20261113T065639Z-136162:E0013:intake.registered:0"
+          ],
+          "item": {
+            "evidence_id": "E0013",
+            "path": "R:\\evidence\\images\\future-exif.jpg",
+            "sub": "",
+            "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+          },
+          "params": {
+            "delta_s": "141960503"
+          }
+        },
+        {
+          "code": "EVENT_IN_FUTURE",
+          "severity": "medium",
+          "events": [
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0"
+          ],
+          "item": {
+            "evidence_id": "E0013",
+            "path": "R:\\evidence\\images\\future-exif.jpg",
+            "sub": "",
+            "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+          },
+          "params": {
+            "reference": "last run.finished",
+            "delta_s": "141960484"
+          }
+        },
+        {
+          "code": "PDF_REVISION_BEFORE_PREVIOUS",
+          "severity": "medium",
+          "events": [
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r2:pdf.info.modified:0",
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r3:pdf.info.modified:0"
+          ],
+          "item": {
+            "evidence_id": "E0018",
+            "path": "R:\\evidence\\pdf\\backdated-revision.pdf",
+            "sub": "",
+            "sha256": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+          },
+          "params": {
+            "revision": "3",
+            "previous": "2",
+            "delta_s": "97200"
+          }
+        },
+        {
+          "code": "ZONE_UNKNOWN_EVENTS",
+          "severity": "info",
+          "events": [],
+          "item": null,
+          "params": {
+            "count": "2",
+            "tools": "rv-imgauth"
+          }
+        },
+        {
+          "code": "RUN_NOT_VERIFIED",
+          "severity": "medium",
           "events": [],
           "item": null,
           "params": {
@@ -5367,8 +5553,147 @@
       "events_total": 132,
       "signals": [
         {
-          "code": "RUN_NOT_VERIFIED",
+          "code": "FILE_MODIFIED_AFTER_INTAKE",
+          "severity": "medium",
+          "events": [
+            "rv-hashinv:20261113T065643Z-8de163:E0011:fs.modified:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0011:fs.modified:0",
+            "rv-hashinv:20261113T065639Z-136162:E0011:intake.registered:0"
+          ],
+          "item": {
+            "evidence_id": "E0011",
+            "path": "R:\\evidence\\images\\camera-original.jpg",
+            "sub": "",
+            "sha256": "3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317"
+          },
+          "params": {
+            "delta_s": "3",
+            "runs": "2"
+          }
+        },
+        {
+          "code": "EXIF_AFTER_INTAKE",
           "severity": "high",
+          "events": [
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0",
+            "rv-hashinv:20261113T065639Z-136162:E0013:intake.registered:0"
+          ],
+          "item": {
+            "evidence_id": "E0013",
+            "path": "R:\\evidence\\images\\future-exif.jpg",
+            "sub": "",
+            "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+          },
+          "params": {
+            "delta_s": "141960503"
+          }
+        },
+        {
+          "code": "EVENT_IN_FUTURE",
+          "severity": "medium",
+          "events": [
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
+            "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0"
+          ],
+          "item": {
+            "evidence_id": "E0013",
+            "path": "R:\\evidence\\images\\future-exif.jpg",
+            "sub": "",
+            "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+          },
+          "params": {
+            "reference": "last run.finished",
+            "delta_s": "141960487"
+          }
+        },
+        {
+          "code": "MAIL_DATE_AFTER_FIRST_HOP",
+          "severity": "medium",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.date:0",
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1"
+          ],
+          "item": {
+            "evidence_id": "E0016",
+            "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+            "sub": "#3",
+            "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+          },
+          "params": {
+            "delta_s": "5400"
+          }
+        },
+        {
+          "code": "CLOCK_SKEW_SUSPECTED",
+          "severity": "low",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1",
+            "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:0"
+          ],
+          "item": {
+            "evidence_id": "E0016",
+            "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+            "sub": "#3",
+            "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+          },
+          "params": {
+            "basis": "received_hops",
+            "skew_s": "1200",
+            "hosts": "smtp.example.org -> mx.acme.example"
+          }
+        },
+        {
+          "code": "MAIL_DATE_AFTER_FIRST_HOP",
+          "severity": "medium",
+          "events": [
+            "rv-mailauth:20261113T065654Z-2f7708:E0017:mail.date:0",
+            "rv-mailauth:20261113T065654Z-2f7708:E0017:mail.hop:1"
+          ],
+          "item": {
+            "evidence_id": "E0017",
+            "path": "R:\\evidence\\mail\\20-date-after-first-hop.eml",
+            "sub": "",
+            "sha256": "4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa"
+          },
+          "params": {
+            "delta_s": "2820"
+          }
+        },
+        {
+          "code": "PDF_REVISION_BEFORE_PREVIOUS",
+          "severity": "medium",
+          "events": [
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r2:pdf.info.modified:0",
+            "rv-pdfauth:20261113T065644Z-0d67db:E0018/r3:pdf.info.modified:0"
+          ],
+          "item": {
+            "evidence_id": "E0018",
+            "path": "R:\\evidence\\pdf\\backdated-revision.pdf",
+            "sub": "",
+            "sha256": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+          },
+          "params": {
+            "revision": "3",
+            "previous": "2",
+            "delta_s": "97200"
+          }
+        },
+        {
+          "code": "ZONE_UNKNOWN_EVENTS",
+          "severity": "info",
+          "events": [],
+          "item": null,
+          "params": {
+            "count": "5",
+            "tools": "rv-imgauth, rv-mailauth"
+          }
+        },
+        {
+          "code": "RUN_NOT_VERIFIED",
+          "severity": "low",
           "events": [],
           "item": null,
           "params": {
