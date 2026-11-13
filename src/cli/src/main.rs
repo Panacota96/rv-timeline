@@ -149,6 +149,10 @@ CHECKS:
     recorded at run_finished (only timestamp_obtained may follow). Entries after the last
     anchored one are listed as not provable; with neither record the output says
     \"truncation not detectable without a timestamp or case record\".
+  - the review log (review.jsonl next to audit.jsonl, written when the timeline is viewed after
+    the run): its chain, its anchor to this run's run_finished entry and the run id of every
+    entry. The output prints its entry count (\"review log: none\" when there is none); an
+    edited or misplaced review log is a problem.
 
 EXAMPLES:
   rv-timeline verify-log rakvor-out/logs/20261019T101500Z-a1b2c3/audit.jsonl
@@ -219,6 +223,8 @@ CHECKS:
     tokens: imprint and TSA signature; the TSA chain is not checked, use verify-log
     --tsa-ca), its case_linked entry points to its run_started entry, and the audit head
     recorded at run_finished is its final entry (only timestamp_obtained may follow);
+  - every run's review log (review.jsonl, viewing after the run), when present: its chain and its
+    anchor to that run; the output prints the review entries counted across the runs;
   - with --rehash: every registered item still reachable at its registered path is read again
     and its digests are compared with the registry (the latest registration of a path).
 
@@ -908,6 +914,10 @@ fn verify_log(log: PathBuf, tsa_ca: Option<PathBuf>) -> u8 {
             println!("    {}", t);
         }
         println!("    {}", v.truncation);
+        match v.review_entries {
+            Some(n) => println!("    review log: {} entries, chain intact", n),
+            None => println!("    review log: none"),
+        }
     } else {
         println!("BROKEN  {}", path.display());
         for p in &v.problems {
@@ -943,6 +953,10 @@ fn verify_case(dir: PathBuf, rehash: bool) -> u8 {
             v.registry_items,
             v.runs,
             dir.display()
+        );
+        println!(
+            "    review logs: {} entries across the runs, all verified",
+            v.review_entries
         );
         if let Some(r) = &rehashed {
             println!(

@@ -342,13 +342,43 @@ fn sample_case_builds_a_verified_cited_timeline() {
         .arg("verify-log")
         .arg(run.join("logs"))
         .assert()
-        .code(0);
+        .code(0)
+        .stdout(predicate::str::contains("review log: none"));
     bin()
         .arg("verify-case")
         .arg(&case)
         .assert()
         .code(0)
-        .stdout(predicate::str::contains("OK  case RV-SAMPLE-001"));
+        .stdout(predicate::str::contains("OK  case RV-SAMPLE-001"))
+        .stdout(predicate::str::contains("review logs: 0 entries"));
+    // Viewing after the run (review.jsonl): both commands print the entries they verified.
+    for f in ["timeline.jsonl", "statistics.json"] {
+        rv_timeline_core::review::append(
+            &run.join("logs"),
+            "tester",
+            "ui_timeline_viewed",
+            serde_json::json!({ "file": f }),
+        )
+        .unwrap();
+    }
+    bin()
+        .arg("verify-log")
+        .arg(run.join("logs"))
+        .assert()
+        .code(0)
+        .stdout(predicate::str::contains(
+            "review log: 2 entries, chain intact",
+        ));
+    bin()
+        .arg("verify-case")
+        .arg(&case)
+        .assert()
+        .code(0)
+        .stdout(predicate::str::contains(
+            "review logs: 2 entries across the runs, all verified",
+        ));
+    let review = run.join("logs").join(rv_timeline_core::review::REVIEW_FILE);
+    std::fs::remove_file(&review).unwrap();
 
     // A second build skips the first timeline run (never reads itself).
     let o = build(&case).output().unwrap();
