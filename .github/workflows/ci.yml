@@ -83,8 +83,7 @@ jobs:
       - name: Cross-language verification (Python re-checks the chain and JSON schemas)
         shell: bash
         run: |
-          run=$(find ci-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f
-' | sort | tail -n 1)
+          run=$(find ci-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
           test -s "ci-out/case/runs/rv-timeline/$run/reports/timeline.jsonl"
           python tests/verify_chain.py "ci-out/case/runs/rv-timeline/$run/logs"
           python tests/validate_reports.py "ci-out/case/runs/rv-timeline/$run/reports"
@@ -123,8 +122,7 @@ jobs:
           rm -rf tsa-out && mkdir -p tsa-out && cp -R examples/sample/case tsa-out/case
           cargo run --locked -q -p rv-timeline-cli -- build --case-dir tsa-out/case --progress none | tee tsa.txt || true
           grep -q "timestamp: ok" tsa.txt
-          run=$(find tsa-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f
-' | sort | tail -n 1)
+          run=$(find tsa-out/case/runs/rv-timeline -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | tail -n 1)
           cargo run --locked -q -p rv-timeline-cli -- verify-log "tsa-out/case/runs/rv-timeline/$run/logs"
       - name: Build release binaries (Windows)
         if: runner.os == 'Windows'
