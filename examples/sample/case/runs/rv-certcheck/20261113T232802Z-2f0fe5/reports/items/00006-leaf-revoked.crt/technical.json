@@ -1,0 +1,123 @@
+{
+  "audit": {
+    "first_seq": 26,
+    "last_seq": 29
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T23:27:52.795Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "certificates": {
+    "certificates": 1,
+    "codes": [
+      "CERT_REVOKED"
+    ],
+    "errors": [],
+    "kind": "certificate",
+    "online_fetches": [],
+    "verdicts": [
+      {
+        "depths": 3,
+        "openssl_code": 23,
+        "openssl_reason": "certificate revoked",
+        "status": "invalid"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "code": "CERT_REVOKED",
+      "params": {
+        "depth": "0",
+        "reason": "keyCompromise",
+        "revoked_at": "2026-02-01T00:00:00Z",
+        "serial": "2004",
+        "source": "item:3",
+        "subject": "C=CO, O=Rakvor Lab, CN=revoked.lab.rakvor.test"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "That the holder did anything wrong (revocation also follows routine changes such as a superseded key) or that signatures made before 2026-02-01T00:00:00Z are invalid.",
+          "shows": "C=CO, O=Rakvor Lab, CN=revoked.lab.rakvor.test (serial 2004) is listed as revoked since 2026-02-01T00:00:00Z, reason keyCompromise, according to item:3.",
+          "title": "Certificate revoked"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "464eff643bd286cf0b215b6521e1ae7c",
+    "sha256": "7a16fdab1650af5675aa07f5d92d0704d18da6f87d8e76d2ff5d8b2f044e8f19"
+  },
+  "item": {
+    "detected_type": "X.509 certificate",
+    "error": null,
+    "evidence_id": "E0006",
+    "extension": "crt",
+    "file_name": "leaf-revoked.crt",
+    "index": 6,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\certs\\leaf-revoked.crt",
+    "size": 1574,
+    "status": "problem"
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "outputs": [
+    {
+      "bytes": 15250,
+      "hashes": {
+        "md5": "63c5d2ef142c758b4572cfe9f54b3f51",
+        "sha256": "0beaba20cadb4b575740e96715a9450e0573251151ca47f16376fb0ab81afca5"
+      },
+      "kind": "chain",
+      "rel_path": "chain.json"
+    },
+    {
+      "bytes": 3738,
+      "hashes": {
+        "md5": "5ad5e6fca87906a89f87e88d20bf3a8e",
+        "sha256": "e6fa703dd47b2d970dea4ee7b195807fe725b5fe3415a73ea61a300f5155a9ed"
+      },
+      "kind": "certificate_text",
+      "rel_path": "certificate.txt"
+    }
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 53,
+    "finished_utc": "2026-11-13T23:28:02.793Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T232802Z-2f0fe5",
+    "started_utc": "2026-11-13T23:28:02.740Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  }
+}

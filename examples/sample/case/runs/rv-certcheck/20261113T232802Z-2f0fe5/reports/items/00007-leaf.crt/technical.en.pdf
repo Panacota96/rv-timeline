@@ -1,0 +1,162 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Title (Technical review) /Producer (rv-certcheck 0.2.2) /Creator (rv-certcheck 0.2.2) /CreationDate (D:20261113232802Z) >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 6527 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F2 18 Tf 50.00 719.70 Td (Technical review) Tj ET
+0.278 0.329 0.404 rg BT /F1 10 Tf 50.00 706.20 Td (Item #7 \267 leaf.crt \267 Run ID: 20261113T232802Z-2f0fe5) Tj ET
+0.165 0.361 1.000 RG 2 w 50 698.20 m 545 698.20 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 676.05 Td (Path) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 676.05 Td (R:\\evidence\\certs\\leaf.crt) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 660.90 Td (Size \(bytes\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 660.90 Td (1566) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 645.75 Td (Last modified \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 645.75 Td (2026-11-12T06:00:00Z) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 630.60 Td (Extension) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 630.60 Td (.crt) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 615.45 Td (Detected type \(signature\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 615.45 Td (X.509 certificate) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 600.30 Td (Status) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 600.30 Td (No issues found) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 585.15 Td (Case) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 585.15 Td (RV-SAMPLE-001) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 570.00 Td (Evidence ID) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 570.00 Td (E0007) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 554.85 Td (Case registry) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 554.85 Td (Verified: identical to the registered evidence) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 539.70 Td (Registered at intake \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 539.70 Td (2026-11-13T23:27:52.795Z) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 510.50 Td (Hashes) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 506.50 m 545 506.50 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 490.35 Td (sha256) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 490.35 Td (c6b8c40685e81a82cdebccebd28d3505a738d1c9020b512a1a3430e704ae4950) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 475.20 Td (md5) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 475.20 Td (d5dd34512fd99dcc81bbbe39e192e3ef) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 446.00 Td (Findings) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 442.00 m 545 442.00 l S
+0.051 0.067 0.090 rg BT /F2 10 Tf 50.00 418.50 Td ([Informational]  Certificate chain verified at the date checked  \(CERT_CHAIN_VALID\)) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 60.00 406.35 Td (What it shows) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 406.35 Td (OpenSSL built a path from C=CO, O=Rakvor Lab, CN=leaf.lab.rakvor.test to the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 394.20 Td (trust anchor file:R:\\anchors\\rakvor-lab-root.crt and the chain verified at) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 382.05 Td (2026-06-01T00:00:00Z: signatures, validity dates, purpose and constraints) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 369.90 Td (passed. Revocation is reported separately: a REVOCATION_UNKNOWN) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 357.75 Td (finding for the same certificate means its revocation status could not be) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 345.60 Td (determined.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 60.00 330.45 Td (What it does not prove) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 330.45 Td (That the certificate was not revoked \(see the revocation findings\), that the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 318.30 Td (certificate holder signed or approved any particular document, that the anchor) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 306.15 Td (deserves trust \(that is the examiner's choice of --anchor\), or that the result holds) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 294.00 Td (at another date.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 264.80 Td (Method) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 260.80 m 545 260.80 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 245.97 Td (Each file was opened read-only, hashed in a single pass with the selected algorithms, and checked against a table of) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 233.15 Td (file signatures. Every action was written to a hash-chained audit log.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 203.95 Td (Audit trail) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 199.95 m 545 199.95 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 183.80 Td (Audit entries) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 183.80 Td (#30 \226 #33) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 168.65 Td (Log folder) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 168.65 Td (R:\\case\\runs\\rv-certcheck\\20261113T232802Z-2f0fe5\\logs) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 153.50 Td (Digital signature) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 153.50 Td (This PDF is not digitally signed.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 124.30 Td (Limitations) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 120.30 m 545 120.30 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 105.47 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 105.47 Td (Every chain is judged at one instant \(--at, recorded in each report\); the same certificate can be valid at one date) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 92.65 Td (and expired or revoked at another.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 79.82 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 79.82 Td (Offline, revocation is checked only against the CRLs and OCSP responses supplied \(--crl, --ocsp, or found among) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 67.00 Td (the evidence\); a revocation published elsewhere is not seen.) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-certcheck 0.2.2 \267 20261113T232802Z-2f0fe5  \227  Page 1 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 3218 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 737.17 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 737.17 Td (Trust lists are used as dated snapshots \(date and SHA-256 recorded\); services added, suspended or withdrawn) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 724.35 Td (after the snapshot are not reflected.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 711.52 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 711.52 Td (In version 0.1 the trust list's own XAdES signature is not verified; the snapshot's source and SHA-256 are) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 698.70 Td (recorded so it can be checked independently. The Colombian list is a curated file, because ONAC publishes no) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 685.87 Td (machine-readable list.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 673.05 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 673.05 Td (Certificates issued by Rakvor's internal PKI are for internal use only: they are not a firma digital under Ley 527 de) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 660.22 Td (1999, art. 28 \(Colombia\), and not qualified certificates under eIDAS \(Regulation \(EU\) No 910/2014\).) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 647.40 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 647.40 Td (The tool's results have been compared with OpenSSL and Python reference implementations on test sets, but no) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 634.57 Td (error rate has yet been measured on a validated corpus.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 621.75 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 621.75 Td (A result without findings does not prove that a file is authentic or unaltered before acquisition.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 608.92 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 608.92 Td (Modification times come from the file system of the examined copy and may differ from the original source.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 596.10 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 596.10 Td (A trusted timestamp of the audit log shows that the log existed in this exact form at the stated time; it does not) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 583.27 Td (show that the examined copy matches the original source.) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-certcheck 0.2.2 \267 20261113T232802Z-2f0fe5  \227  Page 2 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000421 00000 n 
+0000000563 00000 n 
+0000000709 00000 n 
+0000007287 00000 n 
+0000007434 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 6 0 R >>
+startxref
+10704
+%%EOF

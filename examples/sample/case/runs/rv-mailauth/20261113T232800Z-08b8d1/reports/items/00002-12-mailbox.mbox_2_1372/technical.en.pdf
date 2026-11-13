@@ -1,0 +1,212 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Title (Technical review) /Producer (rv-mailauth 0.2.0) /Creator (rv-mailauth 0.2.0) /CreationDate (D:20261113232801Z) >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 6541 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F2 18 Tf 50.00 719.70 Td (Technical review) Tj ET
+0.278 0.329 0.404 rg BT /F1 10 Tf 50.00 706.20 Td (Item #2 \267 12-mailbox.mbox#2@1372 \267 Run ID: 20261113T232800Z-08b8d1) Tj ET
+0.165 0.361 1.000 RG 2 w 50 698.20 m 545 698.20 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 676.05 Td (Path) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 676.05 Td (R:\\evidence\\mail\\12-mailbox.mbox#2@1372) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 660.90 Td (Size \(bytes\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 660.90 Td (1276) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 645.75 Td (Last modified \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 645.75 Td (2026-11-12T06:00:00Z) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 630.60 Td (Extension) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 630.60 Td (.mbox) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 615.45 Td (Detected type \(signature\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 615.45 Td (Email message in an mbox \(RFC 5322\)) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 600.30 Td (Status) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 600.30 Td (Problem found) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 585.15 Td (Derived from \(mbox evidence\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 585.15 Td (Message #2 of the mbox R:\\evidence\\mail\\12-mailbox.mbox \(md5) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 573.00 Td (f4e8e05ccc50d543ed3703f21cb965d4, sha256) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 560.85 Td (2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe\),) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 548.70 Td (stored from byte offset 1421, 1276 bytes \(separator line at offset 1372\). The) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 536.55 Td (custody of these bytes is the custody of that mbox file.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 521.40 Td (Case) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 521.40 Td (RV-SAMPLE-001) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 506.25 Td (Evidence ID) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 506.25 Td (E0016) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 491.10 Td (Case registry) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 491.10 Td () Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 475.95 Td (Registered at intake \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 475.95 Td (2026-11-13T23:27:52.795Z) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 446.75 Td (Hashes) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 442.75 m 545 442.75 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 426.60 Td (sha256) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 426.60 Td (a62b0d52faaaad62074e6f84f0f9c08c998c11138514f3f9db5a459231ab5c50) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 411.45 Td (md5) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 411.45 Td (a3bd09e3d5582c8dc5c000d71e455d3f) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 382.25 Td (Findings) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 378.25 m 545 378.25 l S
+0.051 0.067 0.090 rg BT /F2 10 Tf 50.00 354.75 Td ([High]  DKIM body hash does not match  \(DKIM_BODY_HASH_MISMATCH\)) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 60.00 342.60 Td (What it shows) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 342.60 Td (The DKIM signature of example.org \(selector s2026\) records a hash of the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 330.45 Td (message body that differs from the hash of the body as it is now: the body is not) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 318.30 Td (the one that was signed.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 60.00 303.15 Td (What it does not prove) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 303.15 Td (It does not show who changed the body, when, or why: forwarding systems,) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 291.00 Td (mailing lists, antivirus footers and re-encoding by a mail client also change) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 225.00 278.85 Td (bodies after signing.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 249.65 Td (Email analysis) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 245.65 m 545 245.65 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 229.50 Td (Message in mbox) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 229.50 Td (#2 @1372 \(1276 B\): From bruno@example.org Wed Nov 11 11:30:02 2026) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 214.35 Td (Message-ID) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 214.35 Td (20261111123000.13@example.org) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 199.20 Td (From) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 199.20 Td (Bruno Proveedor <bruno@example.org>) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 184.05 Td (Return-Path) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 184.05 Td (bruno@example.org) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 168.90 Td (Subject) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 168.90 Td (Albar\341n 32) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 153.75 Td (Date header) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 153.75 Td (Wed, 11 Nov 2026 12:30:00 +0100 \(2026-11-11T11:30:00Z\)) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 138.60 Td (DKIM mode / key file) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 138.60 Td (offline \267 R:\\inputs\\dkim-keys.txt \267 4 key\(s\)) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 109.40 Td (Received hops \(first server = 1\)) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 105.40 m 545 105.40 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 89.25 Td (Hop 1) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 89.25 Td (From host: [192.0.2.10] \267 Received by: smtp.example.org \267 Date stamped:) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 77.10 Td (2026-11-11T11:30:00Z) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-mailauth 0.2.0 \267 20261113T232800Z-08b8d1  \227  Page 1 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 8095 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 737.85 Td (Hop 2) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 737.85 Td (From host: smtp.example.org \267 Received by: mx.acme.example \267 Date) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 725.70 Td (stamped: 2026-11-11T11:30:02Z) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 696.50 Td (DKIM signatures \(offline verification\)) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 692.50 m 545 692.50 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 676.35 Td (#1 d=example.org s=s2026) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 676.35 Td (Result: body_hash_mismatch \267 Algorithm: rsa-sha256 \267 Key source: key_file) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 664.20 Td (\(line 3\) \267 computed body hash differs from bh=) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 649.05 Td (ARC chain) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 649.05 Td (none \(0\)) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 619.85 Td (Files written by the analysis) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 615.85 m 545 615.85 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 599.70 Td (headers.json \(headers\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 599.70 Td (md5 7fa92a925c05fd5c5bb78b20605d57fb \267 sha256) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 587.55 Td (97cca6a18734c381404de57e694052363e11e5db222af818f650a6c47a55eb26) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 572.40 Td (dkim.json \(dkim\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 572.40 Td (md5 a0651b6344eb47e8810dc299e33e873e \267 sha256) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 560.25 Td (5407171bff26a0f7eefd07fc1609b58cd2acd32f9c77eedff52f04719b21590a) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 531.05 Td (Method) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 527.05 m 545 527.05 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 512.22 Td (Each file was read once to compute its digests, then analysed as email: .eml as an RFC 5322 message, .msg through) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 499.40 Td (its MAPI properties, and each message of an mbox as an item of its own \(each in a separate worker process with) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 486.57 Td (time and memory limits when worker isolation is on, as recorded in the audit log\). The header section, Received hops) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 473.75 Td (and dates were read and compared; DKIM and ARC signatures were verified offline with the public keys the examiner) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 460.92 Td (supplied \(no DNS query unless online mode was chosen\); Authentication-Results were recorded as stated evidence;) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 448.10 Td (attachments were hashed; and BEC heuristics compared the addresses with the organisation's own domains. Every) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 435.27 Td (step and every file written is recorded in the hash-chained audit log.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 406.07 Td (Audit trail) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 402.07 m 545 402.07 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 385.92 Td (Audit entries) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 385.92 Td (#25 \226 #30) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 370.77 Td (Log folder) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 370.77 Td (R:\\case\\runs\\rv-mailauth\\20261113T232800Z-08b8d1\\logs) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 355.62 Td (Digital signature) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 355.62 Td (This PDF is not digitally signed.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 326.42 Td (Limitations) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 322.42 m 545 322.42 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 307.60 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 307.60 Td (DKIM results depend on the public keys supplied: a check is only meaningful with the key that was valid when the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 294.77 Td (message was sent. Keys are rotated, so a current key can fail a genuine message and a missing key leaves the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 281.95 Td (signature unchecked.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 269.12 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 269.12 Td (A missing DKIM signature is common and proves nothing; a valid signature covers only the signed header fields) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 256.30 Td (and the body, not who wrote the message.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 243.47 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 243.47 Td (Outlook .msg files do not keep the original message: the body is re-encoded \(so DKIM cannot be checked\) and) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 230.65 Td (the original header section is kept only when transport headers were stored.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 217.82 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 217.82 Td (Lookalike-domain, Reply-To, display-name and payment-wording checks are heuristics with false positives and) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 205.00 Td (false negatives; the organisational domain comes from the bundled Public Suffix List, whose version is recorded in) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 192.17 Td (environment.json and may differ from the list in force when the message was sent.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 179.35 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 179.35 Td (Received, Date and Authentication-Results headers are text that servers and clients wrote; unsigned headers can) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 166.52 Td (be added or edited by anyone who handled the file.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 153.70 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 153.70 Td (In an mbox, body lines starting with "From " are escaped with '>'; un-escaping follows the selected variant \(mboxrd) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 140.87 Td (by default\) and cannot always restore the original line, which can affect DKIM body hashes.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 128.05 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 128.05 Td (A result without findings does not prove that a file is authentic or unaltered before acquisition.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 115.22 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 115.22 Td (Modification times come from the file system of the examined copy and may differ from the original source.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 102.40 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 102.40 Td (Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 89.57 Td (suspicious.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 76.75 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 76.75 Td (A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 63.92 Td (examined copy matches the original source.) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-mailauth 0.2.0 \267 20261113T232800Z-08b8d1  \227  Page 2 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000421 00000 n 
+0000000561 00000 n 
+0000000707 00000 n 
+0000007299 00000 n 
+0000007446 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 6 0 R >>
+startxref
+15593
+%%EOF

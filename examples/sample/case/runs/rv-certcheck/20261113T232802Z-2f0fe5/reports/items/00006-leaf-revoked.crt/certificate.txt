@@ -1,0 +1,71 @@
+# Certificate 1 of 1  SHA-256 c55b451ca6abf92aba380efbeb04c22069dcc0bf51e5797b22bac1ab41fd4d9b
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 8196 (0x2004)
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA
+        Validity
+            Not Before: Jan  1 00:00:00 2026 GMT
+            Not After : Jan  1 00:00:00 2028 GMT
+        Subject: C=CO, O=Rakvor Lab, CN=revoked.lab.rakvor.test
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:98:a6:c0:4f:42:d3:9f:4d:fd:b8:01:a0:10:d9:
+                    2f:65:5a:3e:dc:1b:67:53:91:47:bd:7a:cf:03:0b:
+                    6b:a3:e5:c0:61:8e:b2:e1:70:a8:d8:51:02:98:eb:
+                    fa:09:91:c8:78:0f:a3:34:40:e0:f8:ca:63:5b:94:
+                    99:a9:63:10:b9:25:14:16:13:c2:fe:28:f4:ab:38:
+                    e6:1f:b0:29:32:1b:25:58:ef:61:ad:05:43:c6:64:
+                    95:04:47:0c:1a:4c:58:fd:3b:5a:9b:8d:79:f8:12:
+                    0c:7f:95:4f:da:64:44:9c:79:58:a5:46:98:e7:73:
+                    09:50:de:59:1b:9d:d0:91:ae:33:49:39:d7:43:4d:
+                    ef:3a:d3:f5:d2:a1:d3:a3:97:18:7f:8d:96:7a:c7:
+                    f7:31:b1:5e:8e:b3:f5:e7:44:35:bf:6f:fa:67:51:
+                    11:51:63:de:67:a4:52:b4:88:08:29:8a:6c:45:de:
+                    92:6c:ad:8a:e0:47:4d:20:05:50:58:33:bd:7a:95:
+                    7d:11:b7:e0:12:89:da:08:4a:bd:ab:4d:d4:af:be:
+                    7d:09:0f:45:4c:68:27:08:8d:99:7a:a4:0c:bf:f5:
+                    9a:34:78:19:e0:18:43:38:3e:fb:3f:73:a3:57:56:
+                    ba:c3:4a:43:23:bb:3f:6b:a8:88:4a:ca:e1:4b:98:
+                    2c:db
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication, TLS Web Client Authentication
+            X509v3 Subject Key Identifier: 
+                78:A0:DC:E7:83:88:59:E3:05:AB:F5:6F:B7:0D:20:0F:2F:F0:42:88
+            X509v3 Authority Key Identifier: 
+                5D:0B:74:77:20:EC:3B:B0:DD:0A:25:16:2F:DE:AE:DE:61:FB:70:54
+            X509v3 Subject Alternative Name: 
+                DNS:revoked.lab.rakvor.test
+            X509v3 CRL Distribution Points: 
+                Full Name:
+                  URI:http://pki.lab.rakvor.test/intermediate.crl
+
+            Authority Information Access: 
+                OCSP - URI:http://ocsp.lab.rakvor.test
+                CA Issuers - URI:http://pki.lab.rakvor.test/intermediate.crt
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        ab:0b:53:bd:41:a0:78:d0:58:8d:2e:91:e2:6c:d8:4b:d8:34:
+        85:a3:11:31:ad:6e:e9:27:14:ae:1f:6a:2c:dc:5d:07:a0:c5:
+        53:90:0a:fb:c1:25:bb:c5:95:3e:5c:54:78:38:c5:a8:5d:dc:
+        2f:d9:54:ac:c8:c4:87:23:bc:ce:c0:ca:14:2b:24:e7:4b:cd:
+        99:13:62:c7:2b:b5:f9:35:35:0c:67:44:fd:3d:e5:08:3a:16:
+        74:3d:5a:06:59:f8:ba:bd:a4:f5:92:cb:98:1d:0e:e7:04:43:
+        36:4c:2d:41:68:14:98:68:71:1e:06:88:80:44:06:da:16:a1:
+        bb:17:61:2e:8e:a2:de:23:c9:e8:3c:4f:fc:ce:8d:68:11:44:
+        54:4e:bb:31:fa:86:1a:66:49:91:f0:21:5d:ae:76:0f:59:b9:
+        dc:2a:e2:b2:c2:6a:4e:4a:cc:f8:81:02:1f:0d:6e:77:b4:17:
+        fb:31:13:f4:ae:f4:a7:de:59:64:71:4e:a6:3d:06:df:93:6b:
+        e3:5c:38:ad:e3:ff:0f:bd:e0:cd:e8:2c:e9:70:02:52:57:a0:
+        1d:29:9a:8c:51:c9:df:6d:b5:0f:90:05:83:9c:b9:a1:af:2b:
+        6d:ce:5a:06:00:19:1a:b6:4c:e0:de:18:75:91:48:81:78:ac:
+        75:e8:62:93

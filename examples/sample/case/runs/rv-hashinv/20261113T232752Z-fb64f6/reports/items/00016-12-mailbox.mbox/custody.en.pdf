@@ -1,0 +1,159 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Title (Chain of custody record \227 digital evidence \(Colombia\)) /Producer (rv-hashinv 0.4.1) /Creator (rv-hashinv 0.4.1) /CreationDate (D:20261113232752Z) >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 6385 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F2 18 Tf 50.00 719.70 Td (Chain of custody record \227 digital evidence \(Colombia\)) Tj ET
+0.278 0.329 0.404 rg BT /F1 10 Tf 50.00 706.20 Td (Jurisdiction: Colombia \(Fiscal\355a\) \267 Run ID: 20261113T232752Z-fb64f6) Tj ET
+0.165 0.361 1.000 RG 2 w 50 698.20 m 545 698.20 l S
+0.710 0.280 0.030 rg BT /F2 9.5 Tf 58.00 675.38 Td (Prepared following Law 906 of 2004 \(arts. 254\226266\), the chain-of-custody manual of the Attorney General's) Tj ET
+0.710 0.280 0.030 rg BT /F2 9.5 Tf 58.00 662.55 Td (Office \(Fiscal\355a\) and Law 527 of 1999.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 644.40 Td (Case number \(NUNC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 644.40 Td (RV-SAMPLE-001) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 629.25 Td (Evidence item \(EMP/EF\) code) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 629.25 Td (E0016) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 614.10 Td (Registered at intake \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 614.10 Td (2026-11-13T23:27:52.795Z) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 598.95 Td (Description of the item) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 598.95 Td (12-mailbox.mbox \267 3238 bytes \267 unknown) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 583.80 Td (Location \(path\) of the examined copy) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 583.80 Td (R:\\evidence\\mail\\12-mailbox.mbox) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 554.60 Td (Integrity values) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 550.60 m 545 550.60 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 534.45 Td (sha256) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 534.45 Td (2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 519.30 Td (md5) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 519.30 Td (f4e8e05ccc50d543ed3703f21cb965d4) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 490.10 Td (Operations performed with this tool) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 486.10 m 545 486.10 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 471.27 Td (Read-only hashing and analysis by rv-hashinv 0.4.1, run 20261113T232752Z-fb64f6, from) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 458.45 Td (2026-11-13T23:27:52.760Z to 2026-11-13T23:27:52.801Z \(UTC\). Audit entries #50\226#52.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 441.30 Td (Examiner) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 441.30 Td (Sample Examiner) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 412.10 Td (Custody transfers) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 408.10 m 545 408.10 l S
+0.278 0.329 0.404 RG 0.5 w 50.00 380.60 80.00 25.50 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 53.00 396.35 Td (Date and time) Tj ET
+0.278 0.329 0.404 RG 0.5 w 130.00 380.60 120.00 25.50 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 133.00 396.35 Td (Delivered by \(name, ID,) Tj ET
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 133.00 386.60 Td (signature\)) Tj ET
+0.278 0.329 0.404 RG 0.5 w 250.00 380.60 120.00 25.50 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 253.00 396.35 Td (Received by \(name, ID, signature\)) Tj ET
+0.278 0.329 0.404 RG 0.5 w 370.00 380.60 80.00 25.50 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 373.00 396.35 Td (Purpose) Tj ET
+0.278 0.329 0.404 RG 0.5 w 450.00 380.60 95.00 25.50 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 453.00 396.35 Td (Condition of packaging /) Tj ET
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 453.00 386.60 Td (media) Tj ET
+0.278 0.329 0.404 RG 0.5 w 50.00 350.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 350.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 350.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 350.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 350.60 95.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 320.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 320.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 320.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 320.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 320.60 95.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 290.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 290.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 290.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 290.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 290.60 95.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 260.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 260.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 260.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 260.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 260.60 95.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 230.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 230.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 230.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 230.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 230.60 95.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 200.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 130.00 200.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 250.00 200.60 120.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 370.00 200.60 80.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 450.00 200.60 95.00 30.00 re S
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 168.40 Td (Observations) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 164.40 m 545 164.40 l S
+0.278 0.329 0.404 RG 0.5 w 50.00 146.65 495.00 15.75 re S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 53.00 152.65 Td () Tj ET
+0.278 0.329 0.404 RG 0.5 w 50.00 116.65 495.00 30.00 re S
+0.278 0.329 0.404 RG 0.5 w 50.00 86.65 495.00 30.00 re S
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-hashinv 0.4.1 \267 20261113T232752Z-fb64f6  \227  Page 1 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 1175 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 RG 0.6 w 50.00 706.00 m 287.50 706.00 l S
+0.278 0.329 0.404 rg BT /F1 8 Tf 50.00 695.00 Td (Examiner: Sample Examiner \227 Signature) Tj ET
+0.051 0.067 0.090 RG 0.6 w 307.50 706.00 m 545.00 706.00 l S
+0.278 0.329 0.404 rg BT /F1 8 Tf 307.50 695.00 Td (Received by \(name, ID, signature\) \227 Signature) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-hashinv 0.4.1 \267 20261113T232752Z-fb64f6  \227  Page 2 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000421 00000 n 
+0000000601 00000 n 
+0000000747 00000 n 
+0000007183 00000 n 
+0000007330 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 6 0 R >>
+startxref
+8557
+%%EOF

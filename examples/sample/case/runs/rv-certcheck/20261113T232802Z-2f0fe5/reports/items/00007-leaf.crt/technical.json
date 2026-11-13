@@ -1,0 +1,120 @@
+{
+  "audit": {
+    "first_seq": 30,
+    "last_seq": 33
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T23:27:52.795Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "certificates": {
+    "certificates": 1,
+    "codes": [
+      "CERT_CHAIN_VALID"
+    ],
+    "errors": [],
+    "kind": "certificate",
+    "online_fetches": [],
+    "verdicts": [
+      {
+        "depths": 3,
+        "openssl_code": 0,
+        "openssl_reason": "ok",
+        "status": "valid"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "code": "CERT_CHAIN_VALID",
+      "params": {
+        "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+        "at": "2026-06-01T00:00:00Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=leaf.lab.rakvor.test"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate was not revoked (see the revocation findings), that the certificate holder signed or approved any particular document, that the anchor deserves trust (that is the examiner's choice of --anchor), or that the result holds at another date.",
+          "shows": "OpenSSL built a path from C=CO, O=Rakvor Lab, CN=leaf.lab.rakvor.test to the trust anchor file:R:\\anchors\\rakvor-lab-root.crt and the chain verified at 2026-06-01T00:00:00Z: signatures, validity dates, purpose and constraints passed. Revocation is reported separately: a REVOCATION_UNKNOWN finding for the same certificate means its revocation status could not be determined.",
+          "title": "Certificate chain verified at the date checked"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "d5dd34512fd99dcc81bbbe39e192e3ef",
+    "sha256": "c6b8c40685e81a82cdebccebd28d3505a738d1c9020b512a1a3430e704ae4950"
+  },
+  "item": {
+    "detected_type": "X.509 certificate",
+    "error": null,
+    "evidence_id": "E0007",
+    "extension": "crt",
+    "file_name": "leaf.crt",
+    "index": 7,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\certs\\leaf.crt",
+    "size": 1566,
+    "status": "ok"
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "outputs": [
+    {
+      "bytes": 14915,
+      "hashes": {
+        "md5": "5fc3c29726371e1342c09959386d2c27",
+        "sha256": "b0e2ff14b3eced21236c802955ba0a9fd7bb95268459c0ac7225354dea9ce276"
+      },
+      "kind": "chain",
+      "rel_path": "chain.json"
+    },
+    {
+      "bytes": 3732,
+      "hashes": {
+        "md5": "a89084dd0657a625b3a93ed9fc2c550e",
+        "sha256": "69b86b3bf1e25b98a6db18bf35e63927d66bc79636a8e459e84b5668416ebb0c"
+      },
+      "kind": "certificate_text",
+      "rel_path": "certificate.txt"
+    }
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 53,
+    "finished_utc": "2026-11-13T23:28:02.793Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T232802Z-2f0fe5",
+    "started_utc": "2026-11-13T23:28:02.740Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  }
+}

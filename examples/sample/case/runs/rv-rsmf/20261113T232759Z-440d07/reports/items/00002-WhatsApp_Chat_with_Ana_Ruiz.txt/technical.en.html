@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical review — WhatsApp Chat with Ana Ruiz.txt</title><style>:root { --ink:#0D1117; --muted:#475467; --line:#E4E7EC; --accent:#2A5CFF; --violet:#6B00FF; --cyan:#00E5FF; --night:#0D1117; --night2:#1A1F26; --mist:#E6E6E6; --soft:#F5F7FB; --bg:#FFFFFF; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 "Segoe UI", "Inter", system-ui, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
+.band { background: linear-gradient(135deg, var(--night) 0%, var(--night2) 70%); color: var(--mist); border-bottom: 3px solid; border-image: linear-gradient(90deg, var(--accent), var(--violet), var(--cyan)) 1; }
+.band .inner { max-width: 920px; margin: 0 auto; padding: 14px 16px; display:flex; align-items:center; gap:14px; }
+.band .word { font-weight:800; letter-spacing:.22em; font-size:15px; }
+.band .desc { font-size:10.5px; letter-spacing:.14em; color: var(--cyan); }
+header { border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 22px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.mark { font-weight:800; letter-spacing:.18em; color:var(--accent); font-size:12px; }
+.tagline { font-style: italic; color: var(--muted); }
+.sign { margin-top: 28px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; color: var(--muted); min-height: 40px; }
+table.blank td { height: 34px; }
+h1 { font-size: 22px; margin: 6px 0 2px; }
+h2 { font-size: 16px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.meta { font-size: 13px; color: var(--muted); text-align:right; }
+table { width:100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { text-align:left; vertical-align:top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; background: var(--soft); }
+.mono { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; word-break: break-all; }
+.badge { color:#fff; border-radius: 999px; padding: 1px 9px; font-size: 11px; font-weight: 700; }
+.sev-high { background:#B42318; } .sev-medium { background:#B54708; } .sev-low { background:#2A5CFF; } .sev-info { background:#475467; }
+.finding { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:10px 0; break-inside: avoid; }
+.kv { display:grid; grid-template-columns: 210px 1fr; gap: 4px 12px; font-size: 13px; }
+.kv div:nth-child(odd) { color: var(--muted); }
+.status { font-size: 20px; font-weight: 700; padding: 14px 16px; border-left: 5px solid var(--accent); background: var(--soft); }
+.status-problem { border-color:#B42318; } .status-attention { border-color:#B54708; } .status-ok { border-color:#067647; }
+.note { padding: 10px 12px; background:#FFFAEB; border:1px solid #FEDF89; border-radius:8px; }
+footer { margin-top: 36px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 640px) { .kv { grid-template-columns: 1fr; } .meta { text-align:left; } }
+@media print { main { padding: 0; } .band { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style></head>
+<body><div class="band"><div class="inner"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" role="img" aria-label="RV">
+  <defs><linearGradient id="rvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A5CFF"/><stop offset=".55" stop-color="#4D23FF"/><stop offset="1" stop-color="#6B00FF"/></linearGradient></defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0D1117" stroke="url(#rvg)" stroke-width="4"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="800" font-size="26" fill="#E6E6E6">RV</text>
+  <rect x="18" y="47" width="28" height="3" rx="1.5" fill="#00E5FF"/>
+</svg>
+<div><div class="word">RAKVOR</div><div class="desc">FORENSICS | INCIDENT RESPONSE | SECURITY</div></div></div></div>
+<main>
+<header>
+  <div><h1>Technical review</h1><div>WhatsApp Chat with Ana Ruiz.txt</div></div>
+  <div class="meta">
+    <div>Run ID: <strong>20261113T232759Z-440d07</strong></div>
+    <div>Item #2</div>
+    <div>Evidence ID: <strong>E0010</strong></div>
+    <div>Case: RV-SAMPLE-001</div>
+  </div>
+</header>
+
+<div class="kv">
+  <div>Path</div><div class="mono">R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt</div>
+  <div>Size (bytes)</div><div>773</div>
+  <div>Last modified (UTC)</div><div>2026-11-12T06:00:00Z</div>
+  <div>Extension</div><div>.txt</div>
+  <div>Detected type (signature)</div><div>unknown</div>
+  <div>Status</div><div>Needs attention</div>
+  <div>Case</div><div>RV-SAMPLE-001</div>
+  <div>Evidence ID</div><div class="mono">E0010</div>
+  <div>Case registry</div><div>Verified: identical to the registered evidence</div>
+  <div>Registered at intake (UTC)</div><div>2026-11-13T23:27:52.795Z</div>
+</div>
+
+<h2>Hashes</h2>
+<table><tr><th>Hash algorithms</th><th>Hex</th></tr>
+<tr><td>sha256</td><td class="mono">0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d</td></tr><tr><td>md5</td><td class="mono">e59d7e7df7723088be26d481a367eabe</td></tr>
+</table>
+
+
+<h2>RSMF conversion</h2>
+<p>This export was converted into 3 RSMF file(s) holding 10 event(s) from 1 conversation(s); every file passed the RSMF 2.0 schema, the stricter checks and the read-back test.</p>
+<div class="kv">
+  <div>Export type</div><div>whatsapp</div>
+  <div>Conversations</div><div>Ana Ruiz</div>
+  <div>Participants</div><div>3</div>
+  <div>Events</div><div>10</div>
+  <div>chat_file</div><div>WhatsApp Chat with Ana Ruiz.txt</div><div>date_order</div><div>dmy</div><div>date_order_basis</div><div>line 11: first component 13 &gt; 12</div><div>lines_read</div><div>13</div><div>timezone</div><div>Europe&#x2f;Paris</div><div>variant</div><div>android</div>
+</div>
+<table><tr><th>File</th><th>Day</th><th>Events</th><th>attachments</th><th>Validation</th><th>SHA-256</th></tr>
+<tr><td class="mono">001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002&#x2f;Ana-Ruiz-aa3173&#x2f;2026-03-02.rsmf</td><td>2026-03-02</td><td>7</td><td>1 (+1 missing)</td><td>passed</td><td class="mono">4527fa7e7ca432ccc5d7599e6fb7678f5fca938bfc7c145fdb5030ca2df9ece3</td></tr><tr><td class="mono">001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002&#x2f;Ana-Ruiz-aa3173&#x2f;2026-03-13.rsmf</td><td>2026-03-13</td><td>2</td><td>0 (+1 missing)</td><td>passed</td><td class="mono">21ce0b8c75901c6266aca3a14e68ef8167572a92610767c3f88b92ce3f52698c</td></tr><tr><td class="mono">001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002&#x2f;Ana-Ruiz-aa3173&#x2f;2026-03-14.rsmf</td><td>2026-03-14</td><td>1</td><td>0</td><td>passed</td><td class="mono">0854504d5f9d9facbc4f867759054707fc485240e4d9343b31aceec363d6177a</td></tr>
+</table>
+<p>Every message is listed in rsmf&#x2f;trace.csv with the file and line it came from and the RSMF file and event it went to; each .rsmf file&#x27;s SHA-256 is in the audit log (rsmf_written).</p>
+
+
+<h2>Findings</h2>
+
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Date order inferred from the export</strong> <span class="mono">DATE_ORDER_INFERRED</span></div>
+  <div class="kv"><div>What it shows</div><div>Numeric dates were read as dmy: line 11 (&quot;13&#x2f;03&#x2f;2026, 18:45&quot;) can only be read that way.</div><div>What it does not prove</div><div>It does not show that every line was written with the same phone settings; an export that mixes day-first and month-first dates stops with an error instead of being converted.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-low">Low</span> <strong>Media not included in the export</strong> <span class="mono">MEDIA_OMITTED_IN_EXPORT</span></div>
+  <div class="kv"><div>What it shows</div><div>1 message(s) say the media was omitted when the chat was exported (&quot;without media&quot;).</div><div>What it does not prove</div><div>It does not show what the media contained, or that it was deleted from the phone.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-medium">Medium</span> <strong>Referenced file not found</strong> <span class="mono">ATTACHMENT_REFERENCED_NOT_FOUND</span></div>
+  <div class="kv"><div>What it shows</div><div>1 attachment(s) are named in the export but the file is not in it: IMG-20260302-WA0002.jpg.</div><div>What it does not prove</div><div>It does not show that the file was removed on purpose; exports can be incomplete.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Participants known only by phone number</strong> <span class="mono">PARTICIPANT_IDENTIFIED_BY_NUMBER_ONLY</span></div>
+  <div class="kv"><div>What it shows</div><div>1 participant(s) appear only as a number (not in the exporting phone&#x27;s contacts): +33 6 00 00 00 01.</div><div>What it does not prove</div><div>A number does not identify a person; establish who used it from other evidence.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Local times converted with the examiner&#x27;s time zone</strong> <span class="mono">TIMEZONE_APPLIED</span></div>
+  <div class="kv"><div>What it shows</div><div>The export&#x27;s times carry no UTC offset; they were read as Europe&#x2f;Paris and stored in UTC. The original text of each time is kept in the event&#x27;s custom field source_time.</div><div>What it does not prove</div><div>It does not show that the phone was set to Europe&#x2f;Paris; a wrong zone shifts every time by the same amount.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Deleted messages are not exported</strong> <span class="mono">DELETED_MESSAGES_NOT_IN_EXPORT</span></div>
+  <div class="kv"><div>What it shows</div><div>WhatsApp exports leave out messages deleted before the export; the RSMF can only contain what the export contains.</div><div>What it does not prove</div><div>It does not show whether any messages were deleted.</div></div>
+</div>
+
+<h2>Method</h2>
+<p>Each file was opened read-only and hashed in a single pass with the selected algorithms. Chat exports were read into one model (participants, conversations, messages, attachments), local times converted to UTC with the examiner&#x27;s time zone, and written as RSMF 2.0 files, one per conversation per day, then checked against the RSMF 2.0 schema and read back. Every action was written to a hash-chained audit log.</p>
+
+<h2>Audit trail</h2>
+<div class="kv">
+  <div>Audit entries</div><div>#9 – #12</div>
+  <div>Log folder</div><div class="mono">R:\case\runs\rv-rsmf\20261113T232759Z-440d07\logs</div>
+</div>
+
+<h2>Limitations</h2>
+<ul><li>The RSMF files reproduce the export as delivered, not the phone or account: messages deleted before the export, unexported media and edit history are not in them.</li><li>rv-rsmf converts; it does not authenticate. A chat export is a text or JSON file that can be edited before it reaches the examiner; corroborate it with a forensic extraction or the other party&#x27;s copy.</li><li>Files are checked against the published RSMF 2.0 schema and read back; how a given Relativity version displays them was not tested by this run.</li><li>Reactions are mapped with a fixed table of Relativity emoji shortcodes (checked 2026-10-27); other reactions are kept as text.</li><li>Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as suspicious.</li><li>Modification times come from the file system of the examined copy and may differ from the original source.</li><li>A result without findings does not prove that a file is authentic or unaltered before acquisition.</li><li>A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source.</li></ul>
+<footer><div class="tagline">We uncover the hidden. We reconstruct what happened. We protect what matters.</div>Generated by rv-rsmf 0.3.1 · 20261113T232759Z-440d07 · This PDF is not digitally signed.</footer>
+</main></body></html>

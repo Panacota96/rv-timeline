@@ -1,0 +1,172 @@
+{
+  "audit": {
+    "entries": 50,
+    "head": "c0d16fb9afa0a1584190071fc31fe07918122e88d62f9eed75e213b4753ff684",
+    "log_dir": "R:\\case\\runs\\rv-mailauth\\20261113T232800Z-08b8d1\\logs"
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "counts": {
+      "added": 0,
+      "mismatched": 0,
+      "registered": 0,
+      "unregistered": 0,
+      "verified": 3
+    },
+    "role": "analysis"
+  },
+  "duplicate_groups": [],
+  "findings_by_code": {
+    "AUTH_RESULTS_RECORDED": 2,
+    "DATE_AFTER_FIRST_HOP": 2,
+    "DKIM_BODY_HASH_MISMATCH": 1,
+    "DKIM_NOT_SIGNED": 1,
+    "DKIM_SIGNATURE_INVALID": 1,
+    "DKIM_SIGNATURE_VALID": 2,
+    "MESSAGE_ID_DOMAIN_MISMATCH": 1,
+    "RECEIVED_TIME_NOT_MONOTONIC": 1,
+    "TIMEZONE_INCONSISTENT": 1
+  },
+  "findings_by_severity": {
+    "high": 1,
+    "info": 4,
+    "low": 3,
+    "medium": 4
+  },
+  "item_reports": "all",
+  "items": [
+    {
+      "evidence_id": "E0015",
+      "findings": [
+        "DKIM_SIGNATURE_VALID",
+        "AUTH_RESULTS_RECORDED"
+      ],
+      "index": 1,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\01-clean-rsa.eml",
+      "report_folder": "items/00001-01-clean-rsa.eml",
+      "size": 1464,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0016",
+      "findings": [],
+      "index": 2,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+      "report_folder": "items/00002-12-mailbox.mbox",
+      "size": 3238,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0016",
+      "findings": [
+        "DKIM_SIGNATURE_VALID"
+      ],
+      "index": 2,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\12-mailbox.mbox#1@0",
+      "report_folder": "items/00002-12-mailbox.mbox_1_0",
+      "size": 1321,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0016",
+      "findings": [
+        "DKIM_BODY_HASH_MISMATCH"
+      ],
+      "index": 2,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\12-mailbox.mbox#2@1372",
+      "report_folder": "items/00002-12-mailbox.mbox_2_1372",
+      "size": 1276,
+      "status": "problem"
+    },
+    {
+      "evidence_id": "E0016",
+      "findings": [
+        "DKIM_NOT_SIGNED",
+        "RECEIVED_TIME_NOT_MONOTONIC",
+        "DATE_AFTER_FIRST_HOP",
+        "TIMEZONE_INCONSISTENT",
+        "MESSAGE_ID_DOMAIN_MISMATCH"
+      ],
+      "index": 2,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\12-mailbox.mbox#3@2699",
+      "report_folder": "items/00002-12-mailbox.mbox_3_2699",
+      "size": 490,
+      "status": "attention"
+    },
+    {
+      "evidence_id": "E0017",
+      "findings": [
+        "DKIM_SIGNATURE_INVALID",
+        "AUTH_RESULTS_RECORDED",
+        "DATE_AFTER_FIRST_HOP"
+      ],
+      "index": 3,
+      "item_reports_written": true,
+      "path": "R:\\evidence\\mail\\20-date-after-first-hop.eml",
+      "report_folder": "items/00003-20-date-after-first-hop.eml",
+      "size": 1464,
+      "status": "attention"
+    }
+  ],
+  "items_by_status": {
+    "attention": 2,
+    "ok": 3,
+    "problem": 1
+  },
+  "items_by_type": {
+    "Email message (RFC 5322)": 2,
+    "Email message in an mbox (RFC 5322)": 3,
+    "Mailbox (mbox)": 1
+  },
+  "limitations": [
+    "DKIM_NEEDS_KEY_AT_SENDING_TIME",
+    "MISSING_SIGNATURE_PROVES_NOTHING",
+    "MSG_MAY_LACK_TRANSPORT_HEADERS",
+    "BEC_HEURISTICS_FALSE_POSITIVES",
+    "HEADERS_ARE_CLAIMS",
+    "MBOX_ESCAPING_AMBIGUOUS",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 436,
+    "finished_utc": "2026-11-13T23:28:01.432Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T232800Z-08b8d1",
+    "started_utc": "2026-11-13T23:28:00.995Z"
+  },
+  "schema": "rakvor.statistics/1",
+  "timestamp": {
+    "status": "off"
+  },
+  "tool": {
+    "name": "rv-mailauth",
+    "version": "0.2.0"
+  },
+  "totals": {
+    "bytes": 9253,
+    "errors": 0,
+    "items": 6
+  }
+}

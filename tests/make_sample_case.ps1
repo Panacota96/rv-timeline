@@ -1,4 +1,5 @@
-# Builds examples/sample/case, examples/sample/tampered and examples/sample/expected_timeline.json on Windows.
+# Builds examples/sample/case and examples/sample/expected_timeline.json on Windows (the tests write the tampered
+# copies).
 # The work is done by tests/make_sample_case.sh (one implementation, so both give the same case); this wrapper runs
 # it with Git for Windows' bash. Usage: .\tests\make_sample_case.ps1 [-RakvorRoot C:\path\to\Rakvor]
 param([string]$RakvorRoot = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)))

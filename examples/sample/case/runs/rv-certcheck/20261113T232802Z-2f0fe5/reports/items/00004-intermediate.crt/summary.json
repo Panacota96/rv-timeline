@@ -1,0 +1,55 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "CERT_CHAIN_VALID",
+      "params": {
+        "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+        "at": "2026-06-01T00:00:00Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate was not revoked (see the revocation findings), that the certificate holder signed or approved any particular document, that the anchor deserves trust (that is the examiner's choice of --anchor), or that the result holds at another date.",
+          "shows": "OpenSSL built a path from C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA to the trust anchor file:R:\\anchors\\rakvor-lab-root.crt and the chain verified at 2026-06-01T00:00:00Z: signatures, validity dates, purpose and constraints passed. Revocation is reported separately: a REVOCATION_UNKNOWN finding for the same certificate means its revocation status could not be determined.",
+          "title": "Certificate chain verified at the date checked"
+        }
+      }
+    },
+    {
+      "code": "REVOCATION_UNKNOWN",
+      "params": {
+        "source": "none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)",
+        "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate is revoked or that it is not; supply the CA's CRL or an OCSP response (--crl, --ocsp) to decide.",
+          "shows": "No CRL or OCSP response covering C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA was available for the date checked (none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)); its revocation status could not be determined.",
+          "title": "Revocation status unknown"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "ae452532cb82f69f375673eab1e3a3f374b004429d940cf9552821a92f2e9c7c"
+  },
+  "item": {
+    "evidence_id": "E0004",
+    "file_name": "intermediate.crt",
+    "index": 4
+  },
+  "run_id": "20261113T232802Z-2f0fe5",
+  "schema": "rakvor.item-summary/1",
+  "status": "attention",
+  "text": {
+    "en": {
+      "next_step": "Review the findings below with your examiner before relying on this file.",
+      "status": "Needs attention",
+      "summary": "The file was hashed and checked. Some points need attention."
+    }
+  }
+}

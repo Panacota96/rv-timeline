@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "c6b8c40685e81a82cdebccebd28d3505a738d1c9020b512a1a3430e704ae4950"
+  },
+  "item": {
+    "evidence_id": "E0007",
+    "file_name": "leaf.crt",
+    "index": 7
+  },
+  "run_id": "20261113T232752Z-fb64f6",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

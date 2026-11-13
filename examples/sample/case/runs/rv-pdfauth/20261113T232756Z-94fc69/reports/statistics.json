@@ -1,0 +1,164 @@
+{
+  "audit": {
+    "entries": 51,
+    "head": "ca8975aaf65268c67f1411f453e14d957d4ac4999de9adc2b6387c6adde5489d",
+    "log_dir": "R:\\case\\runs\\rv-pdfauth\\20261113T232756Z-94fc69\\logs"
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "counts": {
+      "added": 0,
+      "mismatched": 0,
+      "registered": 0,
+      "unregistered": 0,
+      "verified": 4
+    },
+    "role": "analysis"
+  },
+  "duplicate_groups": [],
+  "findings_by_code": {
+    "CONTENT_CHANGED_AFTER_SIGNATURE": 1,
+    "DOCMDP_VIOLATION": 1,
+    "EDITOR_FINGERPRINT": 2,
+    "FONT_ADDED_IN_LATER_REVISION": 2,
+    "INCREMENTAL_UPDATES": 3,
+    "PRODUCER_CHANGED_BETWEEN_REVISIONS": 2,
+    "REVISION_DATE_NOT_MONOTONIC": 1,
+    "REVISION_TIME_GAP": 4,
+    "SIGNATURE_PRESENT_TRUST_NOT_VERIFIED": 1,
+    "VISUAL_CHANGE_BETWEEN_REVISIONS": 5
+  },
+  "findings_by_severity": {
+    "high": 2,
+    "info": 5,
+    "low": 3,
+    "medium": 12
+  },
+  "items": [
+    {
+      "evidence_id": "E0018",
+      "findings": [
+        "PRODUCER_CHANGED_BETWEEN_REVISIONS",
+        "REVISION_DATE_NOT_MONOTONIC",
+        "EDITOR_FINGERPRINT",
+        "FONT_ADDED_IN_LATER_REVISION",
+        "INCREMENTAL_UPDATES",
+        "REVISION_TIME_GAP",
+        "VISUAL_CHANGE_BETWEEN_REVISIONS",
+        "VISUAL_CHANGE_BETWEEN_REVISIONS"
+      ],
+      "index": 1,
+      "path": "R:\\evidence\\pdf\\backdated-revision.pdf",
+      "report_folder": "items/00001-backdated-revision.pdf",
+      "reports_written": true,
+      "size": 3613,
+      "status": "attention"
+    },
+    {
+      "evidence_id": "E0019",
+      "findings": [
+        "PRODUCER_CHANGED_BETWEEN_REVISIONS",
+        "EDITOR_FINGERPRINT",
+        "FONT_ADDED_IN_LATER_REVISION",
+        "INCREMENTAL_UPDATES",
+        "REVISION_TIME_GAP",
+        "REVISION_TIME_GAP",
+        "VISUAL_CHANGE_BETWEEN_REVISIONS",
+        "VISUAL_CHANGE_BETWEEN_REVISIONS"
+      ],
+      "index": 2,
+      "path": "R:\\evidence\\pdf\\edited-incremental.pdf",
+      "report_folder": "items/00002-edited-incremental.pdf",
+      "reports_written": true,
+      "size": 3613,
+      "status": "attention"
+    },
+    {
+      "evidence_id": "E0020",
+      "findings": [],
+      "index": 3,
+      "path": "R:\\evidence\\pdf\\original.pdf",
+      "report_folder": "items/00003-original.pdf",
+      "reports_written": true,
+      "size": 1648,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0021",
+      "findings": [
+        "CONTENT_CHANGED_AFTER_SIGNATURE",
+        "DOCMDP_VIOLATION",
+        "INCREMENTAL_UPDATES",
+        "REVISION_TIME_GAP",
+        "SIGNATURE_PRESENT_TRUST_NOT_VERIFIED",
+        "VISUAL_CHANGE_BETWEEN_REVISIONS"
+      ],
+      "index": 4,
+      "path": "R:\\evidence\\pdf\\signed-then-modified.pdf",
+      "report_folder": "items/00004-signed-then-modified.pdf",
+      "reports_written": true,
+      "size": 11980,
+      "status": "problem"
+    }
+  ],
+  "items_by_status": {
+    "attention": 2,
+    "ok": 1,
+    "problem": 1
+  },
+  "items_by_type": {
+    "PDF document": 4
+  },
+  "limitations": [
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY",
+    "NO_FINDING_IS_NOT_AUTHENTICITY",
+    "FLATTENED_OR_REGENERATED_PDF_LOSES_HISTORY",
+    "FINGERPRINT_DB_COVERAGE",
+    "SIGNATURE_TRUST_NOT_VALIDATED",
+    "RENDERING_PAGE_CAP"
+  ],
+  "pdf_overview": {
+    "item_reports": "all",
+    "item_reports_skipped": 0,
+    "multi_revision": 3,
+    "online_editor": 0,
+    "pdfs": 4,
+    "signed": 1
+  },
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 981,
+    "finished_utc": "2026-11-13T23:27:57.157Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "run_id": "20261113T232756Z-94fc69",
+    "started_utc": "2026-11-13T23:27:56.175Z"
+  },
+  "schema": "rakvor.statistics/1",
+  "timestamp": {
+    "status": "off"
+  },
+  "tool": {
+    "name": "rv-pdfauth",
+    "version": "0.4.1"
+  },
+  "totals": {
+    "bytes": 20854,
+    "errors": 0,
+    "items": 4
+  }
+}

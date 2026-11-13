@@ -1,0 +1,38 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "CRYPTO_INPUT_NOT_RECOGNISED",
+      "params": {
+        "kind": "unknown"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the file is irrelevant or harmless; it was simply not analysed as cryptographic evidence.",
+          "shows": "The content is not a certificate, certificate bundle, PKCS#7, PKCS#12, CRL, OCSP response, timestamp token, private key or CSR (unknown); only the general file checks were applied.",
+          "title": "Not a recognised cryptographic object"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "f328a2c36dab3f9a3b173d38fd6cc9fe9614cbe1fc3bf0af8117d5d05b4fc7c7"
+  },
+  "item": {
+    "evidence_id": "E0002",
+    "file_name": "data.txt",
+    "index": 2
+  },
+  "run_id": "20261113T232802Z-2f0fe5",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}
