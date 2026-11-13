@@ -948,6 +948,18 @@ pub trait RunSource {
     fn discover(&self, case_dir: &Path) -> Result<Vec<RunRef>, ReadError>;
     fn verify(&self, case_dir: &Path, run: RunRef) -> RunRef;
     fn read(&self, case_dir: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError>;
+    /// [`RunSource::read`] with the time values the reader could not parse (counted, never invented).
+    fn read_outcome(
+        &self,
+        case_dir: &Path,
+        run: &RunRef,
+    ) -> Result<crate::readers::ReadOutcome, ReadError> {
+        self.read(case_dir, run)
+            .map(|events| crate::readers::ReadOutcome {
+                events,
+                ..Default::default()
+            })
+    }
 }
 
 /// The readers of this version ([`crate::readers`]).
@@ -972,6 +984,13 @@ impl RunSource for BuiltinSources {
     }
     fn read(&self, case_dir: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError> {
         crate::readers::read_run(&self.readers, case_dir, run)
+    }
+    fn read_outcome(
+        &self,
+        case_dir: &Path,
+        run: &RunRef,
+    ) -> Result<crate::readers::ReadOutcome, ReadError> {
+        crate::readers::read_run_outcome(case_dir, run)
     }
 }
 
@@ -1318,7 +1337,7 @@ fn timeline_pipeline(
     let mut skipped: Vec<SkippedRun> = Vec::new();
     let mut by_tool: BTreeMap<String, u64> = BTreeMap::new();
     let mut by_kind: BTreeMap<String, u64> = BTreeMap::new();
-    let (mut filtered_out, mut kept_total) = (0u64, 0u64);
+    let (mut filtered_out, mut kept_total, mut times_skipped) = (0u64, 0u64, 0u64);
     let (mut cap_reached, mut cancelled) = (false, false);
     for (i, r) in discovered.into_iter().enumerate() {
         let index = i as u64 + 1;
@@ -1354,7 +1373,7 @@ fn timeline_pipeline(
         if r.status == RunStatus::Verified {
             log.record("run_verified", Some(&r.run_dir), run_json(&r))
                 .map_err(io)?;
-            match sources.read(&case_dir, &r) {
+            match sources.read_outcome(&case_dir, &r) {
                 Err(e) => {
                     r.status = RunStatus::Excluded;
                     r.exclusion = Some(Exclusion {
@@ -1363,7 +1382,13 @@ fn timeline_pipeline(
                     });
                     r.events = 0;
                 }
-                Ok(events) => {
+                Ok(outcome) => {
+                    let crate::readers::ReadOutcome {
+                        events,
+                        skipped: run_skipped,
+                        warnings,
+                    } = outcome;
+                    times_skipped += run_skipped;
                     let read = events.len() as u64;
                     let mut kept: Vec<TimeEvent> = events
                         .into_iter()
@@ -1399,6 +1424,11 @@ fn timeline_pipeline(
                     d["events_read"] = json!(read);
                     d["events_kept"] = json!(n);
                     d["events_outside_filters"] = json!(outside);
+                    // Time values the reader could not parse: counted and listed, never placed.
+                    d["times_skipped"] = json!(run_skipped);
+                    if !warnings.is_empty() {
+                        d["times_skipped_examples"] = json!(warnings);
+                    }
                     log.record("run_read", Some(&r.run_dir), d).map_err(io)?;
                     if dropped > 0 {
                         log.record(
@@ -1715,6 +1745,7 @@ fn timeline_pipeline(
             events: lines,
             filtered_out,
             zone_unknown,
+            times_skipped,
             by_tool,
             by_kind,
             signals: signals.clone(),

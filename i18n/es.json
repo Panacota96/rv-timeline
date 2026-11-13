@@ -249,6 +249,7 @@
     "TL_CLOCK_SKEW": "Las comparaciones entre fuentes toleran %{skew_s} s de diferencia; los desacuerdos menores entre relojes no se reportan.",
     "TL_TOOL_OUTPUTS_ONLY": "En esta versión las únicas fuentes son los resultados auditados de las ejecuciones de herramientas Rakvor en la carpeta del caso; las horas que esas herramientas no extrajeron (otros registros, otros dispositivos) no están en la línea de tiempo.",
     "TL_READER_VERSIONS": "Cada lector admite las versiones de resultados para las que fue escrito; las ejecuciones de otras versiones se dejan fuera y se listan, nunca se adivinan.",
+    "TL_TIMES_SKIPPED": "%{count} valores de hora de las fuentes no pudieron leerse como hora (formato desconocido o inválido); no están en la línea de tiempo y el registro de auditoría los lista por ejecución.",
     "TL_MAX_EVENTS": "La lectura se detuvo en el límite de eventos (%{max_events}); los eventos siguientes no están en la línea de tiempo ni en las señales.",
     "TL_CLEAN_IS_NOT_PROOF": "Una línea de tiempo sin señales no prueba que las horas sean verdaderas; muestra que las fuentes leídas concuerdan dentro de la tolerancia."
   },

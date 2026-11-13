@@ -93,6 +93,9 @@ pub struct TimelineInfo {
     /// Events read but outside the window or the tool filter.
     pub filtered_out: u64,
     pub zone_unknown: u64,
+    /// Time values found in the sources that no parser understood (counted per run in the audit log, never
+    /// placed on the timeline).
+    pub times_skipped: u64,
     pub by_tool: BTreeMap<String, u64>,
     pub by_kind: BTreeMap<String, u64>,
     /// All signals (item, run and case level).
@@ -122,6 +125,11 @@ impl TimelineInfo {
             let mut p = BTreeMap::new();
             p.insert("max_events".to_string(), self.max_events.to_string());
             out.insert(0, ("TL_MAX_EVENTS", p));
+        }
+        if self.times_skipped > 0 {
+            let mut p = BTreeMap::new();
+            p.insert("count".to_string(), self.times_skipped.to_string());
+            out.insert(0, ("TL_TIMES_SKIPPED", p));
         }
         out
     }
@@ -346,7 +354,7 @@ fn timeline_json(t: &TimelineInfo, langs: &[String]) -> Value {
             "run_id": s.run.run_id, "run_dir": s.run.run_dir, "reason": s.reason})).collect::<Vec<_>>(),
         "runs_verified": t.verified(), "runs_excluded": t.excluded(),
         "events": t.events, "events_filtered_out": t.filtered_out, "events_zone_unknown": t.zone_unknown,
-        "events_by_tool": t.by_tool, "events_by_kind": t.by_kind,
+        "times_skipped": t.times_skipped, "events_by_tool": t.by_tool, "events_by_kind": t.by_kind,
         "signals_by_severity": severity_counts(&t.signals),
         "signals": t.signals.iter().map(|s| signal_json(s, langs)).collect::<Vec<_>>(),
         "timeline_file": t.timeline_file, "sort_spilled_chunks": t.spilled_chunks,

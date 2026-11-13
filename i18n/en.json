@@ -249,6 +249,7 @@
     "TL_CLOCK_SKEW": "Cross-source comparisons tolerate %{skew_s} s of difference; smaller disagreements between clocks are not reported.",
     "TL_TOOL_OUTPUTS_ONLY": "In this version the only sources are the audited outputs of Rakvor tool runs in the case folder; times those tools did not extract (other logs, other devices) are not in the timeline.",
     "TL_READER_VERSIONS": "Each reader supports the tool output versions it was written for; runs of other versions are left out and listed, never guessed.",
+    "TL_TIMES_SKIPPED": "%{count} time values in the sources could not be read as a time (unknown or invalid format); they are not in the timeline, and the audit log lists them per run.",
     "TL_MAX_EVENTS": "Reading stopped at the event limit (%{max_events}); later events are neither in the timeline nor in the signals.",
     "TL_CLEAN_IS_NOT_PROOF": "A timeline without signals does not prove that the times are true; it shows that the sources read agree within the tolerance."
   },
