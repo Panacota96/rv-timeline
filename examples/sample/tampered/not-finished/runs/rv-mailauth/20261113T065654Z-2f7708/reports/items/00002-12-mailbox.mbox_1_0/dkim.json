@@ -1,0 +1,46 @@
+{
+  "dkim": {
+    "arc": {
+      "instances": 0,
+      "reason": null,
+      "result": "none"
+    },
+    "evaluated": true,
+    "key_file": "R:\\inputs\\dkim-keys.txt",
+    "key_file_problems": [],
+    "key_file_sha256": "f5de4068b295824c6f4d9b27fd4a936ed63bcc624be6c67b24a3f0e85f09092e",
+    "keys_loaded": 4,
+    "mode": "offline",
+    "not_evaluated_reason": null,
+    "signatures": [
+      {
+        "algorithm": "rsa-sha256",
+        "aligned_with_from": true,
+        "body_length": 0,
+        "canonicalization": "relaxed/relaxed",
+        "domain": "example.org",
+        "expires_at": 0,
+        "identity": "@example.org",
+        "index": 1,
+        "key_line": 3,
+        "key_source": "key_file",
+        "reason": null,
+        "result": "pass",
+        "selector": "s2026",
+        "signed_at": 1794437788,
+        "signed_headers": [
+          "from",
+          "to",
+          "subject",
+          "date",
+          "message-id",
+          "mime-version",
+          "content-type",
+          "content-transfer-encoding",
+          "from"
+        ]
+      }
+    ]
+  },
+  "schema": "rv-mailauth.dkim/1"
+}

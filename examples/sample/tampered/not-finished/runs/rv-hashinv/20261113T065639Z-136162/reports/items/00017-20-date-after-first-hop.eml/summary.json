@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "4bbb81d83fb442fbf181cc581dd73f8bbb3c7ce41842b629bc44161d7e6fdbfa"
+  },
+  "item": {
+    "evidence_id": "E0017",
+    "file_name": "20-date-after-first-hop.eml",
+    "index": 17
+  },
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

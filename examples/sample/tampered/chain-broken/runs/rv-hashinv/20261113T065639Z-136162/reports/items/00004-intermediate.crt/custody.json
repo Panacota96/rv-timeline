@@ -1,0 +1,30 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "evidence_id": "E0004",
+  "examiner": "Sample Examiner",
+  "hashes": {
+    "md5": "643abde945484b9d7a6b464c6dd3bd31",
+    "sha256": "ae452532cb82f69f375673eab1e3a3f374b004429d940cf9552821a92f2e9c7c"
+  },
+  "intake_utc": "2026-11-13T06:56:39.690Z",
+  "item": {
+    "file_name": "intermediate.crt",
+    "index": 4,
+    "path": "R:\\evidence\\certs\\intermediate.crt",
+    "size": 1330
+  },
+  "jurisdiction": "co",
+  "operations": [
+    {
+      "audit_first_seq": 14,
+      "audit_last_seq": 16,
+      "end_utc": "2026-11-13T06:56:39.702Z",
+      "start_utc": "2026-11-13T06:56:39.631Z",
+      "tool": "rv-hashinv",
+      "version": "0.4.1"
+    }
+  ],
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-custody/1",
+  "transfers": []
+}

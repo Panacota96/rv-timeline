@@ -1,0 +1,58 @@
+{
+  "exports": [
+    {
+      "conversations": 1,
+      "events": 10,
+      "export": "WhatsApp Chat with Ana Ruiz.txt",
+      "files": [
+        {
+          "attachments": 1,
+          "conversation": "Ana Ruiz",
+          "day": "2026-03-02",
+          "events": 7,
+          "file": "001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002/Ana-Ruiz-aa3173/2026-03-02.rsmf",
+          "missing_attachments": 1,
+          "part": 0,
+          "sha256": "4527fa7e7ca432ccc5d7599e6fb7678f5fca938bfc7c145fdb5030ca2df9ece3",
+          "valid": true
+        },
+        {
+          "attachments": 0,
+          "conversation": "Ana Ruiz",
+          "day": "2026-03-13",
+          "events": 2,
+          "file": "001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002/Ana-Ruiz-aa3173/2026-03-13.rsmf",
+          "missing_attachments": 1,
+          "part": 0,
+          "sha256": "21ce0b8c75901c6266aca3a14e68ef8167572a92610767c3f88b92ce3f52698c",
+          "valid": true
+        },
+        {
+          "attachments": 0,
+          "conversation": "Ana Ruiz",
+          "day": "2026-03-14",
+          "events": 1,
+          "file": "001-WhatsApp-Chat-with-Ana-Ruiz-txt-000002/Ana-Ruiz-aa3173/2026-03-14.rsmf",
+          "missing_attachments": 0,
+          "part": 0,
+          "sha256": "0854504d5f9d9facbc4f867759054707fc485240e4d9343b31aceec363d6177a",
+          "valid": true
+        }
+      ],
+      "item_index": 2,
+      "source": "whatsapp"
+    }
+  ],
+  "rsmf_version": "2.0.0",
+  "shortcode_table": "relativity-supported-emoji checked 2026-10-27 (Server 2024 page)",
+  "totals": {
+    "attachments_missing": 2,
+    "attachments_packed": 1,
+    "conversations": 1,
+    "events": 10,
+    "exports": 1,
+    "exports_failed": 0,
+    "files": 3,
+    "files_invalid": 0
+  }
+}

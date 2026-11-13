@@ -1,0 +1,136 @@
+{
+  "audit": {
+    "first_seq": 18,
+    "last_seq": 21
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T06:56:39.690Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "certificates": {
+    "certificates": 1,
+    "codes": [
+      "CERT_CHAIN_VALID",
+      "REVOCATION_UNKNOWN"
+    ],
+    "errors": [],
+    "kind": "certificate",
+    "online_fetches": [],
+    "verdicts": [
+      {
+        "depths": 2,
+        "openssl_code": 0,
+        "openssl_reason": "ok",
+        "status": "valid"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "code": "CERT_CHAIN_VALID",
+      "params": {
+        "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+        "at": "2026-06-01T00:00:00Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate was not revoked (see the revocation findings), that the certificate holder signed or approved any particular document, that the anchor deserves trust (that is the examiner's choice of --anchor), or that the result holds at another date.",
+          "shows": "OpenSSL built a path from C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA to the trust anchor file:R:\\anchors\\rakvor-lab-root.crt and the chain verified at 2026-06-01T00:00:00Z: signatures, validity dates, purpose and constraints passed. Revocation is reported separately: a REVOCATION_UNKNOWN finding for the same certificate means its revocation status could not be determined.",
+          "title": "Certificate chain verified at the date checked"
+        }
+      }
+    },
+    {
+      "code": "REVOCATION_UNKNOWN",
+      "params": {
+        "source": "none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)",
+        "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate is revoked or that it is not; supply the CA's CRL or an OCSP response (--crl, --ocsp) to decide.",
+          "shows": "No CRL or OCSP response covering C=CO, O=Rakvor Lab, CN=Rakvor Lab Intermediate CA was available for the date checked (none of the 1 CRL(s) and 0 OCSP response(s) supplied covers this certificate (issuer C=CO, O=Rakvor Lab, CN=Rakvor Lab Root CA)); its revocation status could not be determined.",
+          "title": "Revocation status unknown"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "643abde945484b9d7a6b464c6dd3bd31",
+    "sha256": "ae452532cb82f69f375673eab1e3a3f374b004429d940cf9552821a92f2e9c7c"
+  },
+  "item": {
+    "detected_type": "X.509 certificate",
+    "error": null,
+    "evidence_id": "E0004",
+    "extension": "crt",
+    "file_name": "intermediate.crt",
+    "index": 4,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\certs\\intermediate.crt",
+    "size": 1330,
+    "status": "attention"
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "outputs": [
+    {
+      "bytes": 10228,
+      "hashes": {
+        "md5": "8fd7f832210177b29b94af8357b9a29c",
+        "sha256": "e76d71cdd3f94502b862226d13b4466be54f5c22a9f6789aa7c3ccad0d51f938"
+      },
+      "kind": "chain",
+      "rel_path": "chain.json"
+    },
+    {
+      "bytes": 3352,
+      "hashes": {
+        "md5": "19624851d9728154b6511ff8d1c51789",
+        "sha256": "d67e7f7987caa5ca17210b0120c2ee5df86fd8221e7b53b45d6ae3caed58fbb8"
+      },
+      "kind": "certificate_text",
+      "rel_path": "certificate.txt"
+    }
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 142,
+    "finished_utc": "2026-11-13T06:56:57.965Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065657Z-5588dc",
+    "started_utc": "2026-11-13T06:56:57.822Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  }
+}

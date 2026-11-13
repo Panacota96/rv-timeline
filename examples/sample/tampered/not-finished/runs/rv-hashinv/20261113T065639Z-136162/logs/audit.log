@@ -1,0 +1,112 @@
+2026-11-13T06:56:39.633Z  #00001  run_started          algorithms=sha256+md5 case_dir=R:\case case_id=RV-SAMPLE-001 evidence_ids= frontend=cli input_list=null inputs=R:\evidence jurisdiction=co langs=en out_dir=rakvor-out recursive=true sign_cert=null tool=rv-hashinv tsa_url=null version=0.4.1
+2026-11-13T06:56:39.634Z  #00002  case_linked          case_created=true case_dir=R:\case case_id=RV-SAMPLE-001 case_log_head_at_start=8700946b06199057b3f13f6b62ab8aaa6dd169f3c2422e8658ae074e9500bc5b case_log_seq_at_start=2 jurisdiction=co registry_items=0 registry_sha256=null requested_jurisdiction=co role=intake run_dir=runs/rv-hashinv/20261113T065639Z-136162
+2026-11-13T06:56:39.636Z  #00003  environment_recorded environment.json  md5=4111cd38d07f232eabda4f8d9fdc6d49 sha256=f09de5eb9a1d15ce0532f3edf5b569ff71badbab128d83bb8ba7baa75ccbbc3d
+2026-11-13T06:56:39.641Z  #00004  inputs_resolved      bytes=578627 items=21
+2026-11-13T06:56:39.641Z  #00005  item_started         R:\evidence\certs\data.tsr  index=1 modified_utc=2026-11-12T06:00:00Z size=2557
+2026-11-13T06:56:39.642Z  #00006  item_hashed          R:\evidence\certs\data.tsr  bytes_read=2557 index=1 mtime_unchanged=true
+2026-11-13T06:56:39.643Z  #00007  item_analyzed        R:\evidence\certs\data.tsr  detected_type=null extension=tsr findings= index=1 status=ok
+2026-11-13T06:56:39.643Z  #00008  item_started         R:\evidence\certs\data.txt  index=2 modified_utc=2026-11-12T06:00:00Z size=44
+2026-11-13T06:56:39.644Z  #00009  item_hashed          R:\evidence\certs\data.txt  bytes_read=44 index=2 mtime_unchanged=true
+2026-11-13T06:56:39.646Z  #00010  item_analyzed        R:\evidence\certs\data.txt  detected_type=null extension=txt findings= index=2 status=ok
+2026-11-13T06:56:39.647Z  #00011  item_started         R:\evidence\certs\intermediate.crl  index=3 modified_utc=2026-11-12T06:00:00Z size=458
+2026-11-13T06:56:39.648Z  #00012  item_hashed          R:\evidence\certs\intermediate.crl  bytes_read=458 index=3 mtime_unchanged=true
+2026-11-13T06:56:39.648Z  #00013  item_analyzed        R:\evidence\certs\intermediate.crl  detected_type=null extension=crl findings= index=3 status=ok
+2026-11-13T06:56:39.649Z  #00014  item_started         R:\evidence\certs\intermediate.crt  index=4 modified_utc=2026-11-12T06:00:00Z size=1330
+2026-11-13T06:56:39.650Z  #00015  item_hashed          R:\evidence\certs\intermediate.crt  bytes_read=1330 index=4 mtime_unchanged=true
+2026-11-13T06:56:39.650Z  #00016  item_analyzed        R:\evidence\certs\intermediate.crt  detected_type=null extension=crt findings= index=4 status=ok
+2026-11-13T06:56:39.651Z  #00017  item_started         R:\evidence\certs\leaf-expired.crt  index=5 modified_utc=2026-11-12T06:00:00Z size=1574
+2026-11-13T06:56:39.652Z  #00018  item_hashed          R:\evidence\certs\leaf-expired.crt  bytes_read=1574 index=5 mtime_unchanged=true
+2026-11-13T06:56:39.653Z  #00019  item_analyzed        R:\evidence\certs\leaf-expired.crt  detected_type=null extension=crt findings= index=5 status=ok
+2026-11-13T06:56:39.653Z  #00020  item_started         R:\evidence\certs\leaf-revoked.crt  index=6 modified_utc=2026-11-12T06:00:00Z size=1574
+2026-11-13T06:56:39.654Z  #00021  item_hashed          R:\evidence\certs\leaf-revoked.crt  bytes_read=1574 index=6 mtime_unchanged=true
+2026-11-13T06:56:39.654Z  #00022  item_analyzed        R:\evidence\certs\leaf-revoked.crt  detected_type=null extension=crt findings= index=6 status=ok
+2026-11-13T06:56:39.654Z  #00023  item_started         R:\evidence\certs\leaf.crt  index=7 modified_utc=2026-11-12T06:00:00Z size=1566
+2026-11-13T06:56:39.655Z  #00024  item_hashed          R:\evidence\certs\leaf.crt  bytes_read=1566 index=7 mtime_unchanged=true
+2026-11-13T06:56:39.656Z  #00025  item_analyzed        R:\evidence\certs\leaf.crt  detected_type=null extension=crt findings= index=7 status=ok
+2026-11-13T06:56:39.656Z  #00026  item_started         R:\evidence\certs\tsa.crt  index=8 modified_utc=2026-11-12T06:00:00Z size=1261
+2026-11-13T06:56:39.657Z  #00027  item_hashed          R:\evidence\certs\tsa.crt  bytes_read=1261 index=8 mtime_unchanged=true
+2026-11-13T06:56:39.660Z  #00028  item_analyzed        R:\evidence\certs\tsa.crt  detected_type=null extension=crt findings= index=8 status=ok
+2026-11-13T06:56:39.661Z  #00029  item_started         R:\evidence\chat\whatsapp-android-en\IMG-20260302-WA0001.jpg  index=9 modified_utc=2026-11-12T06:00:00Z size=189
+2026-11-13T06:56:39.663Z  #00030  item_hashed          R:\evidence\chat\whatsapp-android-en\IMG-20260302-WA0001.jpg  bytes_read=189 index=9 mtime_unchanged=true
+2026-11-13T06:56:39.664Z  #00031  item_analyzed        R:\evidence\chat\whatsapp-android-en\IMG-20260302-WA0001.jpg  detected_type=JPEG image extension=jpg findings= index=9 status=ok
+2026-11-13T06:56:39.664Z  #00032  item_started         R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt  index=10 modified_utc=2026-11-12T06:00:00Z size=773
+2026-11-13T06:56:39.665Z  #00033  item_hashed          R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt  bytes_read=773 index=10 mtime_unchanged=true
+2026-11-13T06:56:39.665Z  #00034  item_analyzed        R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt  detected_type=null extension=txt findings= index=10 status=ok
+2026-11-13T06:56:39.666Z  #00035  item_started         R:\evidence\images\camera-original.jpg  index=11 modified_utc=2026-11-12T06:00:00Z size=121033
+2026-11-13T06:56:39.668Z  #00036  item_hashed          R:\evidence\images\camera-original.jpg  bytes_read=121033 index=11 mtime_unchanged=true
+2026-11-13T06:56:39.668Z  #00037  item_analyzed        R:\evidence\images\camera-original.jpg  detected_type=JPEG image extension=jpg findings= index=11 status=ok
+2026-11-13T06:56:39.668Z  #00038  item_started         R:\evidence\images\edited-gimp.jpg  index=12 modified_utc=2026-11-12T06:00:00Z size=105483
+2026-11-13T06:56:39.670Z  #00039  item_hashed          R:\evidence\images\edited-gimp.jpg  bytes_read=105483 index=12 mtime_unchanged=true
+2026-11-13T06:56:39.670Z  #00040  item_analyzed        R:\evidence\images\edited-gimp.jpg  detected_type=JPEG image extension=jpg findings= index=12 status=ok
+2026-11-13T06:56:39.671Z  #00041  item_started         R:\evidence\images\future-exif.jpg  index=13 modified_utc=2026-11-12T06:00:00Z size=120443
+2026-11-13T06:56:39.672Z  #00042  item_hashed          R:\evidence\images\future-exif.jpg  bytes_read=120443 index=13 mtime_unchanged=true
+2026-11-13T06:56:39.673Z  #00043  item_analyzed        R:\evidence\images\future-exif.jpg  detected_type=JPEG image extension=jpg findings= index=13 status=ok
+2026-11-13T06:56:39.673Z  #00044  item_started         R:\evidence\images\screenshot.png  index=14 modified_utc=2026-11-12T06:00:00Z size=193322
+2026-11-13T06:56:39.676Z  #00045  item_hashed          R:\evidence\images\screenshot.png  bytes_read=193322 index=14 mtime_unchanged=true
+2026-11-13T06:56:39.676Z  #00046  item_analyzed        R:\evidence\images\screenshot.png  detected_type=PNG image extension=png findings= index=14 status=ok
+2026-11-13T06:56:39.676Z  #00047  item_started         R:\evidence\mail\01-clean-rsa.eml  index=15 modified_utc=2026-11-12T06:00:00Z size=1464
+2026-11-13T06:56:39.677Z  #00048  item_hashed          R:\evidence\mail\01-clean-rsa.eml  bytes_read=1464 index=15 mtime_unchanged=true
+2026-11-13T06:56:39.677Z  #00049  item_analyzed        R:\evidence\mail\01-clean-rsa.eml  detected_type=null extension=eml findings= index=15 status=ok
+2026-11-13T06:56:39.678Z  #00050  item_started         R:\evidence\mail\12-mailbox.mbox  index=16 modified_utc=2026-11-12T06:00:00Z size=3238
+2026-11-13T06:56:39.679Z  #00051  item_hashed          R:\evidence\mail\12-mailbox.mbox  bytes_read=3238 index=16 mtime_unchanged=true
+2026-11-13T06:56:39.679Z  #00052  item_analyzed        R:\evidence\mail\12-mailbox.mbox  detected_type=null extension=mbox findings= index=16 status=ok
+2026-11-13T06:56:39.679Z  #00053  item_started         R:\evidence\mail\20-date-after-first-hop.eml  index=17 modified_utc=2026-11-12T06:00:00Z size=1464
+2026-11-13T06:56:39.680Z  #00054  item_hashed          R:\evidence\mail\20-date-after-first-hop.eml  bytes_read=1464 index=17 mtime_unchanged=true
+2026-11-13T06:56:39.681Z  #00055  item_analyzed        R:\evidence\mail\20-date-after-first-hop.eml  detected_type=null extension=eml findings= index=17 status=ok
+2026-11-13T06:56:39.681Z  #00056  item_started         R:\evidence\pdf\backdated-revision.pdf  index=18 modified_utc=2026-11-12T06:00:00Z size=3613
+2026-11-13T06:56:39.682Z  #00057  item_hashed          R:\evidence\pdf\backdated-revision.pdf  bytes_read=3613 index=18 mtime_unchanged=true
+2026-11-13T06:56:39.682Z  #00058  item_analyzed        R:\evidence\pdf\backdated-revision.pdf  detected_type=PDF document extension=pdf findings= index=18 status=ok
+2026-11-13T06:56:39.683Z  #00059  item_started         R:\evidence\pdf\edited-incremental.pdf  index=19 modified_utc=2026-11-12T06:00:00Z size=3613
+2026-11-13T06:56:39.684Z  #00060  item_hashed          R:\evidence\pdf\edited-incremental.pdf  bytes_read=3613 index=19 mtime_unchanged=true
+2026-11-13T06:56:39.684Z  #00061  item_analyzed        R:\evidence\pdf\edited-incremental.pdf  detected_type=PDF document extension=pdf findings= index=19 status=ok
+2026-11-13T06:56:39.684Z  #00062  item_started         R:\evidence\pdf\original.pdf  index=20 modified_utc=2026-11-12T06:00:00Z size=1648
+2026-11-13T06:56:39.685Z  #00063  item_hashed          R:\evidence\pdf\original.pdf  bytes_read=1648 index=20 mtime_unchanged=true
+2026-11-13T06:56:39.685Z  #00064  item_analyzed        R:\evidence\pdf\original.pdf  detected_type=PDF document extension=pdf findings= index=20 status=ok
+2026-11-13T06:56:39.686Z  #00065  item_started         R:\evidence\pdf\signed-then-modified.pdf  index=21 modified_utc=2026-11-12T06:00:00Z size=11980
+2026-11-13T06:56:39.687Z  #00066  item_hashed          R:\evidence\pdf\signed-then-modified.pdf  bytes_read=11980 index=21 mtime_unchanged=true
+2026-11-13T06:56:39.687Z  #00067  item_analyzed        R:\evidence\pdf\signed-then-modified.pdf  detected_type=PDF document extension=pdf findings= index=21 status=ok
+2026-11-13T06:56:39.697Z  #00068  evidence_registered  R:\evidence\certs\data.tsr  case_log_seq=3 evidence_id=E0001 index=1 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.698Z  #00069  evidence_registered  R:\evidence\certs\data.txt  case_log_seq=3 evidence_id=E0002 index=2 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.698Z  #00070  evidence_registered  R:\evidence\certs\intermediate.crl  case_log_seq=3 evidence_id=E0003 index=3 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.698Z  #00071  evidence_registered  R:\evidence\certs\intermediate.crt  case_log_seq=3 evidence_id=E0004 index=4 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.698Z  #00072  evidence_registered  R:\evidence\certs\leaf-expired.crt  case_log_seq=3 evidence_id=E0005 index=5 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.698Z  #00073  evidence_registered  R:\evidence\certs\leaf-revoked.crt  case_log_seq=3 evidence_id=E0006 index=6 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.699Z  #00074  evidence_registered  R:\evidence\certs\leaf.crt  case_log_seq=3 evidence_id=E0007 index=7 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.699Z  #00075  evidence_registered  R:\evidence\certs\tsa.crt  case_log_seq=3 evidence_id=E0008 index=8 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.699Z  #00076  evidence_registered  R:\evidence\chat\whatsapp-android-en\IMG-20260302-WA0001.jpg  case_log_seq=3 evidence_id=E0009 index=9 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.699Z  #00077  evidence_registered  R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt  case_log_seq=3 evidence_id=E0010 index=10 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.699Z  #00078  evidence_registered  R:\evidence\images\camera-original.jpg  case_log_seq=3 evidence_id=E0011 index=11 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00079  evidence_registered  R:\evidence\images\edited-gimp.jpg  case_log_seq=3 evidence_id=E0012 index=12 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00080  evidence_registered  R:\evidence\images\future-exif.jpg  case_log_seq=3 evidence_id=E0013 index=13 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00081  evidence_registered  R:\evidence\images\screenshot.png  case_log_seq=3 evidence_id=E0014 index=14 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00082  evidence_registered  R:\evidence\mail\01-clean-rsa.eml  case_log_seq=3 evidence_id=E0015 index=15 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00083  evidence_registered  R:\evidence\mail\12-mailbox.mbox  case_log_seq=3 evidence_id=E0016 index=16 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.700Z  #00084  evidence_registered  R:\evidence\mail\20-date-after-first-hop.eml  case_log_seq=3 evidence_id=E0017 index=17 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.701Z  #00085  evidence_registered  R:\evidence\pdf\backdated-revision.pdf  case_log_seq=3 evidence_id=E0018 index=18 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.701Z  #00086  evidence_registered  R:\evidence\pdf\edited-incremental.pdf  case_log_seq=3 evidence_id=E0019 index=19 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.701Z  #00087  evidence_registered  R:\evidence\pdf\original.pdf  case_log_seq=3 evidence_id=E0020 index=20 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.701Z  #00088  evidence_registered  R:\evidence\pdf\signed-then-modified.pdf  case_log_seq=3 evidence_id=E0021 index=21 new=true registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:39.702Z  #00089  hash_register_written hashes.csv  md5=5db235a0d6157eb360390692c2b712cd sha256=9b996fdb4b57d7b647ad47053ef589a8fd529664b11a4f61398e0de7870761fa
+2026-11-13T06:56:39.716Z  #00090  item_reports_written R:\evidence\certs\data.tsr  folder=items/00001-data.tsr
+2026-11-13T06:56:39.726Z  #00091  item_reports_written R:\evidence\certs\data.txt  folder=items/00002-data.txt
+2026-11-13T06:56:39.740Z  #00092  item_reports_written R:\evidence\certs\intermediate.crl  folder=items/00003-intermediate.crl
+2026-11-13T06:56:39.750Z  #00093  item_reports_written R:\evidence\certs\intermediate.crt  folder=items/00004-intermediate.crt
+2026-11-13T06:56:39.760Z  #00094  item_reports_written R:\evidence\certs\leaf-expired.crt  folder=items/00005-leaf-expired.crt
+2026-11-13T06:56:39.770Z  #00095  item_reports_written R:\evidence\certs\leaf-revoked.crt  folder=items/00006-leaf-revoked.crt
+2026-11-13T06:56:39.793Z  #00096  item_reports_written R:\evidence\certs\leaf.crt  folder=items/00007-leaf.crt
+2026-11-13T06:56:39.803Z  #00097  item_reports_written R:\evidence\certs\tsa.crt  folder=items/00008-tsa.crt
+2026-11-13T06:56:39.811Z  #00098  item_reports_written R:\evidence\chat\whatsapp-android-en\IMG-20260302-WA0001.jpg  folder=items/00009-IMG-20260302-WA0001.jpg
+2026-11-13T06:56:39.822Z  #00099  item_reports_written R:\evidence\chat\whatsapp-android-en\WhatsApp Chat with Ana Ruiz.txt  folder=items/00010-WhatsApp_Chat_with_Ana_Ruiz.txt
+2026-11-13T06:56:39.831Z  #00100  item_reports_written R:\evidence\images\camera-original.jpg  folder=items/00011-camera-original.jpg
+2026-11-13T06:56:39.842Z  #00101  item_reports_written R:\evidence\images\edited-gimp.jpg  folder=items/00012-edited-gimp.jpg
+2026-11-13T06:56:39.861Z  #00102  item_reports_written R:\evidence\images\future-exif.jpg  folder=items/00013-future-exif.jpg
+2026-11-13T06:56:39.873Z  #00103  item_reports_written R:\evidence\images\screenshot.png  folder=items/00014-screenshot.png
+2026-11-13T06:56:39.881Z  #00104  item_reports_written R:\evidence\mail\01-clean-rsa.eml  folder=items/00015-01-clean-rsa.eml
+2026-11-13T06:56:39.894Z  #00105  item_reports_written R:\evidence\mail\12-mailbox.mbox  folder=items/00016-12-mailbox.mbox
+2026-11-13T06:56:39.908Z  #00106  item_reports_written R:\evidence\mail\20-date-after-first-hop.eml  folder=items/00017-20-date-after-first-hop.eml
+2026-11-13T06:56:39.921Z  #00107  item_reports_written R:\evidence\pdf\backdated-revision.pdf  folder=items/00018-backdated-revision.pdf
+2026-11-13T06:56:39.931Z  #00108  item_reports_written R:\evidence\pdf\edited-incremental.pdf  folder=items/00019-edited-incremental.pdf
+2026-11-13T06:56:39.941Z  #00109  item_reports_written R:\evidence\pdf\original.pdf  folder=items/00020-original.pdf
+2026-11-13T06:56:39.959Z  #00110  item_reports_written R:\evidence\pdf\signed-then-modified.pdf  folder=items/00021-signed-then-modified.pdf
+2026-11-13T06:56:39.964Z  #00111  statistics_report_written 
+2026-11-13T06:56:39.964Z  #00112  run_finished         bytes=578627 cancelled=false elapsed_ms=332 errors=0 high=0 info=0 items=21 low=0 medium=0

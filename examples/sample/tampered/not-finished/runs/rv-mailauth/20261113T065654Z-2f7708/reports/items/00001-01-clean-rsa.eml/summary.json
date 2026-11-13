@@ -1,0 +1,57 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "DKIM_SIGNATURE_VALID",
+      "params": {
+        "a": "rsa-sha256",
+        "d": "example.org",
+        "key_source": "key_file",
+        "s": "s2026"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It shows only that whoever held the private key of example.org signed this content; it does not show who wrote it, that the From address is truthful, or that unsigned header fields are original.",
+          "shows": "The DKIM signature of example.org (selector s2026, rsa-sha256) verifies with the key from key_file: the signed header fields and the body are unchanged since signing.",
+          "title": "DKIM signature verifies"
+        }
+      }
+    },
+    {
+      "code": "AUTH_RESULTS_RECORDED",
+      "params": {
+        "authserv_id": "mx.acme.example",
+        "count": "1",
+        "results": "dkim=pass, spf=pass"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "These are claims written into the message by a server; anyone handling the file could have added or edited them, and they were not re-checked.",
+          "shows": "1 Authentication-Results header(s); the top one, written by mx.acme.example, states: dkim=pass, spf=pass.",
+          "title": "Receiving server's checks recorded"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "d774e6fb20d569075f2767ee4dd92136071f6c2fa81ce0979600069b89596f59"
+  },
+  "item": {
+    "evidence_id": "E0015",
+    "file_name": "01-clean-rsa.eml",
+    "index": 1
+  },
+  "run_id": "20261113T065654Z-2f7708",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

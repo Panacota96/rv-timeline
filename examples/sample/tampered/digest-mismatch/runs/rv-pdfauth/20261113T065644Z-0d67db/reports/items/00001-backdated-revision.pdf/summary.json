@@ -1,0 +1,168 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "PRODUCER_CHANGED_BETWEEN_REVISIONS",
+      "params": {
+        "after": "Foxit PDF Editor Version 13.0.0",
+        "before": "ReportLab PDF Library - (opensource)",
+        "from_rev": "1",
+        "to_rev": "2"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Documents legitimately pass through several programs (for example a signing or form tool); this shows a change of tool, not who used it or why.",
+          "shows": "The producer changes from “ReportLab PDF Library - (opensource)” in revision 1 to “Foxit PDF Editor Version 13.0.0” in revision 2.",
+          "title": "Different software between revisions"
+        }
+      }
+    },
+    {
+      "code": "REVISION_DATE_NOT_MONOTONIC",
+      "params": {
+        "from_date": "2026-03-04T17:15:00Z",
+        "from_rev": "2",
+        "gap": "1 d 3 h 0 min",
+        "to_date": "2026-03-03T14:15:00Z",
+        "to_rev": "3"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Metadata dates come from the clock of the computer that saved each revision and can be set freely; a wrong clock, a time-zone error or dates copied by an editor can cause this. It does not by itself show deliberate backdating.",
+          "shows": "Revision 3 was appended to the file after revision 2, but its modification date (2026-03-03T14:15:00Z) is 1 d 3 h 0 min earlier than that of revision 2 (2026-03-04T17:15:00Z).",
+          "title": "Revision dated before the previous one"
+        }
+      }
+    },
+    {
+      "code": "EDITOR_FINGERPRINT",
+      "params": {
+        "label": "Foxit PDF Editor / PhantomPDF",
+        "matched_on": "producer",
+        "revision": "2",
+        "value": "Foxit PDF Editor Version 13.0.0"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Editors are also used for legitimate tasks such as filling in, signing, rotating or compressing a document; the fingerprint shows which software saved the file, not what was changed.",
+          "shows": "Revision 2 carries the fingerprint of a PDF editor: Foxit PDF Editor / PhantomPDF (metadata producer: “Foxit PDF Editor Version 13.0.0”).",
+          "title": "PDF editor fingerprint"
+        }
+      }
+    },
+    {
+      "code": "FONT_ADDED_IN_LATER_REVISION",
+      "params": {
+        "font": "Courier-Bold",
+        "revision": "3"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Editing tools add fonts when a form is filled in, a stamp or comment is added or text is legitimately corrected; this shows that text was written in that revision, not that it falsifies the document.",
+          "shows": "Font Courier-Bold first appears in revision 3 and is used by page content there.",
+          "title": "Font added in a later revision"
+        }
+      }
+    },
+    {
+      "code": "INCREMENTAL_UPDATES",
+      "params": {
+        "revisions": "3"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental saving is normal when a PDF is filled in, signed, annotated or re-saved by many programs; it does not show who changed the file or that a change was improper.",
+          "shows": "The file contains 3 revisions: the original save plus later updates appended to the end of the file. Each earlier version can be extracted and compared.",
+          "title": "Incremental updates"
+        }
+      }
+    },
+    {
+      "code": "REVISION_TIME_GAP",
+      "params": {
+        "from_rev": "1",
+        "gap": "2 d 3 h 0 min",
+        "to_rev": "2"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "Metadata dates are written by the editing software from the computer clock and can be set freely; the gap does not prove when the changes were really made or by whom.",
+          "shows": "Revision 2 is dated 2 d 3 h 0 min after revision 1 (according to their modification dates).",
+          "title": "Time gap between revisions"
+        }
+      }
+    },
+    {
+      "code": "VISUAL_CHANGE_BETWEEN_REVISIONS",
+      "params": {
+        "changed_ratio_max": "0.000058",
+        "from_rev": "1",
+        "pages": "1",
+        "pages_added": "-",
+        "pages_removed": "-",
+        "to_rev": "2"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental updates are normal when forms are filled, documents are signed or comments are added. It does not show who made the change, when, or with what intent.",
+          "shows": "Rendering revision 1 and revision 2 gives different images on page(s) 1 (largest changed share 0.000058); pages added: -; pages removed: -. The changed areas are outlined in the comparison images.",
+          "title": "Visible change between revisions"
+        }
+      }
+    },
+    {
+      "code": "VISUAL_CHANGE_BETWEEN_REVISIONS",
+      "params": {
+        "changed_ratio_max": "0.001099",
+        "from_rev": "2",
+        "pages": "1",
+        "pages_added": "-",
+        "pages_removed": "-",
+        "to_rev": "3"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental updates are normal when forms are filled, documents are signed or comments are added. It does not show who made the change, when, or with what intent.",
+          "shows": "Rendering revision 2 and revision 3 gives different images on page(s) 1 (largest changed share 0.001099); pages added: -; pages removed: -. The changed areas are outlined in the comparison images.",
+          "title": "Visible change between revisions"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "e51612fd222427bc85fa0f2a6b123b634355089087c1f63015174278b58aa34f"
+  },
+  "history": {
+    "last_change_after_s": 86400,
+    "saves": 3,
+    "text": {
+      "en": "The document was saved 3 times; the last change was made 1 day after creation. This information comes from the document itself and is not proof on its own."
+    },
+    "tool_category": null,
+    "tool_label": null
+  },
+  "item": {
+    "evidence_id": "E0018",
+    "file_name": "backdated-revision.pdf",
+    "index": 1
+  },
+  "run_id": "20261113T065644Z-0d67db",
+  "schema": "rakvor.item-summary/1",
+  "status": "attention",
+  "text": {
+    "en": {
+      "next_step": "Review the findings below with your examiner before relying on this file.",
+      "status": "Needs attention",
+      "summary": "The file was hashed and checked. Some points need attention."
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "icc_sha256": null,
+  "makernote_present": true,
+  "problems": [],
+  "tags": [
+    {
+      "group": "IFD0",
+      "id": 271,
+      "name": "Make",
+      "value": "Canon"
+    },
+    {
+      "group": "IFD0",
+      "id": 272,
+      "name": "Model",
+      "value": "Canon EOS R6"
+    },
+    {
+      "group": "IFD0",
+      "id": 274,
+      "name": "Orientation",
+      "value": "1 (row 0 at top and column 0 at left)"
+    },
+    {
+      "group": "IFD0",
+      "id": 282,
+      "name": "XResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD0",
+      "id": 283,
+      "name": "YResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD0",
+      "id": 296,
+      "name": "ResolutionUnit",
+      "value": "2 (inch)"
+    },
+    {
+      "group": "IFD0",
+      "id": 306,
+      "name": "DateTime",
+      "value": "2026:05:14 10:25:02"
+    },
+    {
+      "group": "Exif",
+      "id": 33434,
+      "name": "ExposureTime",
+      "value": "1/250"
+    },
+    {
+      "group": "Exif",
+      "id": 33437,
+      "name": "FNumber",
+      "value": "5.6"
+    },
+    {
+      "group": "Exif",
+      "id": 34855,
+      "name": "PhotographicSensitivity",
+      "value": "400"
+    },
+    {
+      "group": "Exif",
+      "id": 36864,
+      "name": "ExifVersion",
+      "value": "2.32"
+    },
+    {
+      "group": "Exif",
+      "id": 36867,
+      "name": "DateTimeOriginal",
+      "value": "2026:05:14 10:25:02"
+    },
+    {
+      "group": "Exif",
+      "id": 36868,
+      "name": "DateTimeDigitized",
+      "value": "2026:05:14 10:25:02"
+    },
+    {
+      "group": "Exif",
+      "id": 36880,
+      "name": "OffsetTime",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 36881,
+      "name": "OffsetTimeOriginal",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 36882,
+      "name": "OffsetTimeDigitized",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 37500,
+      "name": "MakerNote",
+      "value": "<269 bytes>"
+    },
+    {
+      "group": "Exif",
+      "id": 40961,
+      "name": "ColorSpace",
+      "value": "1 (sRGB)"
+    },
+    {
+      "group": "Exif",
+      "id": 40962,
+      "name": "PixelXDimension",
+      "value": "1200"
+    },
+    {
+      "group": "Exif",
+      "id": 40963,
+      "name": "PixelYDimension",
+      "value": "900"
+    },
+    {
+      "group": "IFD1",
+      "id": 259,
+      "name": "Compression",
+      "value": "6 (JPEG)"
+    },
+    {
+      "group": "IFD1",
+      "id": 282,
+      "name": "XResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD1",
+      "id": 283,
+      "name": "YResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD1",
+      "id": 296,
+      "name": "ResolutionUnit",
+      "value": "2 (inch)"
+    },
+    {
+      "group": "IFD1",
+      "id": 513,
+      "name": "JPEGInterchangeFormat",
+      "value": "772"
+    },
+    {
+      "group": "IFD1",
+      "id": 514,
+      "name": "JPEGInterchangeFormatLength",
+      "value": "4036"
+    }
+  ],
+  "xmp": null,
+  "xmp_history": []
+}

@@ -1,0 +1,16 @@
+{
+  "anchors": [
+    "file:R:\\anchors\\rakvor-lab-root.crt"
+  ],
+  "at": "2026-06-01T00:00:00Z",
+  "certificates": [],
+  "errors": [],
+  "item": 3,
+  "key_match": null,
+  "kind": "crl",
+  "openssl": "OpenSSL 3.6.3 9 Jun 2026",
+  "purpose": "any",
+  "schema": "rakvor.cert-chain/1",
+  "timestamp": null,
+  "verdicts": []
+}

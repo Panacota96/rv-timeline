@@ -1,0 +1,128 @@
+{
+  "audit": {
+    "entries": 29,
+    "head": "23c3a977f586aa7c2e3d15829d957824b1f295dc09e85e3a6d2215583bfd42f2",
+    "log_dir": "R:\\case\\runs\\rv-rsmf\\20261113T065652Z-fa70ee\\logs"
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "counts": {
+      "added": 0,
+      "mismatched": 0,
+      "registered": 0,
+      "unregistered": 0,
+      "verified": 2
+    },
+    "role": "analysis"
+  },
+  "conversion": {
+    "attachments_missing": 2,
+    "attachments_packed": 1,
+    "conversations": 1,
+    "events": 10,
+    "exports": 1,
+    "exports_by_source": {
+      "whatsapp": 1
+    },
+    "exports_failed": 0,
+    "rsmf_files": 3,
+    "rsmf_files_invalid": 0
+  },
+  "duplicate_groups": [],
+  "findings_by_code": {
+    "ATTACHMENT_REFERENCED_NOT_FOUND": 1,
+    "DATE_ORDER_INFERRED": 1,
+    "DELETED_MESSAGES_NOT_IN_EXPORT": 1,
+    "MEDIA_OMITTED_IN_EXPORT": 1,
+    "PARTICIPANT_IDENTIFIED_BY_NUMBER_ONLY": 1,
+    "PART_OF_EXPORT": 1,
+    "TIMEZONE_APPLIED": 1
+  },
+  "findings_by_severity": {
+    "high": 0,
+    "info": 5,
+    "low": 1,
+    "medium": 1
+  },
+  "items": [
+    {
+      "evidence_id": "E0009",
+      "findings": [
+        "PART_OF_EXPORT"
+      ],
+      "index": 1,
+      "path": "R:\\evidence\\chat\\whatsapp-android-en\\IMG-20260302-WA0001.jpg",
+      "report_folder": "items/00001-IMG-20260302-WA0001.jpg",
+      "size": 189,
+      "status": "ok"
+    },
+    {
+      "evidence_id": "E0010",
+      "findings": [
+        "DATE_ORDER_INFERRED",
+        "MEDIA_OMITTED_IN_EXPORT",
+        "ATTACHMENT_REFERENCED_NOT_FOUND",
+        "PARTICIPANT_IDENTIFIED_BY_NUMBER_ONLY",
+        "TIMEZONE_APPLIED",
+        "DELETED_MESSAGES_NOT_IN_EXPORT"
+      ],
+      "index": 2,
+      "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
+      "report_folder": "items/00002-WhatsApp_Chat_with_Ana_Ruiz.txt",
+      "size": 773,
+      "status": "attention"
+    }
+  ],
+  "items_by_status": {
+    "attention": 1,
+    "ok": 1
+  },
+  "items_by_type": {
+    "JPEG image": 1,
+    "unknown": 1
+  },
+  "limitations": [
+    "CONVERSION_REPRESENTS_THE_EXPORT_NOT_THE_DEVICE",
+    "EXPORT_CONTENT_NOT_AUTHENTICATED",
+    "RELATIVITY_RENDERING_NOT_VERIFIED",
+    "SHORTCODE_TABLE_VERSION",
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 131,
+    "finished_utc": "2026-11-13T06:56:52.163Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T065652Z-fa70ee",
+    "started_utc": "2026-11-13T06:56:52.031Z"
+  },
+  "schema": "rakvor.statistics/1",
+  "timestamp": {
+    "status": "off"
+  },
+  "tool": {
+    "name": "rv-rsmf",
+    "version": "0.3.1"
+  },
+  "totals": {
+    "bytes": 962,
+    "errors": 0,
+    "items": 2
+  }
+}

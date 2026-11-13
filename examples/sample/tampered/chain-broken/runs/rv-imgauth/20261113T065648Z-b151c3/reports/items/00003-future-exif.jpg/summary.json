@@ -1,0 +1,53 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "QT_NON_STANDARD",
+      "params": {
+        "distance": "578",
+        "nearest": "90"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "Cameras and many apps use their own tables; a quality figure for them is only an approximation and is not stated as fact.",
+          "shows": "The quantization tables are not IJG standard tables; the nearest IJG quality is 90 (distance 578).",
+          "title": "Non-standard compression tables"
+        }
+      }
+    },
+    {
+      "code": "QT_UNKNOWN",
+      "params": {
+        "hash": "cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "The database covers few devices and apps; an unknown table says nothing about authenticity. Add known originals with `fingerprints learn`.",
+          "shows": "No entry of the fingerprint databases matches these tables (SHA-256 cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545).",
+          "title": "Compression tables not in the database"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+  },
+  "item": {
+    "evidence_id": "E0013",
+    "file_name": "future-exif.jpg",
+    "index": 3
+  },
+  "run_id": "20261113T065648Z-b151c3",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

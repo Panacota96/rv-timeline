@@ -1,0 +1,12 @@
+2026-11-13T06:56:43.217Z  #00001  run_started          algorithms=sha256+md5 case_dir=R:\case case_id=RV-SAMPLE-001 evidence_ids=E0011 frontend=cli input_list=null inputs=R:\evidence\images\camera-original.jpg jurisdiction=co langs=en out_dir=rakvor-out recursive=false sign_cert=null tool=rv-hashinv tsa_url=null version=0.4.1
+2026-11-13T06:56:43.217Z  #00002  case_linked          case_created=false case_dir=R:\case case_id=RV-SAMPLE-001 case_log_head_at_start=cf8f8ac3d07c117d8a16d7aeec8549c334b3562cdc411639d0311019f921a958 case_log_seq_at_start=5 jurisdiction=co registry_items=21 registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152 requested_jurisdiction=co role=intake run_dir=runs/rv-hashinv/20261113T065643Z-8de163
+2026-11-13T06:56:43.220Z  #00003  environment_recorded environment.json  md5=32b2945e245aeb503a2900b999c0f31a sha256=2641ccd025bad0b3643220aef6580e04668350671013ce543d5fbacb10a59421
+2026-11-13T06:56:43.220Z  #00004  inputs_resolved      bytes=121033 items=1
+2026-11-13T06:56:43.221Z  #00005  item_started         R:\evidence\images\camera-original.jpg  index=1 modified_utc=2026-11-13T06:56:42Z size=121033
+2026-11-13T06:56:43.222Z  #00006  item_hashed          R:\evidence\images\camera-original.jpg  bytes_read=121033 index=1 mtime_unchanged=true
+2026-11-13T06:56:43.223Z  #00007  item_analyzed        R:\evidence\images\camera-original.jpg  detected_type=JPEG image extension=jpg findings= index=1 status=ok
+2026-11-13T06:56:43.230Z  #00008  evidence_registered  R:\evidence\images\camera-original.jpg  case_log_seq=6 evidence_id=E0011 index=1 new=false registry_sha256=1d0912c10e67a777da0ff84b012d04e047a8bd4c289cefd48aef6a7147be0152
+2026-11-13T06:56:43.231Z  #00009  hash_register_written hashes.csv  md5=b545a265889cfd82b69b2794086ba825 sha256=aff3bdac51ce59ce77fb15c53e928fb49471962a0f6c138bae97fb7f97b08fc2
+2026-11-13T06:56:43.242Z  #00010  item_reports_written R:\evidence\images\camera-original.jpg  folder=items/00001-camera-original.jpg
+2026-11-13T06:56:43.247Z  #00011  statistics_report_written 
+2026-11-13T06:56:43.247Z  #00012  run_finished         bytes=121033 cancelled=false elapsed_ms=31 errors=0 high=0 info=0 items=1 low=0 medium=0

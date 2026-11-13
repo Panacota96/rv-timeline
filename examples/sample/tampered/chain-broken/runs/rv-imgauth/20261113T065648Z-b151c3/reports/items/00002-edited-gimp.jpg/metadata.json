@@ -1,0 +1,258 @@
+{
+  "icc_sha256": null,
+  "makernote_present": true,
+  "problems": [],
+  "tags": [
+    {
+      "group": "IFD0",
+      "id": 271,
+      "name": "Make",
+      "value": "Canon"
+    },
+    {
+      "group": "IFD0",
+      "id": 272,
+      "name": "Model",
+      "value": "Canon EOS R6"
+    },
+    {
+      "group": "IFD0",
+      "id": 274,
+      "name": "Orientation",
+      "value": "1 (row 0 at top and column 0 at left)"
+    },
+    {
+      "group": "IFD0",
+      "id": 282,
+      "name": "XResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD0",
+      "id": 283,
+      "name": "YResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD0",
+      "id": 296,
+      "name": "ResolutionUnit",
+      "value": "2 (inch)"
+    },
+    {
+      "group": "IFD0",
+      "id": 305,
+      "name": "Software",
+      "value": "GIMP 2.10.36"
+    },
+    {
+      "group": "IFD0",
+      "id": 306,
+      "name": "DateTime",
+      "value": "2026:05:16 18:02:10"
+    },
+    {
+      "group": "Exif",
+      "id": 33434,
+      "name": "ExposureTime",
+      "value": "1/250"
+    },
+    {
+      "group": "Exif",
+      "id": 33437,
+      "name": "FNumber",
+      "value": "5.6"
+    },
+    {
+      "group": "Exif",
+      "id": 34855,
+      "name": "PhotographicSensitivity",
+      "value": "400"
+    },
+    {
+      "group": "Exif",
+      "id": 36864,
+      "name": "ExifVersion",
+      "value": "2.32"
+    },
+    {
+      "group": "Exif",
+      "id": 36867,
+      "name": "DateTimeOriginal",
+      "value": "2026:05:14 10:21:33"
+    },
+    {
+      "group": "Exif",
+      "id": 36868,
+      "name": "DateTimeDigitized",
+      "value": "2026:05:14 10:21:33"
+    },
+    {
+      "group": "Exif",
+      "id": 36880,
+      "name": "OffsetTime",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 36881,
+      "name": "OffsetTimeOriginal",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 36882,
+      "name": "OffsetTimeDigitized",
+      "value": "+02:00"
+    },
+    {
+      "group": "Exif",
+      "id": 37500,
+      "name": "MakerNote",
+      "value": "<269 bytes>"
+    },
+    {
+      "group": "Exif",
+      "id": 40961,
+      "name": "ColorSpace",
+      "value": "1 (sRGB)"
+    },
+    {
+      "group": "Exif",
+      "id": 40962,
+      "name": "PixelXDimension",
+      "value": "1200"
+    },
+    {
+      "group": "Exif",
+      "id": 40963,
+      "name": "PixelYDimension",
+      "value": "900"
+    },
+    {
+      "group": "IFD1",
+      "id": 259,
+      "name": "Compression",
+      "value": "6 (JPEG)"
+    },
+    {
+      "group": "IFD1",
+      "id": 282,
+      "name": "XResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD1",
+      "id": 283,
+      "name": "YResolution",
+      "value": "72"
+    },
+    {
+      "group": "IFD1",
+      "id": 296,
+      "name": "ResolutionUnit",
+      "value": "2 (inch)"
+    },
+    {
+      "group": "IFD1",
+      "id": 513,
+      "name": "JPEGInterchangeFormat",
+      "value": "798"
+    },
+    {
+      "group": "IFD1",
+      "id": 514,
+      "name": "JPEGInterchangeFormatLength",
+      "value": "4068"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmpMM:DocumentID",
+      "value": "gimp:docid:gimp:0b6c1a59-synthetic"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmpMM:InstanceID",
+      "value": "xmp.iid:5e1f-synthetic-2"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmpMM:OriginalDocumentID",
+      "value": "xmp.did:5e1f-synthetic-0"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "dc:Format",
+      "value": "image/jpeg"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "GIMP:API",
+      "value": "2.0"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "GIMP:Platform",
+      "value": "Linux"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "GIMP:Version",
+      "value": "2.10.36"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:CreatorTool",
+      "value": "GIMP 2.10"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:ModifyDate",
+      "value": "2026-05-16T18:02:10+02:00"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmp:MetadataDate",
+      "value": "2026-05-16T18:02:10+02:00"
+    },
+    {
+      "group": "XMP",
+      "id": 0,
+      "name": "xmpMM:History",
+      "value": "2 event(s)"
+    },
+    {
+      "group": "COM",
+      "id": 0,
+      "name": "Comment",
+      "value": "Created with GIMP"
+    }
+  ],
+  "xmp": "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 4.4.0-Exiv2\">\n <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n  <rdf:Description rdf:about=\"\"\n    xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\"\n    xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\"\n    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n    xmlns:GIMP=\"http://www.gimp.org/xmp/\"\n    xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\"\n   xmpMM:DocumentID=\"gimp:docid:gimp:0b6c1a59-synthetic\"\n   xmpMM:InstanceID=\"xmp.iid:5e1f-synthetic-2\"\n   xmpMM:OriginalDocumentID=\"xmp.did:5e1f-synthetic-0\"\n   dc:Format=\"image/jpeg\"\n   GIMP:API=\"2.0\"\n   GIMP:Platform=\"Linux\"\n   GIMP:Version=\"2.10.36\"\n   xmp:CreatorTool=\"GIMP 2.10\"\n   xmp:ModifyDate=\"2026-05-16T18:02:10+02:00\"\n   xmp:MetadataDate=\"2026-05-16T18:02:10+02:00\">\n   <xmpMM:History>\n    <rdf:Seq>\n     <rdf:li\n      stEvt:action=\"saved\"\n      stEvt:changed=\"/\"\n      stEvt:instanceID=\"xmp.iid:5e1f-synthetic-1\"\n      stEvt:softwareAgent=\"Gimp 2.10 (Linux)\"\n      stEvt:when=\"2026-05-16T17:40:02+02:00\"/>\n     <rdf:li\n      stEvt:action=\"saved\"\n      stEvt:changed=\"/\"\n      stEvt:instanceID=\"xmp.iid:5e1f-synthetic-2\"\n      stEvt:softwareAgent=\"Gimp 2.10 (Linux)\"\n      stEvt:when=\"2026-05-16T18:02:10+02:00\"/>\n    </rdf:Seq>\n   </xmpMM:History>\n  </rdf:Description>\n </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?>",
+  "xmp_history": [
+    {
+      "action": "saved",
+      "changed": "/",
+      "instance_id": "xmp.iid:5e1f-synthetic-1",
+      "software_agent": "Gimp 2.10 (Linux)",
+      "when": "2026-05-16T17:40:02+02:00"
+    },
+    {
+      "action": "saved",
+      "changed": "/",
+      "instance_id": "xmp.iid:5e1f-synthetic-2",
+      "software_agent": "Gimp 2.10 (Linux)",
+      "when": "2026-05-16T18:02:10+02:00"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "evidence_id": "E0001",
+  "examiner": "Sample Examiner",
+  "hashes": {
+    "md5": "e807df196b2529da959ac0285cd20f45",
+    "sha256": "1b504e1928137748678b47aab45f9ab46442c5e5fb4e9dac3c0133497a5db022"
+  },
+  "intake_utc": "2026-11-13T06:56:39.690Z",
+  "item": {
+    "file_name": "data.tsr",
+    "index": 1,
+    "path": "R:\\evidence\\certs\\data.tsr",
+    "size": 2557
+  },
+  "jurisdiction": "co",
+  "operations": [
+    {
+      "audit_first_seq": 5,
+      "audit_last_seq": 7,
+      "end_utc": "2026-11-13T06:56:39.702Z",
+      "start_utc": "2026-11-13T06:56:39.631Z",
+      "tool": "rv-hashinv",
+      "version": "0.4.1"
+    }
+  ],
+  "run_id": "20261113T065639Z-136162",
+  "schema": "rakvor.item-custody/1",
+  "transfers": []
+}
