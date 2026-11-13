@@ -1,5 +1,5 @@
 //! End-to-end tests of the rv-timeline binary: the contract every Rakvor CLI must meet, on the sample case
-//! (examples/sample/case) and its tampered copies.
+//! (examples/sample/case) and its tampered copies (written at test time by tests/make_sample_case.py tamper).
 
 use assert_cmd::Command;
 use predicates::prelude::*;
@@ -84,9 +84,31 @@ fn copy_dir(from: &Path, to: &Path) {
     }
 }
 
-/// A fresh copy of examples/sample/case (or of a tampered copy: `tampered/<name>`), so tests never write into
-/// the repository.
+/// Writes the three tampered copies of examples/sample/case into `dst/<name>` with `tests/make_sample_case.py tamper`
+/// (the same edits that produced expected_timeline.json; the copies are not committed). Needs Python 3, standard
+/// library only (RV_TEST_PYTHON, default python3).
+fn write_tampered(dst: &Path) {
+    let py = std::env::var("RV_TEST_PYTHON").unwrap_or_else(|_| "python3".into());
+    let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let o = std::process::Command::new(&py)
+        .arg("-I")
+        .arg(base.join("tests/make_sample_case.py"))
+        .arg("tamper")
+        .arg(base.join("examples/sample/case"))
+        .arg(dst)
+        .output()
+        .unwrap_or_else(|e| panic!("{py} (RV_TEST_PYTHON) for make_sample_case.py tamper: {e}"));
+    assert!(o.status.success(), "make_sample_case.py tamper: {o:?}");
+}
+
+/// A fresh copy of examples/sample/case (or a tampered copy: `tampered/<name>`, written from it by
+/// [`write_tampered`]), so tests never write into the repository.
 fn case_copy(rel: &str, dest: &Path) -> PathBuf {
+    if let Some(name) = rel.strip_prefix("tampered/") {
+        let root = dest.join("TAMPERED");
+        write_tampered(&root);
+        return root.join(name);
+    }
     let case = dest.join("CASE");
     copy_dir(&sample_dir().join(rel), &case);
     case

@@ -68,6 +68,8 @@ jobs:
             exit 1
           fi
       - name: Ground truth (sample case against examples/sample/expected_timeline.json)
+        env:
+          RV_TEST_PYTHON: python  # writes the tampered copies (tests/make_sample_case.py tamper)
         run: cargo test --locked -p rv-timeline-core --test sample_case
       - name: Determinism (two builds of the same case give the same timeline.jsonl and reports JSON)
         run: cargo test --locked -p rv-timeline-core --test determinism

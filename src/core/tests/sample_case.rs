@@ -13,6 +13,23 @@ fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
+/// Writes the three tampered copies of examples/sample/case into `dst/<name>` with `tests/make_sample_case.py tamper`
+/// (the same edits that produced expected_timeline.json; the copies are not committed). Needs Python 3, standard
+/// library only (RV_TEST_PYTHON, default python3).
+fn write_tampered(dst: &Path) {
+    let py = std::env::var("RV_TEST_PYTHON").unwrap_or_else(|_| "python3".into());
+    let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let o = std::process::Command::new(&py)
+        .arg("-I")
+        .arg(base.join("tests/make_sample_case.py"))
+        .arg("tamper")
+        .arg(base.join("examples/sample/case"))
+        .arg(dst)
+        .output()
+        .unwrap_or_else(|e| panic!("{py} (RV_TEST_PYTHON) for make_sample_case.py tamper: {e}"));
+    assert!(o.status.success(), "make_sample_case.py tamper: {o:?}");
+}
+
 fn expected() -> Value {
     let p = root().join("examples/sample/expected_timeline.json");
     serde_json::from_slice(&std::fs::read(p).expect("expected_timeline.json")).expect("valid JSON")
@@ -142,8 +159,10 @@ fn clean_case_matches_ground_truth() {
 #[test]
 fn tampered_copies_exclude_the_right_run() {
     let exp = expected();
+    let tampered = tempfile::tempdir().unwrap();
+    write_tampered(tampered.path());
     for (name, want) in exp["tampered"].as_object().unwrap() {
-        let dir = root().join("examples/sample/tampered").join(name);
+        let dir = tampered.path().join(name);
         let t = build(&dir, &exp);
         let run_dir = want["excluded_run"]["run_dir"].as_str().unwrap();
         let reason = want["excluded_run"]["reason"].as_str().unwrap();
@@ -188,8 +207,10 @@ fn tampered_copies_exclude_the_right_run() {
 fn every_signal_fills_its_placeholders() {
     let exp = expected();
     let mut dirs = vec![root().join("examples/sample/case")];
+    let tampered = tempfile::tempdir().unwrap();
+    write_tampered(tampered.path());
     for name in exp["tampered"].as_object().unwrap().keys() {
-        dirs.push(root().join("examples/sample/tampered").join(name));
+        dirs.push(tampered.path().join(name));
     }
     let mut problems = Vec::new();
     for dir in dirs {
