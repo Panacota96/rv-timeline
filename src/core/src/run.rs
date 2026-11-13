@@ -1142,7 +1142,6 @@ fn failed(log: &mut AuditLog, stage: &str, message: String) -> String {
     message
 }
 
-#[allow(clippy::too_many_arguments)]
 /// One row of the timeline run's `hashes.csv`.
 struct RegisterRow {
     path: PathBuf,
@@ -1197,6 +1196,7 @@ fn read_files_register(case_dir: &Path, runs: &[RunRef], algos: &[HashAlgo]) -> 
     out
 }
 
+#[allow(clippy::too_many_arguments)]
 fn timeline_pipeline(
     cfg: &RunConfig,
     opts: &TimelineOptions,
