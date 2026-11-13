@@ -17,7 +17,7 @@ sequenceDiagram
     E->>H: scan -i EVIDENCE --case-dir CASE --case ID
     H->>C: case.json, registry (E0001…), runs/rv-hashinv/RUN
     E->>A: rv-pdfauth / rv-imgauth / rv-mailauth / rv-certcheck analyze, rv-rsmf convert (--case-dir CASE)
-    A->>C: runs/<tool>/RUN (each item re-verified against the registry)
+    A->>C: runs/TOOL/RUN (each item re-verified against the registry)
     E->>T: build --case-dir CASE --display-zone …
     T->>C: verify every run, read it, runs/rv-timeline/RUN (timeline.jsonl, reports)
     E->>T: rv-timeline-gui: timeline viewer
