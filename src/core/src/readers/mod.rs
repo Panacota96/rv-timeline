@@ -655,11 +655,12 @@ impl RunData {
             .collect()
     }
 
-    /// The item an item folder (`reports/items/00003-x.jpg/…`) belongs to, by its 5-digit index prefix.
+    /// The item an item folder (`reports/items/00003-x.jpg/…`) belongs to, by its index prefix. The tools name
+    /// folders `{:05}-<name>`: at least five digits, more from item 100000 on, so the whole digit run before the
+    /// first `-` is the index (taking exactly five would map `100000-…` to item 10000).
     pub fn item_of_folder(&self, rel: &str) -> Option<&RunItem> {
         let folder = rel.strip_prefix("reports/items/")?.split('/').next()?;
-        let idx: u64 = folder.get(..5)?.parse().ok()?;
-        self.items.get(&idx)
+        self.items.get(&folder_index(folder)?)
     }
 
     pub fn source(&self, file: &str, file_sha256: &str, pointer: String) -> SourceRef {
@@ -893,8 +894,28 @@ pub fn read_run(
     }
 }
 
+/// Index of an item report folder name `NNNNN-name`: the digits before the first `-` (at least five).
+pub fn folder_index(folder: &str) -> Option<u64> {
+    let (digits, _) = folder.split_once('-')?;
+    if digits.len() < 5 || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    digits.parse().ok()
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn folder_index_reads_every_digit() {
+        assert_eq!(folder_index("00003-photo.jpg"), Some(3));
+        assert_eq!(folder_index("99999-x"), Some(99_999));
+        assert_eq!(folder_index("100000-x"), Some(100_000));
+        assert_eq!(folder_index("1234567-a-b.pdf"), Some(1_234_567));
+        assert_eq!(folder_index("0003-x"), None);
+        assert_eq!(folder_index("00003x-y"), None);
+        assert_eq!(folder_index("photo.jpg"), None);
+    }
+
     use super::*;
 
     #[test]
