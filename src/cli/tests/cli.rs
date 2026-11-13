@@ -509,6 +509,68 @@ fn a_broken_case_is_never_extended() {
     );
 }
 
+/// verify-log and verify-case re-hash every output the build's audit log records (outputs.rs): an edited
+/// timeline.jsonl or report and a deleted one are named, exit 3; restored, verify-log passes again.
+#[test]
+fn edited_or_deleted_outputs_fail_verify_log_and_verify_case() {
+    let tmp = tempfile::tempdir().unwrap();
+    let case = case_copy("case", tmp.path());
+    let out = build(&case)
+        .args(["--hash", "sha256,md5", "--lang", "en"])
+        .assert()
+        .code(3);
+    let run = run_folder(&out.get_output().stdout);
+    let logs = run.join("logs");
+    let rid = run.file_name().unwrap().to_string_lossy().into_owned();
+    let ok = bin().arg("verify-log").arg(&logs).assert().code(0);
+    let text = String::from_utf8_lossy(&ok.get_output().stdout).into_owned();
+    let line = text
+        .lines()
+        .find_map(|l| l.trim().strip_prefix("outputs: "))
+        .expect("outputs line");
+    let (verified, rest) = line.split_once(" verified of ").unwrap();
+    assert!(
+        rest == format!("{} recorded (md5, sha256)", verified),
+        "{}",
+        line
+    );
+    assert!(verified.parse::<u32>().unwrap() > 21, "{}", line);
+
+    let jsonl = run.join("reports/timeline.jsonl");
+    let saved = std::fs::read(&jsonl).unwrap();
+    std::fs::write(
+        &jsonl,
+        b"{\"edited\": true}
+",
+    )
+    .unwrap();
+    let stats = run.join("reports/statistics.json");
+    std::fs::rename(&stats, tmp.path().join("moved.json")).unwrap();
+    bin().arg("verify-log").arg(&logs).assert().code(3).stdout(
+        predicate::str::contains("output reports/timeline.jsonl: md5 differs from audit entry #")
+            .and(predicate::str::contains(
+                "output reports/statistics.json: missing",
+            ))
+            .and(predicate::str::contains("1 missing, 1 changed")),
+    );
+    bin()
+        .arg("verify-case")
+        .arg(&case)
+        .assert()
+        .code(3)
+        .stdout(predicate::str::contains(format!(
+            "run {}: output reports/timeline.jsonl: md5 differs from audit entry #",
+            rid
+        )))
+        .stdout(predicate::str::contains(format!(
+            "run {}: output reports/statistics.json: missing",
+            rid
+        )));
+    std::fs::write(&jsonl, saved).unwrap();
+    std::fs::rename(tmp.path().join("moved.json"), &stats).unwrap();
+    bin().arg("verify-log").arg(&logs).assert().code(0);
+}
+
 /// examples/sample/run.sh builds the timeline on a copy of the sample case and checks the exit code and that
 /// timeline.jsonl is written and listed in the audit log.
 #[test]
