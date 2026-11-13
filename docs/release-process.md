@@ -58,7 +58,7 @@ flowchart LR
 4. After ~15–20 minutes the release has: `rv-timeline-X.Y.Z-windows-x64.zip`, `rv-timeline-X.Y.Z-windows-x64-setup.exe`,
    `SHA256SUMS`, `sbom.cdx.json`; the provenance attestation is stored by GitHub.
 5. Smoke-test on Windows 10 and 11 (checklist in [development.md](development.md)): verify the hashes, install,
-   `rv-timeline self-test`, the sample case (`examplessampleun.ps1`), open the GUI on it, uninstall.
+   `rv-timeline self-test`, the sample case (`examples/sample/run.ps1`), open the GUI on it, uninstall.
 
 ### Test package without a release
 
