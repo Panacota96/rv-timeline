@@ -245,10 +245,20 @@ def t_iso(s: str):
     return _pack(naive, off, len(frac), ns)
 
 
-def t_exif(s: str, offset: str | None):
-    """EXIF 2026:05:14 10:21:33 (+ OffsetTime* when present)."""
+def t_exif(s: str, offset: str | None, subsec: str | None = None):
+    """EXIF 2026:05:14 10:21:33 (+ OffsetTime* and SubSecTime* when present)."""
     naive = dt.datetime.strptime(s, "%Y:%m:%d %H:%M:%S")
-    return _pack(naive, parse_offset(offset) if offset else None, 0)
+    digits = (subsec or "").strip()
+    assert digits.isdigit() or not digits, subsec
+    ns = int((digits + "000000000")[:9]) if digits else 0
+    frac = {0: 0, 1: 3, 2: 3, 3: 3, 4: 6, 5: 6, 6: 6}.get(len(digits), 9)
+    return _pack(naive, parse_offset(offset) if offset else None, frac, ns)
+
+
+def t_asctime(s: str):
+    """Wed Nov 11 11:00:03 2026 (mbox From_ line): no zone."""
+    naive = dt.datetime.strptime(" ".join(s.split()), "%a %b %d %H:%M:%S %Y")
+    return _pack(naive, None, 0)
 
 
 def t_rfc5322(s: str):
@@ -323,11 +333,14 @@ def read_hashinv(case: Path, run: dict, registry: dict) -> list[dict]:
     return out
 
 
-EXIF_KINDS = {  # EXIF tag -> (kind, the OffsetTime* tag that states its zone)
-    "DateTime": ("exif.modified", "OffsetTime"),
-    "DateTimeOriginal": ("exif.original", "OffsetTimeOriginal"),
-    "DateTimeDigitized": ("exif.digitized", "OffsetTimeDigitized"),
-}
+# (EXIF tag, its group, kind, the OffsetTime* tag that states its zone, the SubSecTime* tag)
+EXIF_KINDS = [
+    ("DateTimeOriginal", "Exif", "exif.original", "OffsetTimeOriginal", "SubSecTimeOriginal"),
+    ("DateTimeDigitized", "Exif", "exif.digitized", "OffsetTimeDigitized", "SubSecTimeDigitized"),
+    ("DateTime", "IFD0", "exif.modify", "OffsetTime", "SubSecTime"),
+]
+XMP_KINDS = {"xmp:CreateDate": "xmp.create", "xmp:ModifyDate": "xmp.modify", "xmp:MetadataDate": "xmp.metadata",
+             "photoshop:DateCreated": "xmp.photoshop_created", "exif:DateTimeOriginal": "xmp.exif_original"}
 
 
 def read_imgauth(case: Path, run: dict, registry: dict) -> list[dict]:
@@ -338,32 +351,41 @@ def read_imgauth(case: Path, run: dict, registry: dict) -> list[dict]:
         eid = d["item"].get("evidence_id") or ""
         # metadata.json holds every tag (technical.json's summary leaves OffsetTimeDigitized out).
         mrel = rel.replace("technical.json", "metadata.json")
-        tags = load(rd, mrel)["tags"]
+        meta = load(rd, mrel)
+        tags = meta["tags"]
         byname = {}
         for i, t in enumerate(tags):
             byname.setdefault((t["group"], t["name"]), (i, t["value"]))
-        for i, t in enumerate(tags):
-            if t["group"] in ("IFD0", "Exif") and t["name"] in EXIF_KINDS:
-                kind, offtag = EXIF_KINDS[t["name"]]
+        for name, group, kind, offtag, subtag in EXIF_KINDS:
+            for i, t in enumerate(tags):
+                if (t["group"], t["name"]) != (group, name):
+                    continue
                 off = byname.get(("Exif", offtag))
-                out.append(ev(kind, t_exif(t["value"], off[1] if off else None), t["value"], eid, mrel,
-                              f"/tags/{i}/value", offset_tag=(offtag if off else None),
+                sub = byname.get(("Exif", subtag))
+                out.append(ev(kind, t_exif(t["value"], off[1] if off else None, sub[1] if sub else None),
+                              t["value"] + (f" {off[1]}" if off else ""), eid, mrel, f"/tags/{i}/value",
                               offset_pointer=(f"/tags/{off[0]}/value" if off else None)))
-            elif t["group"] == "PNG-tIME":
-                # PNG tIME is UTC by definition of the format (PNG spec 11.3.6.1).
+        if ("GPS", "GPSDateStamp") in byname:
+            sys.exit(f"{mrel}: GPS time not in the sample: extend make_sample_case.py (rv-timeline reads gps.time)")
+        for i, t in enumerate(tags):
+            if t["group"] == "PNG-tIME" and t["name"] == "tIME":
+                # PNG tIME is UTC by the PNG specification (11.3.6.1); rv-imgauth labels it UTC.
                 naive = dt.datetime.strptime(t["value"], "%Y-%m-%d %H:%M:%S")
                 out.append(ev("png.time", _pack(naive, 0, 0), t["value"], eid, mrel, f"/tags/{i}/value"))
-            elif t["group"] == "XMP" and t["name"] in ("xmp:ModifyDate", "xmp:MetadataDate", "xmp:CreateDate"):
-                kind = {"xmp:ModifyDate": "xmp.modify", "xmp:MetadataDate": "xmp.metadata",
-                        "xmp:CreateDate": "xmp.create"}[t["name"]]
-                out.append(ev(kind, t_iso(t["value"]), t["value"], eid, mrel, f"/tags/{i}/value"))
-        hist = d["image"]["metadata_summary"].get("xmp_history") or []
-        for i, h in enumerate(hist):
+            elif t["group"].startswith("PNG") and t["name"] == "Creation Time":
+                sys.exit(f"{mrel}: PNG Creation Time not in the sample: extend make_sample_case.py")
+            elif t["group"] == "XMP" and t["name"] in XMP_KINDS:
+                out.append(ev(XMP_KINDS[t["name"]], t_iso(t["value"].strip()), t["value"], eid, mrel,
+                              f"/tags/{i}/value"))
+        for i, h in enumerate(meta.get("xmp_history") or []):
             if h.get("when"):
-                out.append(ev("xmp.history", t_iso(h["when"]), h["when"], eid, rel,
-                              f"/image/metadata_summary/xmp_history/{i}/when", action=h.get("action"),
-                              software=h.get("software_agent")))
+                out.append(ev("xmp.history", t_iso(h["when"].strip()), h["when"], eid, mrel,
+                              f"/xmp_history/{i}/when", action=h.get("action"), software=h.get("software_agent")))
     return out
+
+
+CHAT_KINDS = {"": "chat.message", "message": "chat.message", "disclaimer": "chat.disclaimer", "join": "chat.join",
+              "leave": "chat.leave", "history": "chat.history"}
 
 
 def read_rsmf(case: Path, run: dict, registry: dict) -> list[dict]:
@@ -379,17 +401,18 @@ def read_rsmf(case: Path, run: dict, registry: dict) -> list[dict]:
     for i, t in enumerate(trace):
         eid, conv = by_export[t["export"]]
         tz = conv["facts"].get("timezone")
+        assert tz, "the sample's chat is converted with --timezone (else its times are zone-unknown)"
         s, ns, _, _, _ = t_iso(t["utc"])
         # The export has no offset; rv-rsmf applied the examiner's --timezone. The offset is the one that zone gives
         # at that instant (utc - local wall clock), recorded as explicit with its basis in the details.
         local = dt.datetime.strptime(t["source_time"], "%d/%m/%Y, %H:%M")
         off = int((local.replace(tzinfo=dt.timezone.utc) - (EPOCH + dt.timedelta(seconds=s))).total_seconds() // 60)
-        day = Path(t["rsmf_file"]).stem
-        conv_name = Path(t["rsmf_file"]).parent.name
-        out.append(ev("chat.message" if t["kind"] == "message" else "chat.event",
-                      (s, ns, "explicit", off, "minute"), t["source_time"], eid, "rsmf/trace.json", f"/{i}",
-                      sub=f"{conv_name}/{day}", chat_kind=t["kind"], line=t["line"], timezone_basis=f"--timezone {tz}",
-                      event_id=t["event_id"]))
+        # Sub-item: <conversation id>/<day>, the day being the stem of the RSMF file the row went into.
+        day = Path(t["rsmf_file"].replace("\\", "/")).stem
+        out.append(ev(CHAT_KINDS.get(t["kind"] or "", "chat.unknown"), (s, ns, "explicit", off, "minute"),
+                      t["source_time"], eid, "rsmf/trace.json", f"/{i}/source_time",
+                      sub=f"{t['conversation']}/{day}", chat_kind=t["kind"], line=t["line"],
+                      timezone_basis=f"--timezone {tz}", event_id=t["event_id"]))
     return out
 
 
@@ -402,11 +425,20 @@ def read_mailauth(case: Path, run: dict, registry: dict) -> list[dict]:
         derived = d.get("derived_from")
         if not derived:  # a message inside an mbox carries its container's file times: read them once
             out += common_item_events(run, rel, d, registry)
+        sub = f"#{derived['n']}" if derived else ""
+        irel = rel.replace("technical.json", "mbox_index.json")
+        if (rd / irel).exists():
+            # The mbox "From " separator line: the time the message was written to the mailbox (asctime, no zone).
+            for i, m in enumerate(load(rd, irel).get("messages") or []):
+                if m.get("from_line"):
+                    out.append(ev("mail.mbox_from", t_asctime(" ".join(m["from_line"].split()[-5:])),
+                                  m["from_line"], eid, irel, f"/messages/{i}/from_line", sub=f"#{m['n']}",
+                                  offset=m.get("offset")))
         hrel = rel.replace("technical.json", "headers.json")
         if not (rd / hrel).exists():
             continue  # the mbox container itself: its messages are items of their own
-        h = load(rd, hrel)["headers"]
-        sub = f"#{derived['n']}" if derived else ""
+        doc = load(rd, hrel)
+        h = doc["headers"]
         if h.get("date_raw"):
             out.append(ev("mail.date", t_rfc5322(h["date_raw"]), h["date_raw"], eid, hrel, "/headers/date_raw",
                           sub=sub, message_id=h.get("message_id")))
@@ -415,39 +447,70 @@ def read_mailauth(case: Path, run: dict, registry: dict) -> list[dict]:
                 out.append(ev("mail.hop", t_rfc5322(hop["date_raw"]), hop["date_raw"], eid, hrel,
                               f"/headers/hops/{i}/date_raw", sub=sub, position=hop["position"], by=hop.get("by"),
                               host=hop.get("from")))
+        for i, a in enumerate(doc.get("attachments") or []):
+            for key, kind in (("creation_date_raw", "mail.attachment.created"),
+                              ("modification_date_raw", "mail.attachment.modified")):
+                if a.get(key):
+                    out.append(ev(kind, t_rfc5322(a[key]), a[key], eid, hrel, f"/attachments/{i}/{key}", sub=sub,
+                                  file_name=a.get("file_name")))
+        if isinstance(h.get("msg"), dict):
+            for key, kind in (("client_submit_time", "mail.msg.submitted"), ("delivery_time", "mail.msg.delivered")):
+                if h["msg"].get(key):
+                    out.append(ev(kind, t_iso(h["msg"][key]), h["msg"][key], eid, hrel, f"/headers/msg/{key}",
+                                  sub=sub))
     return out
 
 
 def read_pdfauth(case: Path, run: dict, registry: dict) -> list[dict]:
-    """objects.json: the Info dictionary (CreationDate, ModDate) and signature dictionaries (/M) written in each
-    revision, with the PDF date strings as the file states them; sub = r<n> (revision n, from 1)."""
+    """objects.json: the Info dictionary (CreationDate, ModDate) written in each revision and each signature
+    dictionary's /M, with the PDF date strings as the file states them; technical.json: CMS signing times and the
+    XMP saved time per revision. sub = r<n> (revision n, from 1)."""
     rd = case / run["run_dir"]
     out = []
     for rel, d in items_of(rd):
         out += common_item_events(run, rel, d, registry)
         eid = d["item"].get("evidence_id") or ""
         orel = rel.replace("technical.json", "objects.json")
-        if not (rd / orel).exists():
+        has_objects = (rd / orel).exists()
+        pdf = d.get("pdf") or {}
+        for ri, rev in enumerate(pdf.get("revisions") or []):
+            n = rev.get("index") or ri + 1
+            for key, kind, wanted in (("saved_at_info", "pdf.info.saved", not has_objects),
+                                      ("saved_at_xmp", "pdf.xmp.saved", True)):
+                if wanted and rev.get(key):
+                    out.append(ev(kind, t_iso(rev[key]), rev[key], eid, rel, f"/pdf/revisions/{ri}/{key}",
+                                  sub=f"r{n}", revision=n))
+        for si, sig in enumerate(pdf.get("signatures") or []):
+            if sig.get("signing_time"):
+                out.append(ev("pdf.revision.signed", t_iso(sig["signing_time"]), sig["signing_time"], eid, rel,
+                              f"/pdf/signatures/{si}/signing_time",
+                              sub=f"r{sig['revision']}" if sig.get("revision") else "", revision=sig.get("revision")))
+        if not has_objects:
             continue
         for ri, rev in enumerate(load(rd, orel).get("revisions") or []):
             n = ri + 1
             for oi, obj in enumerate(rev.get("objects") or []):
-                dd = obj.get("dict") if isinstance(obj.get("dict"), dict) else {}
+                dd = obj.get("dict") if isinstance(obj.get("dict"), dict) else None
+                if dd is None:
+                    continue
                 base = f"/revisions/{ri}/objects/{oi}/dict"
-                for key, kind in (("CreationDate", "pdf.info.created"), ("ModDate", "pdf.info.modified")):
-                    if isinstance(dd.get(key), str) and dd[key].startswith("D:"):
-                        out.append(ev(kind, t_pdf(dd[key]), dd[key], eid, orel, f"{base}/{key}", sub=f"r{n}",
-                                      revision=n, object=obj.get("id")))
-                if isinstance(dd.get("M"), str) and ("ByteRange" in dd or "Filter" in dd):
-                    out.append(ev("pdf.revision.signed", t_pdf(dd["M"]), dd["M"], eid, orel, f"{base}/M",
-                                  sub=f"r{n}", revision=n, object=obj.get("id")))
+                if dd.get("Type") == "/Sig" or "ByteRange" in dd:
+                    if isinstance(dd.get("M"), str):
+                        out.append(ev("pdf.signature.claimed", t_pdf(dd["M"]), dd["M"], eid, orel, f"{base}/M",
+                                      sub=f"r{n}", revision=n, object=obj.get("id")))
+                elif "Type" not in dd:  # the Info dictionary has no /Type
+                    for key, kind in (("CreationDate", "pdf.info.created"), ("ModDate", "pdf.info.modified")):
+                        if isinstance(dd.get(key), str):
+                            out.append(ev(kind, t_pdf(dd[key]), dd[key], eid, orel, f"{base}/{key}", sub=f"r{n}",
+                                          revision=n, object=obj.get("id")))
     return out
 
 
 def read_certcheck(case: Path, run: dict, registry: dict) -> list[dict]:
-    """chain.json: the item's own certificates (validity), its revocation time, an RFC 3161 token's genTime.
+    """chain.json: the item's own certificates (validity), a revocation time, an RFC 3161 token's genTime.
     rv-certcheck 0.2.x writes these as normalised UTC strings (Z); that string is the original kept here. A CRL
-    item's own thisUpdate/nextUpdate are not in its outputs, so a CRL has file times only."""
+    item's own thisUpdate/nextUpdate are not in its outputs, so a CRL has file times only. Sub-item c<n> (n-th
+    certificate of the file) only when the file holds several certificates."""
     rd = case / run["run_dir"]
     out = []
     for rel, d in items_of(rd):
@@ -457,17 +520,26 @@ def read_certcheck(case: Path, run: dict, registry: dict) -> list[dict]:
         if not (rd / crel).exists():
             continue
         c = load(rd, crel)
-        for i, cert in enumerate(c.get("certificates") or []):
+        certs = c.get("certificates") or []
+
+        def csub(i: int) -> str:
+            return f"c{i + 1}" if len(certs) > 1 else ""
+
+        for i, cert in enumerate(certs):
             for kind, key in (("cert.not_before", "not_before"), ("cert.not_after", "not_after")):
                 if cert.get(key):
                     out.append(ev(kind, t_iso(cert[key]), cert[key], eid, crel, f"/certificates/{i}/{key}",
-                                  subject=cert.get("subject"), serial=cert.get("serial_hex")))
+                                  sub=csub(i), subject=cert.get("subject"), serial=cert.get("serial_hex")))
         for v, verdict in enumerate(c.get("verdicts") or []):
-            nodes = verdict.get("nodes") or []
-            rev = (nodes[0].get("revocation") or {}) if nodes else {}
-            if rev.get("revoked_at"):
+            for ni, node in enumerate(verdict.get("nodes") or []):
+                rev = node.get("revocation") or {}
+                if rev.get("status") != "revoked" or not rev.get("revoked_at"):
+                    continue
+                sha = (node.get("cert") or {}).get("sha256")
+                pos = next((i for i, x in enumerate(certs) if sha and x.get("sha256") == sha), None)
                 out.append(ev("cert.revoked", t_iso(rev["revoked_at"]), rev["revoked_at"], eid, crel,
-                              f"/verdicts/{v}/nodes/0/revocation/revoked_at", subject=nodes[0]["cert"].get("subject")))
+                              f"/verdicts/{v}/nodes/{ni}/revocation/revoked_at",
+                              sub=csub(pos) if pos is not None else "", subject=node["cert"].get("subject")))
         ts = (c.get("timestamp") or {}).get("info") or {}
         if ts.get("gen_time"):
             out.append(ev("tsa.gen_time", t_iso(ts["gen_time"]), ts["gen_time"], eid, crel,
@@ -476,14 +548,31 @@ def read_certcheck(case: Path, run: dict, registry: dict) -> list[dict]:
 
 
 def run_level_events(case: Path, run: dict) -> list[dict]:
+    """run.started / run.finished: ts_utc of the run's own run_started / run_finished audit entries (the chained
+    record; reports/statistics.json is written before the final entry and holds slightly different times);
+    run.timestamped: genTime of each RFC 3161 token over the audit log."""
     rd = case / run["run_dir"]
-    r = load(rd, "reports/statistics.json")["run"]
     out = []
-    for kind, key in (("run.started", "started_utc"), ("run.finished", "finished_utc")):
-        if r.get(key):
-            out.append(ev(kind, t_iso(r[key]), r[key], "", "reports/statistics.json", f"/run/{key}",
-                          tool=run["tool"]))
+    for line, e in enumerate(jsonl_lines(rd / AUDIT), start=1):
+        if e is None:
+            continue
+        a = e["action"]
+        if a in ("run_started", "run_finished"):
+            out.append(ev(a.replace("_", "."), t_iso(e["ts_utc"]), e["ts_utc"], "", AUDIT, f"line:{line}/ts_utc",
+                          actor=e.get("actor")))
+        elif a == "timestamp_obtained" and (e.get("details") or {}).get("gen_time"):
+            g = e["details"]["gen_time"]
+            out.append(ev("run.timestamped", t_iso(g), g, "", AUDIT, f"line:{line}/details/gen_time",
+                          tsa=e["details"].get("tsa")))
     return out
+
+
+AUDIT = "logs/audit.jsonl"
+
+
+def jsonl_lines(path: Path) -> list[dict | None]:
+    """Each line of a JSON Lines file (None for a blank line), so that line numbers stay 1-based file lines."""
+    return [json.loads(x) if x.strip() else None for x in path.read_text(encoding="utf-8").splitlines()]
 
 
 # ------------------------------------------------------------------------------------------------ digests
@@ -520,7 +609,7 @@ READERS = {
 CLOCK_SKEW_S = 300  # TimelineOptions::default().clock_skew_s
 # Kinds that state a validity bound or a schedule, not something that happened: never EVENT_IN_FUTURE.
 NOT_OCCURRENCES = {"cert.not_before", "cert.not_after", "crl.next_update", "crl.this_update"}
-EXIF_EVENT_KINDS = {"exif.original", "exif.digitized", "exif.modified"}
+EXIF_EVENT_KINDS = {"exif.original", "exif.digitized", "exif.modify"}
 SEVERITY = {  # proposed severities (the engine owns them; the codes, events and items are the ground truth)
     "EXIF_AFTER_INTAKE": "high", "FILE_MODIFIED_AFTER_INTAKE": "medium", "PDF_REVISION_BEFORE_PREVIOUS": "medium",
     "MAIL_DATE_AFTER_FIRST_HOP": "medium", "EVENT_IN_FUTURE": "medium", "CLOCK_SKEW_SUSPECTED": "low",
@@ -545,7 +634,8 @@ def build_events(case: Path, runs: list[dict], registry: dict) -> list[dict]:
             k = (item_key(e), e["kind"])
             n = counters.get(k, 0)
             counters[k] = n + 1
-            digest = digests.get(e["file"])
+            # The audit log is checked by its hash chain (and the case log's record of its head), not by a digest.
+            digest = sha256(rd / AUDIT) if e["file"] == AUDIT else digests.get(e["file"])
             if digest is None:
                 sys.exit(f"{run['run_dir']}/{e['file']}: no digest in the audit log")
             if digest != sha256(rd / e["file"]):
@@ -599,8 +689,14 @@ def build_signals(events: list[dict], runs: list[dict], registry: dict, excluded
                     and (e["utc_s"], e["utc_ns"]) > t0]
             if late:
                 add("EXIF_AFTER_INTAKE", late + [it], eid, delta_s=min(e["utc_s"] for e in late) - it["utc_s"])
-            # FILE_MODIFIED_AFTER_INTAKE: a later run saw a modification time after the registration.
-            mod = [e for e in evs if e["kind"] == "fs.modified" and (e["utc_s"], e["utc_ns"]) > t0]
+            # FILE_MODIFIED_AFTER_INTAKE: a modification time later than the registration, either beyond the
+            # tolerated skew or (any amount) differing from the one the intake run itself recorded.
+            seen = {(e["utc_s"], e["utc_ns"]) for e in evs
+                    if e["kind"] == "fs.modified" and e["source"]["run_id"] == it["source"]["run_id"]}
+            mod = [e for e in evs if e["kind"] == "fs.modified" and (e["utc_s"], e["utc_ns"]) > t0
+                   and (e["utc_s"] - it["utc_s"] > CLOCK_SKEW_S
+                        or (seen and e["source"]["run_id"] != it["source"]["run_id"]
+                            and (e["utc_s"], e["utc_ns"]) not in seen))]
             if mod:
                 add("FILE_MODIFIED_AFTER_INTAKE", mod + [it], eid,
                     delta_s=min(e["utc_s"] for e in mod) - it["utc_s"], runs=len({e["source"]["run_id"] for e in mod}))
@@ -628,16 +724,18 @@ def build_signals(events: list[dict], runs: list[dict], registry: dict, excluded
                     delta_s=date[0]["utc_s"] - hops[0]["utc_s"])
             for a, b in zip(hops, hops[1:]):
                 if a["utc_s"] - b["utc_s"] > CLOCK_SKEW_S:
-                    add("CLOCK_SKEW_SUSPECTED", [a, b], eid, sub=sub, skew_s=a["utc_s"] - b["utc_s"],
-                        hosts=f"{a['details'].get('by')} -> {b['details'].get('by')}")
+                    add("CLOCK_SKEW_SUSPECTED", [a, b], eid, sub=sub, basis="received_hops",
+                        skew_s=a["utc_s"] - b["utc_s"], hosts=f"{a['details'].get('by')} -> {b['details'].get('by')}")
         # EVENT_IN_FUTURE: something that happened after the last run of the case finished.
         fut = [e for e in evs if e["kind"] not in NOT_OCCURRENCES and e["utc_s"] > last_finished]
         if fut:
             add("EVENT_IN_FUTURE", fut, eid, reference="last run.finished",
                 delta_s=min(e["utc_s"] for e in fut) - last_finished)
-        unk = [e for e in evs if e["zone"] == "unknown"]
-        if unk:
-            add("ZONE_UNKNOWN_EVENTS", unk, eid, count=len(unk))
+    # ZONE_UNKNOWN_EVENTS: one case-level count (no item, no event list), as the engine's spec says.
+    unk = [e for e in events if e["zone"] == "unknown"]
+    if unk:
+        add("ZONE_UNKNOWN_EVENTS", [], "", count=len(unk),
+            tools=", ".join(sorted({e["source"]["tool"] for e in unk})))
     for x in excluded:
         sig.append({"code": "RUN_NOT_VERIFIED", "severity": SEVERITY["RUN_NOT_VERIFIED"], "events": [],
                     "item": None, "params": {"tool": x["tool"], "run_id": x["run_id"], "reason": x["reason"]}})

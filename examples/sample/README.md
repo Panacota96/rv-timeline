@@ -31,7 +31,7 @@ evidence; the sample private key of rv-certcheck (`leaf-mismatch.key`) is delibe
 | Folder | Files | From | Planted |
 | --- | --- | --- | --- |
 | `pdf/` | original, edited-incremental, signed-then-modified, **backdated-revision** | rv-pdfauth | revision 3's ModDate moved before revision 2's → `PDF_REVISION_BEFORE_PREVIOUS` |
-| `images/` | camera-original, edited-gimp, screenshot.png, **future-exif** | rv-imgauth | future-exif: EXIF dates (+02:00) in 2031 → `EXIF_AFTER_INTAKE`, `EVENT_IN_FUTURE`; screenshot.png: EXIF without OffsetTime → `ZONE_UNKNOWN_EVENTS`; camera-original: touched after the intake → `FILE_MODIFIED_AFTER_INTAKE` |
+| `images/` | camera-original, edited-gimp, screenshot.png, **future-exif** | rv-imgauth | future-exif: EXIF dates (+02:00) in 2031 → `EXIF_AFTER_INTAKE`, `EVENT_IN_FUTURE`; screenshot.png: EXIF without OffsetTime → zone unknown (counted in `ZONE_UNKNOWN_EVENTS`); camera-original: touched after the intake → `FILE_MODIFIED_AFTER_INTAKE` |
 | `chat/` | WhatsApp Android export (txt + photo) | rv-rsmf | converted with `--timezone Europe/Paris` |
 | `mail/` | 01-clean-rsa.eml, 12-mailbox.mbox (3 messages), **20-date-after-first-hop.eml** | rv-mailauth | 20-…: Date 47 min after its first hop; mbox #3: Date after first hop and hops 20 min out of order → `MAIL_DATE_AFTER_FIRST_HOP` ×2, `CLOCK_SKEW_SUSPECTED` |
 | `certs/` | leaf, leaf-expired, leaf-revoked, intermediate (+CRL), TSA certificate, data.txt + its RFC 3161 token | rv-certcheck | judged `--at 2026-06-01T00:00:00Z` against the lab root |
@@ -62,31 +62,39 @@ Every other run of each copy stays verified, and each copy has exactly one `RUN_
 | `events[].source.file_sha256` | the run's `audit.jsonl` (`item_reports_written`, `statistics_report_written`, `output_written`, `trace_written`); the script checks it equals the file's SHA-256 |
 | `events[].item` (evidence id, path, sha256) | `evidence/registry.json` |
 | `intake.registered` | rv-hashinv intake run, `technical.json` `/case/intake_utc` (only the run that registered the item) |
-| `fs.modified` | every run's `technical.json` `/item/modified_utc` (mbox messages: once, from the container) |
-| `exif.modified` / `exif.original` / `exif.digitized` | rv-imgauth `metadata.json` `/tags/<n>/value` (DateTime, DateTimeOriginal, DateTimeDigitized); zone from OffsetTime / OffsetTimeOriginal / OffsetTimeDigitized, `unknown` when absent |
+| `fs.modified` | every run's `technical.json` `/item/modified_utc`, the value its audit entry `item_started` records (rv-timeline cites the audit log); mbox messages: once, from the container |
+| `exif.modify` / `exif.original` / `exif.digitized` | rv-imgauth `metadata.json` `/tags/<n>/value` (IFD0 DateTime, DateTimeOriginal, DateTimeDigitized); zone from OffsetTime / OffsetTimeOriginal / OffsetTimeDigitized, `unknown` when absent |
 | `png.time` | rv-imgauth `metadata.json` PNG tIME (UTC by the PNG specification) |
-| `xmp.modify` / `xmp.metadata` / `xmp.history` | rv-imgauth `metadata.json` XMP tags; `technical.json` `/image/metadata_summary/xmp_history` |
-| `pdf.*` | rv-pdfauth `technical.json` (see the pointers in the file) |
-| `chat.message` / `chat.event` | rv-rsmf `rsmf/trace.json` (`source_time` is the original, `utc` the instant; offset = the `--timezone` the examiner gave, recorded in `details.timezone_basis`) |
+| `xmp.modify` / `xmp.metadata` / `xmp.history` | rv-imgauth `metadata.json` XMP tags and `/xmp_history/<n>/when` |
+| `pdf.info.created` / `pdf.info.modified` / `pdf.signature.claimed` | rv-pdfauth `objects.json`: each revision's Info dictionary, each signature dictionary's `/M`; sub `r<n>` |
+| `pdf.revision.signed` / `pdf.xmp.saved` | rv-pdfauth `technical.json` `/pdf/signatures/<n>/signing_time` (CMS), `/pdf/revisions/<n>/saved_at_xmp` |
+| `chat.message` / `chat.join` / `chat.leave` / `chat.history` / `chat.disclaimer` | rv-rsmf `rsmf/trace.json`, by the row's kind (`source_time` is the original, `utc` the instant; offset = the `--timezone` the examiner gave, recorded in `details.timezone_basis`); sub `<conversation>/<day>` (the row's `conversation`, the stem of its `rsmf_file`) |
 | `mail.date` / `mail.hop` | rv-mailauth `headers.json` `/headers/date_raw`, `/headers/hops/<n>/date_raw` (position 1 = first hop); mbox messages have `sub` `#<n>` |
-| `cert.*` / `crl.*` / `tsa.gen_time` | rv-certcheck `technical.json` (see the pointers in the file) |
-| `run.started` / `run.finished` | each run's `reports/statistics.json` `/run/started_utc`, `/run/finished_utc` |
+| `mail.mbox_from` | rv-mailauth `mbox_index.json` `/messages/<n>/from_line` (the mbox `From ` line: asctime, zone unknown) |
+| `cert.*` / `tsa.gen_time` | rv-certcheck `chain.json` (see the pointers in the file); sub `c<n>` only when the file holds several certificates |
+| `run.started` / `run.finished` | `ts_utc` of each run's `run_started` / `run_finished` entry in `logs/audit.jsonl` (not `reports/statistics.json`, written before the last entry) |
 
-**Decided here, not read from the tools** (the contract the engine is tested against): which values are events and
-their `kind`; the event id `<tool>:<run_id>:<evidence_id>[/<sub>]:<kind>:<n>` (n from 0 per run, item/sub and kind,
-in file order); and the signal rules, with `clock_skew_s` = 300:
+**Decided, not read from the tools** (the conventions documented in `src/core/src/model.rs`, which the readers
+follow too): which values are events (one per time value a tool wrote, nothing derived) and their `kind`; the event
+id `<tool>:<run_id>:<evidence_id>[/<sub>]:<kind>:<n>` (n from 0 per run, item/sub and kind, in file order); and the
+signal rules, with `clock_skew_s` = 300:
 
 - `EXIF_AFTER_INTAKE`: an EXIF date with a stated zone later than the item's `intake.registered`.
-- `FILE_MODIFIED_AFTER_INTAKE`: an `fs.modified` later than the item's `intake.registered` (cites every run that saw it).
+- `FILE_MODIFIED_AFTER_INTAKE`: an `fs.modified` later than the item's `intake.registered`, either by more than 300 s
+  or by any amount when it differs from the one the intake run recorded (cites every run that saw it). The sample's
+  touch is 3 s after the intake.
 - `PDF_REVISION_BEFORE_PREVIOUS`: a revision's ModDate earlier than the previous revision's.
 - `MAIL_DATE_AFTER_FIRST_HOP`: a message's Date more than 300 s after its first (position 1) hop.
-- `CLOCK_SKEW_SUSPECTED`: a hop more than 300 s earlier than the hop before it (the servers' clocks disagree).
+- `CLOCK_SKEW_SUSPECTED` (basis `received_hops`): a hop more than 300 s earlier than the hop before it (the servers'
+  clocks disagree). The engine's other basis (two tools a constant offset apart) does not occur in the sample.
 - `EVENT_IN_FUTURE`: an occurrence (not a validity bound such as `cert.not_after`) after the case's last `run.finished`.
-- `ZONE_UNKNOWN_EVENTS`: one signal per item with zone-unknown events.
+- `ZONE_UNKNOWN_EVENTS`: one case-level signal (no item) with the count of zone-unknown events (here 5: the two
+  EXIF dates of screenshot.png and the three mbox `From ` lines).
 - `RUN_NOT_VERIFIED`: one per excluded run (tampered copies only).
 
-Severities are proposals; codes, cited events and items are the ground truth. Left out on purpose: the DKIM `t=`
-values (the time the samples' generator signed them, after delivery) and the mbox `From_` separator lines.
+Severities are proposals; codes and items are the ground truth (`src/core/tests/sample_case.rs` compares runs, event
+ids and times, the zone-unknown count and each signal's code, item and severity). Left out on purpose: the DKIM `t=`
+values (rv-mailauth 0.2 does not write them out).
 
 **Not deterministic** across rebuilds: run ids, run and intake times and the touch time (the tools have no fixed
 clock). Rebuilding rewrites `expected_timeline.json` from the new outputs, so the two always agree.

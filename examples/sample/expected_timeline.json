@@ -67,7 +67,7 @@
         "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
         "status": "verified",
         "exclusion": null,
-        "events": 25
+        "events": 26
       },
       {
         "tool": "rv-imgauth",
@@ -94,7 +94,7 @@
         "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
         "status": "verified",
         "exclusion": null,
-        "events": 20
+        "events": 23
       },
       {
         "tool": "rv-certcheck",
@@ -106,8 +106,8 @@
         "events": 22
       }
     ],
-    "events_total": 150,
-    "zone_unknown": 2,
+    "events_total": 154,
+    "zone_unknown": 5,
     "items": [
       {
         "evidence_id": "E0001",
@@ -264,22 +264,25 @@
         "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
         "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d",
         "event_counts": {
-          "chat.event": 4,
+          "chat.disclaimer": 1,
+          "chat.history": 1,
+          "chat.join": 1,
+          "chat.leave": 1,
           "chat.message": 6,
           "fs.modified": 2,
           "intake.registered": 1
         },
         "events": [
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:0",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:1",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:2",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:0",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:1",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:2",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:3",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-13:chat.message:0",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-13:chat.message:1",
-          "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-14:chat.event:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.disclaimer:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.history:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.join:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:1",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:2",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:3",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-13:chat.message:0",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-13:chat.message:1",
+          "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-14:chat.leave:0",
           "rv-hashinv:20261113T065639Z-136162:E0010:fs.modified:0",
           "rv-rsmf:20261113T065652Z-fa70ee:E0010:fs.modified:0",
           "rv-hashinv:20261113T065639Z-136162:E0010:intake.registered:0"
@@ -291,14 +294,14 @@
         "sha256": "3605e4a48c8641b542ce8216359748470374d57cae5c364f543dcb87035f1317",
         "event_counts": {
           "exif.digitized": 1,
-          "exif.modified": 1,
+          "exif.modify": 1,
           "exif.original": 1,
           "fs.modified": 3,
           "intake.registered": 1
         },
         "events": [
           "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.digitized:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.original:0",
           "rv-hashinv:20261113T065639Z-136162:E0011:fs.modified:0",
           "rv-hashinv:20261113T065639Z-136162:E0011:intake.registered:0",
@@ -312,7 +315,7 @@
         "sha256": "1a37e10d99d05c6ff552cc2ea29b218b133e1ee319b5b477d5ca64989ddff3f5",
         "event_counts": {
           "exif.digitized": 1,
-          "exif.modified": 1,
+          "exif.modify": 1,
           "exif.original": 1,
           "fs.modified": 2,
           "intake.registered": 1,
@@ -324,7 +327,7 @@
           "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.digitized:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.original:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0012:xmp.history:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0012:xmp.history:1",
           "rv-imgauth:20261113T065648Z-b151c3:E0012:xmp.metadata:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0012:xmp.modify:0",
@@ -339,7 +342,7 @@
         "sha256": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c",
         "event_counts": {
           "exif.digitized": 1,
-          "exif.modified": 1,
+          "exif.modify": 1,
           "exif.original": 1,
           "fs.modified": 2,
           "intake.registered": 1
@@ -349,7 +352,7 @@
           "rv-imgauth:20261113T065648Z-b151c3:E0013:fs.modified:0",
           "rv-hashinv:20261113T065639Z-136162:E0013:intake.registered:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0"
         ]
       },
@@ -358,14 +361,14 @@
         "path": "R:\\evidence\\images\\screenshot.png",
         "sha256": "ac7b0609981440312d29ab1926020de1d4889192b68d48f5b4960dc672e6bd47",
         "event_counts": {
-          "exif.modified": 1,
+          "exif.modify": 1,
           "exif.original": 1,
           "fs.modified": 2,
           "intake.registered": 1,
           "png.time": 1
         },
         "events": [
-          "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.original:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0014:png.time:0",
           "rv-hashinv:20261113T065639Z-136162:E0014:fs.modified:0",
@@ -400,18 +403,22 @@
           "fs.modified": 2,
           "intake.registered": 1,
           "mail.date": 3,
-          "mail.hop": 6
+          "mail.hop": 6,
+          "mail.mbox_from": 3
         },
         "events": [
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:0",
+          "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.mbox_from:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#1:mail.date:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#1:mail.hop:1",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#1:mail.hop:0",
+          "rv-mailauth:20261113T065654Z-2f7708:E0016/#1:mail.mbox_from:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.date:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.hop:1",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.date:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.hop:0",
+          "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.mbox_from:0",
           "rv-hashinv:20261113T065639Z-136162:E0016:fs.modified:0",
           "rv-mailauth:20261113T065654Z-2f7708:E0016:fs.modified:0",
           "rv-hashinv:20261113T065639Z-136162:E0016:intake.registered:0"
@@ -507,13 +514,15 @@
           "intake.registered": 1,
           "pdf.info.created": 2,
           "pdf.info.modified": 2,
-          "pdf.revision.signed": 1
+          "pdf.revision.signed": 1,
+          "pdf.signature.claimed": 1
         },
         "events": [
           "rv-pdfauth:20261113T065644Z-0d67db:E0021/r1:pdf.info.created:0",
           "rv-pdfauth:20261113T065644Z-0d67db:E0021/r1:pdf.info.modified:0",
           "rv-pdfauth:20261113T065644Z-0d67db:E0021/r3:pdf.info.created:0",
           "rv-pdfauth:20261113T065644Z-0d67db:E0021/r2:pdf.revision.signed:0",
+          "rv-pdfauth:20261113T065644Z-0d67db:E0021/r2:pdf.signature.claimed:0",
           "rv-pdfauth:20261113T065644Z-0d67db:E0021/r3:pdf.info.modified:0",
           "rv-hashinv:20261113T065639Z-136162:E0021:fs.modified:0",
           "rv-pdfauth:20261113T065644Z-0d67db:E0021:fs.modified:0",
@@ -792,7 +801,7 @@
         }
       },
       {
-        "id": "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.modified:0",
+        "id": "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.modify:0",
         "utc": "2026-03-01T09:15:00Z",
         "utc_s": 1772356500,
         "utc_ns": 0,
@@ -800,7 +809,7 @@
         "offset_min": null,
         "precision": "second",
         "original": "2026:03:01 09:15:00",
-        "kind": "exif.modified",
+        "kind": "exif.modify",
         "item": {
           "evidence_id": "E0014",
           "path": "R:\\evidence\\images\\screenshot.png",
@@ -846,7 +855,7 @@
         "details": {}
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:0",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.disclaimer:0",
         "utc": "2026-03-02T08:58:00Z",
         "utc_s": 1772441880,
         "utc_ns": 0,
@@ -854,11 +863,11 @@
         "offset_min": 60,
         "precision": "minute",
         "original": "02/03/2026, 09:58",
-        "kind": "chat.event",
+        "kind": "chat.disclaimer",
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -868,7 +877,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/0"
+          "pointer": "/0/source_time"
         },
         "details": {
           "chat_kind": "disclaimer",
@@ -878,7 +887,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:1",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.history:0",
         "utc": "2026-03-02T08:59:00Z",
         "utc_s": 1772441940,
         "utc_ns": 0,
@@ -886,11 +895,11 @@
         "offset_min": 60,
         "precision": "minute",
         "original": "02/03/2026, 09:59",
-        "kind": "chat.event",
+        "kind": "chat.history",
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -900,7 +909,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/1"
+          "pointer": "/1/source_time"
         },
         "details": {
           "chat_kind": "history",
@@ -910,7 +919,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.event:2",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.join:0",
         "utc": "2026-03-02T08:59:00Z",
         "utc_s": 1772441940,
         "utc_ns": 0,
@@ -918,11 +927,11 @@
         "offset_min": 60,
         "precision": "minute",
         "original": "02/03/2026, 09:59",
-        "kind": "chat.event",
+        "kind": "chat.join",
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -932,7 +941,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/2"
+          "pointer": "/2/source_time"
         },
         "details": {
           "chat_kind": "join",
@@ -942,7 +951,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:0",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:0",
         "utc": "2026-03-02T09:00:00Z",
         "utc_s": 1772442000,
         "utc_ns": 0,
@@ -954,7 +963,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -964,7 +973,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/3"
+          "pointer": "/3/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -974,7 +983,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:1",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:1",
         "utc": "2026-03-02T09:01:00Z",
         "utc_s": 1772442060,
         "utc_ns": 0,
@@ -986,7 +995,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -996,7 +1005,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/4"
+          "pointer": "/4/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -1006,7 +1015,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:2",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:2",
         "utc": "2026-03-02T09:02:00Z",
         "utc_s": 1772442120,
         "utc_ns": 0,
@@ -1018,7 +1027,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -1028,7 +1037,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/5"
+          "pointer": "/5/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -1038,7 +1047,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-02:chat.message:3",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-02:chat.message:3",
         "utc": "2026-03-02T09:03:00Z",
         "utc_s": 1772442180,
         "utc_ns": 0,
@@ -1050,7 +1059,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-02",
+          "sub": "c-554810aa3173/2026-03-02",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -1060,7 +1069,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/6"
+          "pointer": "/6/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -1457,7 +1466,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-13:chat.message:0",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-13:chat.message:0",
         "utc": "2026-03-13T17:45:00Z",
         "utc_s": 1773423900,
         "utc_ns": 0,
@@ -1469,7 +1478,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-13",
+          "sub": "c-554810aa3173/2026-03-13",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -1479,7 +1488,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/7"
+          "pointer": "/7/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -1489,7 +1498,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-13:chat.message:1",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-13:chat.message:1",
         "utc": "2026-03-13T17:46:00Z",
         "utc_s": 1773423960,
         "utc_ns": 0,
@@ -1501,7 +1510,7 @@
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-13",
+          "sub": "c-554810aa3173/2026-03-13",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -1511,7 +1520,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/8"
+          "pointer": "/8/source_time"
         },
         "details": {
           "chat_kind": "message",
@@ -1521,7 +1530,7 @@
         }
       },
       {
-        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/Ana-Ruiz-aa3173/2026-03-14:chat.event:0",
+        "id": "rv-rsmf:20261113T065652Z-fa70ee:E0010/c-554810aa3173/2026-03-14:chat.leave:0",
         "utc": "2026-03-14T07:00:00Z",
         "utc_s": 1773471600,
         "utc_ns": 0,
@@ -1529,11 +1538,11 @@
         "offset_min": 60,
         "precision": "minute",
         "original": "14/03/2026, 08:00",
-        "kind": "chat.event",
+        "kind": "chat.leave",
         "item": {
           "evidence_id": "E0010",
           "path": "R:\\evidence\\chat\\whatsapp-android-en\\WhatsApp Chat with Ana Ruiz.txt",
-          "sub": "Ana-Ruiz-aa3173/2026-03-14",
+          "sub": "c-554810aa3173/2026-03-14",
           "sha256": "0642f460332ab8b5887be935dfefbef8214786c2247ec98d4c5eed832cbdb71d"
         },
         "source": {
@@ -1543,7 +1552,7 @@
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
           "file": "rsmf/trace.json",
           "file_sha256": "1251be768916b3fa7a7d3255bd649813169ddd852d0d2d08c302cb96cc322130",
-          "pointer": "/9"
+          "pointer": "/9/source_time"
         },
         "details": {
           "chat_kind": "leave",
@@ -1650,8 +1659,37 @@
         "zone": "explicit",
         "offset_min": 0,
         "precision": "second",
-        "original": "D:20260504132000+00'00'",
+        "original": "2026-05-04T13:20:00Z",
         "kind": "pdf.revision.signed",
+        "item": {
+          "evidence_id": "E0021",
+          "path": "R:\\evidence\\pdf\\signed-then-modified.pdf",
+          "sub": "r2",
+          "sha256": "a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3"
+        },
+        "source": {
+          "tool": "rv-pdfauth",
+          "tool_version": "0.4.1",
+          "run_id": "20261113T065644Z-0d67db",
+          "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
+          "file": "reports/items/00004-signed-then-modified.pdf/technical.json",
+          "file_sha256": "16100de4335925bdf250961730b55442a15a7d291d7da2566c501ad58d10fe7e",
+          "pointer": "/pdf/signatures/0/signing_time"
+        },
+        "details": {
+          "revision": "2"
+        }
+      },
+      {
+        "id": "rv-pdfauth:20261113T065644Z-0d67db:E0021/r2:pdf.signature.claimed:0",
+        "utc": "2026-05-04T13:20:00Z",
+        "utc_s": 1777900800,
+        "utc_ns": 0,
+        "zone": "explicit",
+        "offset_min": 0,
+        "precision": "second",
+        "original": "D:20260504132000+00'00'",
+        "kind": "pdf.signature.claimed",
         "item": {
           "evidence_id": "E0021",
           "path": "R:\\evidence\\pdf\\signed-then-modified.pdf",
@@ -1710,7 +1748,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:14 10:21:33",
+        "original": "2026:05:14 10:21:33 +02:00",
         "kind": "exif.digitized",
         "item": {
           "evidence_id": "E0011",
@@ -1728,20 +1766,19 @@
           "pointer": "/tags/12/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeDigitized",
           "offset_pointer": "/tags/15/value"
         }
       },
       {
-        "id": "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.modified:0",
+        "id": "rv-imgauth:20261113T065648Z-b151c3:E0011:exif.modify:0",
         "utc": "2026-05-14T08:21:33Z",
         "utc_s": 1778746893,
         "utc_ns": 0,
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:14 10:21:33",
-        "kind": "exif.modified",
+        "original": "2026:05:14 10:21:33 +02:00",
+        "kind": "exif.modify",
         "item": {
           "evidence_id": "E0011",
           "path": "R:\\evidence\\images\\camera-original.jpg",
@@ -1758,7 +1795,6 @@
           "pointer": "/tags/6/value"
         },
         "details": {
-          "offset_tag": "OffsetTime",
           "offset_pointer": "/tags/13/value"
         }
       },
@@ -1770,7 +1806,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:14 10:21:33",
+        "original": "2026:05:14 10:21:33 +02:00",
         "kind": "exif.original",
         "item": {
           "evidence_id": "E0011",
@@ -1788,7 +1824,6 @@
           "pointer": "/tags/11/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeOriginal",
           "offset_pointer": "/tags/14/value"
         }
       },
@@ -1800,7 +1835,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:14 10:21:33",
+        "original": "2026:05:14 10:21:33 +02:00",
         "kind": "exif.digitized",
         "item": {
           "evidence_id": "E0012",
@@ -1818,7 +1853,6 @@
           "pointer": "/tags/13/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeDigitized",
           "offset_pointer": "/tags/16/value"
         }
       },
@@ -1830,7 +1864,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:14 10:21:33",
+        "original": "2026:05:14 10:21:33 +02:00",
         "kind": "exif.original",
         "item": {
           "evidence_id": "E0012",
@@ -1848,7 +1882,6 @@
           "pointer": "/tags/12/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeOriginal",
           "offset_pointer": "/tags/15/value"
         }
       },
@@ -1873,9 +1906,9 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065648Z-b151c3",
           "run_dir": "runs/rv-imgauth/20261113T065648Z-b151c3",
-          "file": "reports/items/00002-edited-gimp.jpg/technical.json",
-          "file_sha256": "b318a636542b3d99f511abc4601050f3a39282217259760f12579c8245132927",
-          "pointer": "/image/metadata_summary/xmp_history/0/when"
+          "file": "reports/items/00002-edited-gimp.jpg/metadata.json",
+          "file_sha256": "6d9a9d70212eb2428a487968e14dba0902f63b07590114e2746e4ca42970ad28",
+          "pointer": "/xmp_history/0/when"
         },
         "details": {
           "action": "saved",
@@ -1883,15 +1916,15 @@
         }
       },
       {
-        "id": "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.modified:0",
+        "id": "rv-imgauth:20261113T065648Z-b151c3:E0012:exif.modify:0",
         "utc": "2026-05-16T16:02:10Z",
         "utc_s": 1778947330,
         "utc_ns": 0,
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2026:05:16 18:02:10",
-        "kind": "exif.modified",
+        "original": "2026:05:16 18:02:10 +02:00",
+        "kind": "exif.modify",
         "item": {
           "evidence_id": "E0012",
           "path": "R:\\evidence\\images\\edited-gimp.jpg",
@@ -1908,7 +1941,6 @@
           "pointer": "/tags/7/value"
         },
         "details": {
-          "offset_tag": "OffsetTime",
           "offset_pointer": "/tags/14/value"
         }
       },
@@ -1933,9 +1965,9 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065648Z-b151c3",
           "run_dir": "runs/rv-imgauth/20261113T065648Z-b151c3",
-          "file": "reports/items/00002-edited-gimp.jpg/technical.json",
-          "file_sha256": "b318a636542b3d99f511abc4601050f3a39282217259760f12579c8245132927",
-          "pointer": "/image/metadata_summary/xmp_history/1/when"
+          "file": "reports/items/00002-edited-gimp.jpg/metadata.json",
+          "file_sha256": "6d9a9d70212eb2428a487968e14dba0902f63b07590114e2746e4ca42970ad28",
+          "pointer": "/xmp_history/1/when"
         },
         "details": {
           "action": "saved",
@@ -2240,6 +2272,35 @@
         }
       },
       {
+        "id": "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.mbox_from:0",
+        "utc": "2026-11-11T09:40:00Z",
+        "utc_s": 1794390000,
+        "utc_ns": 0,
+        "zone": "unknown",
+        "offset_min": null,
+        "precision": "second",
+        "original": "From bruno@example.org Wed Nov 11 09:40:00 2026",
+        "kind": "mail.mbox_from",
+        "item": {
+          "evidence_id": "E0016",
+          "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+          "sub": "#3",
+          "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+        },
+        "source": {
+          "tool": "rv-mailauth",
+          "tool_version": "0.2.0",
+          "run_id": "20261113T065654Z-2f7708",
+          "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
+          "file": "reports/items/00002-12-mailbox.mbox/mbox_index.json",
+          "file_sha256": "14c375ef45048c35378878596f86d336c48958d248fba94aa818a77a626571b2",
+          "pointer": "/messages/2/from_line"
+        },
+        "details": {
+          "offset": "2699"
+        }
+      },
+      {
         "id": "rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1",
         "utc": "2026-11-11T10:00:00Z",
         "utc_s": 1794391200,
@@ -2362,6 +2423,35 @@
         }
       },
       {
+        "id": "rv-mailauth:20261113T065654Z-2f7708:E0016/#1:mail.mbox_from:0",
+        "utc": "2026-11-11T11:00:03Z",
+        "utc_s": 1794394803,
+        "utc_ns": 0,
+        "zone": "unknown",
+        "offset_min": null,
+        "precision": "second",
+        "original": "From bruno@example.org Wed Nov 11 11:00:03 2026",
+        "kind": "mail.mbox_from",
+        "item": {
+          "evidence_id": "E0016",
+          "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+          "sub": "#1",
+          "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+        },
+        "source": {
+          "tool": "rv-mailauth",
+          "tool_version": "0.2.0",
+          "run_id": "20261113T065654Z-2f7708",
+          "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
+          "file": "reports/items/00002-12-mailbox.mbox/mbox_index.json",
+          "file_sha256": "14c375ef45048c35378878596f86d336c48958d248fba94aa818a77a626571b2",
+          "pointer": "/messages/0/from_line"
+        },
+        "details": {
+          "offset": "0"
+        }
+      },
+      {
         "id": "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.date:0",
         "utc": "2026-11-11T11:30:00Z",
         "utc_s": 1794396600,
@@ -2479,6 +2569,35 @@
           "position": "2",
           "by": "mx.acme.example",
           "host": "smtp.example.org"
+        }
+      },
+      {
+        "id": "rv-mailauth:20261113T065654Z-2f7708:E0016/#2:mail.mbox_from:0",
+        "utc": "2026-11-11T11:30:02Z",
+        "utc_s": 1794396602,
+        "utc_ns": 0,
+        "zone": "unknown",
+        "offset_min": null,
+        "precision": "second",
+        "original": "From bruno@example.org Wed Nov 11 11:30:02 2026",
+        "kind": "mail.mbox_from",
+        "item": {
+          "evidence_id": "E0016",
+          "path": "R:\\evidence\\mail\\12-mailbox.mbox",
+          "sub": "#2",
+          "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+        },
+        "source": {
+          "tool": "rv-mailauth",
+          "tool_version": "0.2.0",
+          "run_id": "20261113T065654Z-2f7708",
+          "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
+          "file": "reports/items/00002-12-mailbox.mbox/mbox_index.json",
+          "file_sha256": "14c375ef45048c35378878596f86d336c48958d248fba94aa818a77a626571b2",
+          "pointer": "/messages/1/from_line"
+        },
+        "details": {
+          "offset": "1372"
         }
       },
       {
@@ -3590,13 +3709,13 @@
       },
       {
         "id": "rv-hashinv:20261113T065639Z-136162:run:run.started:0",
-        "utc": "2026-11-13T06:56:39.631Z",
+        "utc": "2026-11-13T06:56:39.633Z",
         "utc_s": 1794552999,
-        "utc_ns": 631000000,
+        "utc_ns": 633000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:39.631Z",
+        "original": "2026-11-13T06:56:39.633Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -3609,12 +3728,12 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065639Z-136162",
           "run_dir": "runs/rv-hashinv/20261113T065639Z-136162",
-          "file": "reports/statistics.json",
-          "file_sha256": "8bc47190e556720b2723b473e8bda24b897b7a22720375eecb1a3a88ab91b06a",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "4eb56b9251cd13b214f0e6c79606519c24dd7d21f9119c4318bc4727db6b842e",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-hashinv"
+          "actor": "Sample Examiner"
         }
       },
       {
@@ -4186,13 +4305,13 @@
       },
       {
         "id": "rv-hashinv:20261113T065639Z-136162:run:run.finished:0",
-        "utc": "2026-11-13T06:56:39.702Z",
+        "utc": "2026-11-13T06:56:39.964Z",
         "utc_s": 1794552999,
-        "utc_ns": 702000000,
+        "utc_ns": 964000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:39.702Z",
+        "original": "2026-11-13T06:56:39.964Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4205,12 +4324,12 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065639Z-136162",
           "run_dir": "runs/rv-hashinv/20261113T065639Z-136162",
-          "file": "reports/statistics.json",
-          "file_sha256": "8bc47190e556720b2723b473e8bda24b897b7a22720375eecb1a3a88ab91b06a",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "4eb56b9251cd13b214f0e6c79606519c24dd7d21f9119c4318bc4727db6b842e",
+          "pointer": "line:112/ts_utc"
         },
         "details": {
-          "tool": "rv-hashinv"
+          "actor": "Sample Examiner"
         }
       },
       {
@@ -4269,13 +4388,13 @@
       },
       {
         "id": "rv-hashinv:20261113T065643Z-8de163:run:run.started:0",
-        "utc": "2026-11-13T06:56:43.215Z",
+        "utc": "2026-11-13T06:56:43.217Z",
         "utc_s": 1794553003,
-        "utc_ns": 215000000,
+        "utc_ns": 217000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:43.215Z",
+        "original": "2026-11-13T06:56:43.217Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4288,23 +4407,23 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065643Z-8de163",
           "run_dir": "runs/rv-hashinv/20261113T065643Z-8de163",
-          "file": "reports/statistics.json",
-          "file_sha256": "d313dd1ed34bc3046b9cc05812b7fc9a665152e181f3be00e6e6e721adbf147d",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "96e6cb8635a882d11464c4bc5d1b0f68ed334bea1bd0820a0d12fe33234abbaf",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-hashinv"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-hashinv:20261113T065643Z-8de163:run:run.finished:0",
-        "utc": "2026-11-13T06:56:43.231Z",
+        "utc": "2026-11-13T06:56:43.247Z",
         "utc_s": 1794553003,
-        "utc_ns": 231000000,
+        "utc_ns": 247000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:43.231Z",
+        "original": "2026-11-13T06:56:43.247Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4317,23 +4436,23 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065643Z-8de163",
           "run_dir": "runs/rv-hashinv/20261113T065643Z-8de163",
-          "file": "reports/statistics.json",
-          "file_sha256": "d313dd1ed34bc3046b9cc05812b7fc9a665152e181f3be00e6e6e721adbf147d",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "96e6cb8635a882d11464c4bc5d1b0f68ed334bea1bd0820a0d12fe33234abbaf",
+          "pointer": "line:12/ts_utc"
         },
         "details": {
-          "tool": "rv-hashinv"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-pdfauth:20261113T065644Z-0d67db:run:run.started:0",
-        "utc": "2026-11-13T06:56:44.712Z",
+        "utc": "2026-11-13T06:56:44.714Z",
         "utc_s": 1794553004,
-        "utc_ns": 712000000,
+        "utc_ns": 714000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:44.712Z",
+        "original": "2026-11-13T06:56:44.714Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4346,23 +4465,23 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065644Z-0d67db",
           "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
-          "file": "reports/statistics.json",
-          "file_sha256": "2402698ccde398c402bccc86259896fe651b4929dd0f0c09a7b41eb9b0f1c571",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "d381ea8b655ff55b992444eb97960a92038187fb7402863611191545c6b9a72a",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-pdfauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-pdfauth:20261113T065644Z-0d67db:run:run.finished:0",
-        "utc": "2026-11-13T06:56:46.612Z",
+        "utc": "2026-11-13T06:56:46.702Z",
         "utc_s": 1794553006,
-        "utc_ns": 612000000,
+        "utc_ns": 702000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:46.612Z",
+        "original": "2026-11-13T06:56:46.702Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4375,23 +4494,23 @@
           "tool_version": "0.4.1",
           "run_id": "20261113T065644Z-0d67db",
           "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
-          "file": "reports/statistics.json",
-          "file_sha256": "2402698ccde398c402bccc86259896fe651b4929dd0f0c09a7b41eb9b0f1c571",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "d381ea8b655ff55b992444eb97960a92038187fb7402863611191545c6b9a72a",
+          "pointer": "line:53/ts_utc"
         },
         "details": {
-          "tool": "rv-pdfauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-imgauth:20261113T065648Z-b151c3:run:run.started:0",
-        "utc": "2026-11-13T06:56:48.321Z",
+        "utc": "2026-11-13T06:56:48.323Z",
         "utc_s": 1794553008,
-        "utc_ns": 321000000,
+        "utc_ns": 323000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:48.321Z",
+        "original": "2026-11-13T06:56:48.323Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4404,23 +4523,23 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065648Z-b151c3",
           "run_dir": "runs/rv-imgauth/20261113T065648Z-b151c3",
-          "file": "reports/statistics.json",
-          "file_sha256": "3a26bb9c632c80edc3552cc2af3f0dbe8f1144c97bcb5f777fbff922b459ecef",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "cbf49ff164ed156cda7a75a9b13d950295d6da8b4ecab9a955945845b80b3fcb",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-imgauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-imgauth:20261113T065648Z-b151c3:run:run.finished:0",
-        "utc": "2026-11-13T06:56:49.92Z",
-        "utc_s": 1794553009,
-        "utc_ns": 920000000,
+        "utc": "2026-11-13T06:56:50.273Z",
+        "utc_s": 1794553010,
+        "utc_ns": 273000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:49.920Z",
+        "original": "2026-11-13T06:56:50.273Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4433,23 +4552,23 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065648Z-b151c3",
           "run_dir": "runs/rv-imgauth/20261113T065648Z-b151c3",
-          "file": "reports/statistics.json",
-          "file_sha256": "3a26bb9c632c80edc3552cc2af3f0dbe8f1144c97bcb5f777fbff922b459ecef",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "cbf49ff164ed156cda7a75a9b13d950295d6da8b4ecab9a955945845b80b3fcb",
+          "pointer": "line:46/ts_utc"
         },
         "details": {
-          "tool": "rv-imgauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-rsmf:20261113T065652Z-fa70ee:run:run.started:0",
-        "utc": "2026-11-13T06:56:52.031Z",
+        "utc": "2026-11-13T06:56:52.033Z",
         "utc_s": 1794553012,
-        "utc_ns": 31000000,
+        "utc_ns": 33000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:52.031Z",
+        "original": "2026-11-13T06:56:52.033Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4462,23 +4581,23 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065652Z-fa70ee",
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
-          "file": "reports/statistics.json",
-          "file_sha256": "3e7a4a299dde97914e1d9be563028e7d980b81583dc0c083263fa6a752b8f9df",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "a9a5272d7390d3d62c9e025098a0558bce6357c4cadba6eb937d81691b5b15d3",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-rsmf"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-rsmf:20261113T065652Z-fa70ee:run:run.finished:0",
-        "utc": "2026-11-13T06:56:52.163Z",
+        "utc": "2026-11-13T06:56:52.199Z",
         "utc_s": 1794553012,
-        "utc_ns": 163000000,
+        "utc_ns": 199000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:52.163Z",
+        "original": "2026-11-13T06:56:52.199Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4491,23 +4610,23 @@
           "tool_version": "0.3.1",
           "run_id": "20261113T065652Z-fa70ee",
           "run_dir": "runs/rv-rsmf/20261113T065652Z-fa70ee",
-          "file": "reports/statistics.json",
-          "file_sha256": "3e7a4a299dde97914e1d9be563028e7d980b81583dc0c083263fa6a752b8f9df",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "a9a5272d7390d3d62c9e025098a0558bce6357c4cadba6eb937d81691b5b15d3",
+          "pointer": "line:31/ts_utc"
         },
         "details": {
-          "tool": "rv-rsmf"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-mailauth:20261113T065654Z-2f7708:run:run.started:0",
-        "utc": "2026-11-13T06:56:54.66Z",
+        "utc": "2026-11-13T06:56:54.662Z",
         "utc_s": 1794553014,
-        "utc_ns": 660000000,
+        "utc_ns": 662000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:54.660Z",
+        "original": "2026-11-13T06:56:54.662Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4520,23 +4639,23 @@
           "tool_version": "0.2.0",
           "run_id": "20261113T065654Z-2f7708",
           "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
-          "file": "reports/statistics.json",
-          "file_sha256": "ef5a0d4d6d7fa3ee7784d419229a16634dfd80a65bf351ca33281e47f904ea94",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "bec48b308f1e171c0a39437c162a85d5e587cae7c016580ad7438adafa577b9b",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-mailauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-mailauth:20261113T065654Z-2f7708:run:run.finished:0",
-        "utc": "2026-11-13T06:56:55.616Z",
+        "utc": "2026-11-13T06:56:55.724Z",
         "utc_s": 1794553015,
-        "utc_ns": 616000000,
+        "utc_ns": 724000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:55.616Z",
+        "original": "2026-11-13T06:56:55.724Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4549,23 +4668,23 @@
           "tool_version": "0.2.0",
           "run_id": "20261113T065654Z-2f7708",
           "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
-          "file": "reports/statistics.json",
-          "file_sha256": "ef5a0d4d6d7fa3ee7784d419229a16634dfd80a65bf351ca33281e47f904ea94",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "bec48b308f1e171c0a39437c162a85d5e587cae7c016580ad7438adafa577b9b",
+          "pointer": "line:52/ts_utc"
         },
         "details": {
-          "tool": "rv-mailauth"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-certcheck:20261113T065657Z-5588dc:run:run.started:0",
-        "utc": "2026-11-13T06:56:57.822Z",
+        "utc": "2026-11-13T06:56:57.824Z",
         "utc_s": 1794553017,
-        "utc_ns": 822000000,
+        "utc_ns": 824000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:57.822Z",
+        "original": "2026-11-13T06:56:57.824Z",
         "kind": "run.started",
         "item": {
           "evidence_id": "",
@@ -4578,23 +4697,23 @@
           "tool_version": "0.2.2",
           "run_id": "20261113T065657Z-5588dc",
           "run_dir": "runs/rv-certcheck/20261113T065657Z-5588dc",
-          "file": "reports/statistics.json",
-          "file_sha256": "5f03c1641aaa0d35a7e9b440e497837cdc77fb4d46f16efd90506001ae31a0ed",
-          "pointer": "/run/started_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "4c923ed07eb6bd3cf6413cccafcd0fa6f55b9cf0be504e6feda8a2e0ad8b17e0",
+          "pointer": "line:1/ts_utc"
         },
         "details": {
-          "tool": "rv-certcheck"
+          "actor": "Sample Examiner"
         }
       },
       {
         "id": "rv-certcheck:20261113T065657Z-5588dc:run:run.finished:0",
-        "utc": "2026-11-13T06:56:57.965Z",
-        "utc_s": 1794553017,
-        "utc_ns": 965000000,
+        "utc": "2026-11-13T06:56:58.078Z",
+        "utc_s": 1794553018,
+        "utc_ns": 78000000,
         "zone": "explicit",
         "offset_min": 0,
         "precision": "millisecond",
-        "original": "2026-11-13T06:56:57.965Z",
+        "original": "2026-11-13T06:56:58.078Z",
         "kind": "run.finished",
         "item": {
           "evidence_id": "",
@@ -4607,12 +4726,12 @@
           "tool_version": "0.2.2",
           "run_id": "20261113T065657Z-5588dc",
           "run_dir": "runs/rv-certcheck/20261113T065657Z-5588dc",
-          "file": "reports/statistics.json",
-          "file_sha256": "5f03c1641aaa0d35a7e9b440e497837cdc77fb4d46f16efd90506001ae31a0ed",
-          "pointer": "/run/finished_utc"
+          "file": "logs/audit.jsonl",
+          "file_sha256": "4c923ed07eb6bd3cf6413cccafcd0fa6f55b9cf0be504e6feda8a2e0ad8b17e0",
+          "pointer": "line:67/ts_utc"
         },
         "details": {
-          "tool": "rv-certcheck"
+          "actor": "Sample Examiner"
         }
       },
       {
@@ -4683,7 +4802,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2031:05:14 10:25:02",
+        "original": "2031:05:14 10:25:02 +02:00",
         "kind": "exif.digitized",
         "item": {
           "evidence_id": "E0013",
@@ -4701,20 +4820,19 @@
           "pointer": "/tags/12/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeDigitized",
           "offset_pointer": "/tags/15/value"
         }
       },
       {
-        "id": "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modified:0",
+        "id": "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
         "utc": "2031-05-14T08:25:02Z",
         "utc_s": 1936513502,
         "utc_ns": 0,
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2031:05:14 10:25:02",
-        "kind": "exif.modified",
+        "original": "2031:05:14 10:25:02 +02:00",
+        "kind": "exif.modify",
         "item": {
           "evidence_id": "E0013",
           "path": "R:\\evidence\\images\\future-exif.jpg",
@@ -4731,7 +4849,6 @@
           "pointer": "/tags/6/value"
         },
         "details": {
-          "offset_tag": "OffsetTime",
           "offset_pointer": "/tags/13/value"
         }
       },
@@ -4743,7 +4860,7 @@
         "zone": "explicit",
         "offset_min": 120,
         "precision": "second",
-        "original": "2031:05:14 10:25:02",
+        "original": "2031:05:14 10:25:02 +02:00",
         "kind": "exif.original",
         "item": {
           "evidence_id": "E0013",
@@ -4761,7 +4878,6 @@
           "pointer": "/tags/11/value"
         },
         "details": {
-          "offset_tag": "OffsetTimeOriginal",
           "offset_pointer": "/tags/14/value"
         }
       },
@@ -4851,7 +4967,7 @@
         "severity": "high",
         "events": [
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0",
           "rv-hashinv:20261113T065639Z-136162:E0013:intake.registered:0"
         ],
@@ -4870,7 +4986,7 @@
         "severity": "medium",
         "events": [
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.digitized:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modified:0",
+          "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.modify:0",
           "rv-imgauth:20261113T065648Z-b151c3:E0013:exif.original:0"
         ],
         "item": {
@@ -4881,24 +4997,7 @@
         },
         "params": {
           "reference": "last run.finished",
-          "delta_s": "141960485"
-        }
-      },
-      {
-        "code": "ZONE_UNKNOWN_EVENTS",
-        "severity": "info",
-        "events": [
-          "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.modified:0",
-          "rv-imgauth:20261113T065648Z-b151c3:E0014:exif.original:0"
-        ],
-        "item": {
-          "evidence_id": "E0014",
-          "path": "R:\\evidence\\images\\screenshot.png",
-          "sub": "",
-          "sha256": "ac7b0609981440312d29ab1926020de1d4889192b68d48f5b4960dc672e6bd47"
-        },
-        "params": {
-          "count": "2"
+          "delta_s": "141960484"
         }
       },
       {
@@ -4932,6 +5031,7 @@
           "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
         },
         "params": {
+          "basis": "received_hops",
           "skew_s": "1200",
           "hosts": "smtp.example.org -> mx.acme.example"
         }
@@ -4970,6 +5070,16 @@
           "revision": "3",
           "previous": "2",
           "delta_s": "97200"
+        }
+      },
+      {
+        "code": "ZONE_UNKNOWN_EVENTS",
+        "severity": "info",
+        "events": [],
+        "item": null,
+        "params": {
+          "count": "5",
+          "tools": "rv-imgauth, rv-mailauth"
         }
       }
     ]
@@ -5010,7 +5120,7 @@
           "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
           "status": "verified",
           "exclusion": null,
-          "events": 25
+          "events": 26
         },
         {
           "tool": "rv-imgauth",
@@ -5040,7 +5150,7 @@
           "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
           "status": "verified",
           "exclusion": null,
-          "events": 20
+          "events": 23
         },
         {
           "tool": "rv-certcheck",
@@ -5052,7 +5162,7 @@
           "events": 22
         }
       ],
-      "events_total": 128,
+      "events_total": 132,
       "signals": [
         {
           "code": "RUN_NOT_VERIFIED",
@@ -5066,13 +5176,14 @@
           }
         }
       ],
-      "signals_total": 6,
+      "signals_total": 7,
       "signal_codes": [
         "CLOCK_SKEW_SUSPECTED",
         "FILE_MODIFIED_AFTER_INTAKE",
         "MAIL_DATE_AFTER_FIRST_HOP",
         "PDF_REVISION_BEFORE_PREVIOUS",
-        "RUN_NOT_VERIFIED"
+        "RUN_NOT_VERIFIED",
+        "ZONE_UNKNOWN_EVENTS"
       ]
     },
     "chain-broken": {
@@ -5110,7 +5221,7 @@
           "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
           "status": "verified",
           "exclusion": null,
-          "events": 25
+          "events": 26
         },
         {
           "tool": "rv-imgauth",
@@ -5152,7 +5263,7 @@
           "events": 22
         }
       ],
-      "events_total": 130,
+      "events_total": 131,
       "signals": [
         {
           "code": "RUN_NOT_VERIFIED",
@@ -5211,7 +5322,7 @@
           "run_dir": "runs/rv-pdfauth/20261113T065644Z-0d67db",
           "status": "verified",
           "exclusion": null,
-          "events": 25
+          "events": 26
         },
         {
           "tool": "rv-imgauth",
@@ -5238,7 +5349,7 @@
           "run_dir": "runs/rv-mailauth/20261113T065654Z-2f7708",
           "status": "verified",
           "exclusion": null,
-          "events": 20
+          "events": 23
         },
         {
           "tool": "rv-certcheck",
@@ -5253,7 +5364,7 @@
           "events": 0
         }
       ],
-      "events_total": 128,
+      "events_total": 132,
       "signals": [
         {
           "code": "RUN_NOT_VERIFIED",
