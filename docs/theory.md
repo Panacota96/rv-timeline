@@ -557,7 +557,8 @@ The review log (`review.jsonl`) is a second chain whose first entry carries `anc
 one copied next to another run, fails `verify-log` and `verify-case` ([review.rs](../src/core/src/review.rs)).
 `verify-log` prints `review log: <n> entries, chain intact` (or `review log: none`); `verify-case` prints the
 review entries counted across all runs.
-Independent check: [tests/verify_chain.py](../tests/verify_chain.py) re-implements the chain in Python.
+Independent check: [tests/verify_chain.py](../tests/verify_chain.py) re-implements the chain in Python and re-hashes the
+evidence in `hashes.csv` and every output the audit log records.
 
 ## B11 The case folder and the two chains
 
@@ -673,5 +674,5 @@ Standards and specifications
 Independent oracles used to cross-check this tool: [tests/make_sample_case.py](../tests/make_sample_case.py)
 (standard-library Python, derives the expected timeline from the tools' outputs); the six released tools' own
 `verify-case` on the sample case and its tampered copies; [tests/verify_chain.py](../tests/verify_chain.py) and
-[tests/validate_reports.py](../tests/validate_reports.py) (chain and JSON schemas, in CI); pyHanko for signed PDFs;
+[tests/validate_reports.py](../tests/validate_reports.py) (chain, hash register and recorded outputs; JSON schemas; in CI); pyHanko for signed PDFs;
 the Python profile's golden case ([tests/golden/](../tests/golden/regenerate.py)).

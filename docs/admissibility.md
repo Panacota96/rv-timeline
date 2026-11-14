@@ -455,7 +455,8 @@ Owners: **Eng.** = engineering, **Counsel**, **Examiner**, **Firm** = Rakvor man
    validation status is known (G-TL1).
 9. **Workstation clock** synchronised; time source noted.
 10. **The build is complete** (`run_finished`) and `rv-timeline verify-log <RUN>/logs` prints OK, including the
-    review entries; `python tests/verify_chain.py <RUN>/logs` exits 0.
+    review entries; `python tests/verify_chain.py <RUN>/logs` exits 0 (it also re-hashes every output the audit log
+    records).
 11. **Timestamp** obtained and checked (`verify-log --tsa-ca`, `openssl ts -verify`), and the TSA certificate's
     revocation status at genTime established from CRL/OCSP evidence covering genTime.
 12. **Every signal relied on** is presented with what it does **not** prove; alternative explanations (wrong device

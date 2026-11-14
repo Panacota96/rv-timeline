@@ -257,7 +257,7 @@ Anyone — you, a colleague, an opposing expert — can check a build with the c
 | Step | Command | Proves |
 | --- | --- | --- |
 | 1 | `rv-timeline verify-log <RUN>\logs` (exit 0 intact, 3 broken, truncated or an output changed) | No entry edited, deleted or reordered; timestamp tokens match; the log reaches the final entry the case log recorded; `review.jsonl` intact and anchored to this build; every output the log records still has its digests (`outputs:` line) |
-| 2 | `python tests/verify_chain.py <RUN>/logs` (source tree) | Same, with an independent implementation; also re-hashes the files listed in `hashes.csv` |
+| 2 | `python tests/verify_chain.py <RUN>/logs` (source tree) | Same, with an independent implementation; also re-hashes the files listed in `hashes.csv` and every output the audit log records |
 | 3 | `rv-timeline verify-case <CASE>` (add `--rehash` where the evidence is reachable) | Every run, the build's included, is the one the case log announced and complete, with every recorded output unchanged; the registry is intact |
 | 4 | Step 1 (`outputs:` line); script below for an independent check | `timeline.jsonl`, every report, `environment.json` and `hashes.csv` still have the digests recorded in the log |
 | 5 | Rebuild on a **copy** of the case with the same options | The same `timeline.jsonl` SHA-256 ([theory.md B14](theory.md#b14-determinism-and-repeatability)) |

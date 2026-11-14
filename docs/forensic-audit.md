@@ -36,7 +36,7 @@ Verify with either implementation:
 
 ```bash
 rv-timeline verify-log <CASE>/runs/rv-timeline/<RUN-ID>/logs          # exit 0 intact, 3 broken, truncated or an output changed
-python tests/verify_chain.py <CASE>/runs/rv-timeline/<RUN-ID>/logs   # independent re-implementation (chain + hashes.csv)
+python tests/verify_chain.py <CASE>/runs/rv-timeline/<RUN-ID>/logs   # independent re-implementation (chain + hashes.csv + recorded outputs)
 ```
 
 > The chain proves the log is **internally consistent**. On its own it does not prove *when* it was written —

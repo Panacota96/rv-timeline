@@ -1050,7 +1050,7 @@ fn describe() -> serde_json::Value {
         // logs and the other tools' JSON outputs. No evidence signature: never suggested for an evidence file.
         "accepts": {"extensions": ["json", "jsonl"], "signatures": []},
         "case_formats": [case::SCHEMA_CASE],
-        "log_formats": ["rakvor.audit/1"],
+        "log_formats": ["rakvor.audit/1", "rakvor.review/1"],
         "cli_exe": format!("{}.exe", TOOL_NAME),
         "gui_exe": format!("{}-gui.exe", TOOL_NAME),
         "exit_codes": {
