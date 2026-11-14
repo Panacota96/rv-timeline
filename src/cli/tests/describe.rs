@@ -9,7 +9,7 @@ const TOOL: &str = "rv-timeline";
 const TITLE: &str = "RV Timeline";
 const ROLE: &str = "analysis";
 const MAIN_VERB: &str = "build";
-const LOG_FORMATS: &[&str] = &["rakvor.audit/1"];
+const LOG_FORMATS: &[&str] = &["rakvor.audit/1", "rakvor.review/1"];
 
 fn root() -> &'static Path {
     Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../.."))
