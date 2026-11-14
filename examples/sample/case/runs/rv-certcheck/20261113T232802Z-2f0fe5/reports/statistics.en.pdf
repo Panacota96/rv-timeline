@@ -1,0 +1,219 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Title (Run statistics report) /Producer (rv-certcheck 0.2.2) /Creator (rv-certcheck 0.2.2) /CreationDate (D:20261113232802Z) >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 5708 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F2 18 Tf 50.00 719.70 Td (Run statistics report) Tj ET
+0.278 0.329 0.404 rg BT /F1 10 Tf 50.00 706.20 Td (Run ID: 20261113T232802Z-2f0fe5) Tj ET
+0.165 0.361 1.000 RG 2 w 50 698.20 m 545 698.20 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 676.05 Td (Tool) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 676.05 Td (rv-certcheck 0.2.2) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 660.90 Td (Case) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 660.90 Td (RV-SAMPLE-001) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 645.75 Td (Examiner) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 645.75 Td (Sample Examiner) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 630.60 Td (Started \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 630.60 Td (2026-11-13T23:28:02.740Z) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 615.45 Td (Finished \(UTC\)) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 615.45 Td (2026-11-13T23:28:02.793Z) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 600.30 Td (Duration) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 600.30 Td (0.1 s) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 585.15 Td (Interface) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 585.15 Td (cli) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 570.00 Td (Hash algorithms) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 570.00 Td (sha256 + md5) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 554.85 Td (Items) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 554.85 Td (8) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 539.70 Td (Bytes) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 539.70 Td (10364) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 524.55 Td (Errors) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 524.55 Td (0) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 509.40 Td (Throughput) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 509.40 Td (191.0 KiB/s) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 480.20 Td (Findings by severity) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 476.20 m 545 476.20 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 460.05 Td (High) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 460.05 Td (2) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 444.90 Td (Medium) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 444.90 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 429.75 Td (Low) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 429.75 Td (0) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 414.60 Td (Informational) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 414.60 Td (6) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 385.40 Td (Findings by type) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 381.40 m 545 381.40 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 365.25 Td (Certificate chain verified at the date) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 353.10 Td (checked) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 365.25 Td (4) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 337.95 Td (Certificate expired at the date checked) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 337.95 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 322.80 Td (Certificate revoked) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 322.80 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 307.65 Td (Not a recognised cryptographic object) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 307.65 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 292.50 Td (Revocation status unknown) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 292.50 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 277.35 Td (Timestamp token valid) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 277.35 Td (1) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 248.15 Td (Items by detected type) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 244.15 m 545 244.15 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 228.00 Td (RFC 3161 timestamp token) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 228.00 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 212.85 Td (X.509 certificate) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 212.85 Td (5) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 197.70 Td (X.509 certificate revocation list) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 197.70 Td (1) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 182.55 Td (unknown) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 182.55 Td (1) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 153.35 Td (Duplicate groups) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 149.35 m 545 149.35 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 134.52 Td (None) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 105.32 Td (Case folder) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 101.32 m 545 101.32 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 85.17 Td (Case) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 85.17 Td (RV-SAMPLE-001) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 70.02 Td (With an evidence ID from intake) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 70.02 Td (0) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-certcheck 0.2.2 \267 20261113T232802Z-2f0fe5  \227  Page 1 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 7448 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 737.85 Td (Newly registered by this run) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 737.85 Td (0) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 722.70 Td (Verified against the registry) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 722.70 Td (8) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 707.55 Td (Different from the registry) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 707.55 Td (0) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 692.40 Td (Not in the registry) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 692.40 Td (0) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 677.25 Td (Case folder) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 677.25 Td (R:\\case) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 648.05 Td (Items) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 644.05 m 545 644.05 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 627.90 Td (#1  E0001  data.tsr) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 627.90 Td (No issues found \267 2557 bytes \267 2 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 612.75 Td (#2  E0002  data.txt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 612.75 Td (No issues found \267 44 bytes \267 1 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 597.60 Td (#3  E0003  intermediate.crl) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 597.60 Td (No issues found \267 458 bytes \267 0 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 582.45 Td (#4  E0004  intermediate.crt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 582.45 Td (Needs attention \267 1330 bytes \267 2 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 567.30 Td (#5  E0005  leaf-expired.crt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 567.30 Td (Problem found \267 1574 bytes \267 1 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 552.15 Td (#6  E0006  leaf-revoked.crt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 552.15 Td (Problem found \267 1574 bytes \267 1 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 537.00 Td (#7  E0007  leaf.crt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 537.00 Td (No issues found \267 1566 bytes \267 1 findings) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 521.85 Td (#8  E0008  tsa.crt) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 521.85 Td (No issues found \267 1261 bytes \267 1 findings) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 492.65 Td (Limitations) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 488.65 m 545 488.65 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 473.82 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 473.82 Td (Every chain is judged at one instant \(--at, recorded in each report\); the same certificate can be valid at one date) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 461.00 Td (and expired or revoked at another.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 448.17 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 448.17 Td (Offline, revocation is checked only against the CRLs and OCSP responses supplied \(--crl, --ocsp, or found among) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 435.35 Td (the evidence\); a revocation published elsewhere is not seen.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 422.52 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 422.52 Td (Trust lists are used as dated snapshots \(date and SHA-256 recorded\); services added, suspended or withdrawn) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 409.70 Td (after the snapshot are not reflected.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 396.87 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 396.87 Td (In version 0.1 the trust list's own XAdES signature is not verified; the snapshot's source and SHA-256 are) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 384.05 Td (recorded so it can be checked independently. The Colombian list is a curated file, because ONAC publishes no) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 371.22 Td (machine-readable list.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 358.40 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 358.40 Td (Certificates issued by Rakvor's internal PKI are for internal use only: they are not a firma digital under Ley 527 de) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 345.57 Td (1999, art. 28 \(Colombia\), and not qualified certificates under eIDAS \(Regulation \(EU\) No 910/2014\).) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 332.75 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 332.75 Td (The tool's results have been compared with OpenSSL and Python reference implementations on test sets, but no) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 319.92 Td (error rate has yet been measured on a validated corpus.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 307.10 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 307.10 Td (A result without findings does not prove that a file is authentic or unaltered before acquisition.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 294.27 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 294.27 Td (Modification times come from the file system of the examined copy and may differ from the original source.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 281.45 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 281.45 Td (A trusted timestamp of the audit log shows that the log existed in this exact form at the stated time; it does not) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 268.62 Td (show that the examined copy matches the original source.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 242.42 Td (Trusted timestamp \(RFC 3161\)) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 238.42 m 545 238.42 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 222.27 Td (Status) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 222.27 Td (Not requested) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 207.12 Td (Digital signature) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 207.12 Td (This PDF is not digitally signed.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 177.92 Td (Audit trail) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 173.92 m 545 173.92 l S
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 157.77 Td (Audit chain head \(SHA-256\)) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 157.77 Td (7aae5be669a55bf58d62dfba46b3df8f10a93964fa5e6c293134c0034cbd6827) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 142.62 Td (Audit entries) Tj ET
+0.051 0.067 0.090 rg BT /F1 9 Tf 215.00 142.62 Td (65) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 127.47 Td (Log folder) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 127.47 Td (R:\\case\\runs\\rv-certcheck\\20261113T232802Z-2f0fe5\\logs) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-certcheck 0.2.2 \267 20261113T232802Z-2f0fe5  \227  Page 2 of 2) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000421 00000 n 
+0000000568 00000 n 
+0000000714 00000 n 
+0000006473 00000 n 
+0000006620 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 6 0 R >>
+startxref
+14120
+%%EOF

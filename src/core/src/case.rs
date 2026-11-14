@@ -833,12 +833,16 @@ pub struct CaseVerification {
     /// Entries of the runs' review logs (`review.jsonl`, viewing after the run), all verified.
     pub review_entries: u64,
     pub problems: Vec<String>,
+    /// Output files recorded by the runs' audit logs, and how many of them were re-hashed and match.
+    pub outputs_recorded: usize,
+    pub outputs_verified: usize,
     pub warnings: Vec<String>,
 }
 
 /// Full check of a case folder: case log chain, registry digest, each run's audit chain (and timestamps), the
 /// cross-links (case_linked ↔ run_started) and that the audit head recorded at run_finished is the run's
-/// final entry (later entries may only be `timestamp_obtained`).
+/// final entry (later entries may only be `timestamp_obtained`), and every output file each run's audit log
+/// records still has the recorded digests (`outputs.rs`).
 pub fn verify_case(dir: &Path) -> CaseVerification {
     let mut v = CaseVerification::default();
     match load_case_json(dir) {
@@ -926,6 +930,12 @@ pub fn verify_case(dir: &Path) -> CaseVerification {
                 .push(format!("run {}: audit.jsonl has no case_linked entry", rid)),
         }
         for p in crate::trust::verify_timestamps(&audit_path) {
+            v.problems.push(format!("run {}: {}", rid, p));
+        }
+        let outputs = crate::outputs::verify_recorded_outputs(&log_dir, &entries);
+        v.outputs_recorded += outputs.recorded;
+        v.outputs_verified += outputs.verified;
+        for p in &outputs.problems {
             v.problems.push(format!("run {}: {}", rid, p));
         }
         match crate::review::verify(&log_dir) {

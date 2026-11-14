@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "7446db6b551798dc8389da3e84e90bc5caf40c3008b71fc19e56afd13164c743"
+  },
+  "item": {
+    "evidence_id": "E0020",
+    "file_name": "original.pdf",
+    "index": 20
+  },
+  "run_id": "20261113T232752Z-fb64f6",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

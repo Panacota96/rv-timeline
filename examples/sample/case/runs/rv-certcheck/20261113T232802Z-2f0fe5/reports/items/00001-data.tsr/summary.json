@@ -1,0 +1,59 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "TIMESTAMP_TOKEN_VALID",
+      "params": {
+        "gen_time": "2026-11-03T11:19:41Z",
+        "hash_algorithm": "sha256",
+        "imprint_checked": "yes",
+        "imprint_file": "data.txt",
+        "policy": "2.25.130074246409705057913773883974790544206.9.2",
+        "tsa": "C=CO, O=Rakvor Lab, CN=Rakvor Lab TSA"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the timestamped data is authentic or who submitted it; it shows only that data with this digest existed at genTime, as far as the TSA and the anchors chosen are trusted.",
+          "shows": "The RFC 3161 token states the time 2026-11-03T11:19:41Z; its signature by C=CO, O=Rakvor Lab, CN=Rakvor Lab TSA verifies (policy 2.25.130074246409705057913773883974790544206.9.2, imprint sha256) and the TSA certificate chain was valid at that time. Imprint checked against an evidence file of the run: yes (data.txt); when no, the token is not linked to any file and shows only that some data with its digest existed at genTime.",
+          "title": "Timestamp token valid"
+        }
+      }
+    },
+    {
+      "code": "CERT_CHAIN_VALID",
+      "params": {
+        "anchor": "file:R:\\anchors\\rakvor-lab-root.crt",
+        "at": "2026-11-03T11:19:41Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=Rakvor Lab TSA"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "That the certificate was not revoked (see the revocation findings), that the certificate holder signed or approved any particular document, that the anchor deserves trust (that is the examiner's choice of --anchor), or that the result holds at another date.",
+          "shows": "OpenSSL built a path from C=CO, O=Rakvor Lab, CN=Rakvor Lab TSA to the trust anchor file:R:\\anchors\\rakvor-lab-root.crt and the chain verified at 2026-11-03T11:19:41Z: signatures, validity dates, purpose and constraints passed. Revocation is reported separately: a REVOCATION_UNKNOWN finding for the same certificate means its revocation status could not be determined.",
+          "title": "Certificate chain verified at the date checked"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "1b504e1928137748678b47aab45f9ab46442c5e5fb4e9dac3c0133497a5db022"
+  },
+  "item": {
+    "evidence_id": "E0001",
+    "file_name": "data.tsr",
+    "index": 1
+  },
+  "run_id": "20261113T232802Z-2f0fe5",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

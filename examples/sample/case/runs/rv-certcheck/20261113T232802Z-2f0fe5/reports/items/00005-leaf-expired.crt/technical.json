@@ -1,0 +1,121 @@
+{
+  "audit": {
+    "first_seq": 22,
+    "last_seq": 25
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T23:27:52.795Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "certificates": {
+    "certificates": 1,
+    "codes": [
+      "CERT_EXPIRED_AT_DATE"
+    ],
+    "errors": [],
+    "kind": "certificate",
+    "online_fetches": [],
+    "verdicts": [
+      {
+        "depths": 3,
+        "openssl_code": 10,
+        "openssl_reason": "certificate has expired",
+        "status": "invalid"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "code": "CERT_EXPIRED_AT_DATE",
+      "params": {
+        "at": "2026-06-01T00:00:00Z",
+        "depth": "0",
+        "not_after": "2025-01-01T00:00:00Z",
+        "subject": "C=CO, O=Rakvor Lab, CN=expired.lab.rakvor.test"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "That a signature made with it is invalid: what matters for a signature is the validity at signing time (check again with --at signing-time or the date of signing). Expiry of old certificates is normal.",
+          "shows": "C=CO, O=Rakvor Lab, CN=expired.lab.rakvor.test was valid until 2025-01-01T00:00:00Z; the chain was checked at 2026-06-01T00:00:00Z, after that date.",
+          "title": "Certificate expired at the date checked"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "efebfe58df5781bd87e2eb96df0b1595",
+    "sha256": "346e22485a3cb93677fa1262bd12c5870f9d656d4737004018c34c8bcf18e0c9"
+  },
+  "item": {
+    "detected_type": "X.509 certificate",
+    "error": null,
+    "evidence_id": "E0005",
+    "extension": "crt",
+    "file_name": "leaf-expired.crt",
+    "index": 5,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\certs\\leaf-expired.crt",
+    "size": 1574,
+    "status": "problem"
+  },
+  "limitations": [
+    "VALIDATION_IS_AS_OF_THE_DATE_GIVEN",
+    "OFFLINE_REVOCATION_DEPENDS_ON_SUPPLIED_FILES",
+    "TRUST_LIST_SNAPSHOT_DATED",
+    "TRUST_LIST_SIGNATURE_NOT_VERIFIED_V01",
+    "RAKVOR_CERTIFICATES_ARE_INTERNAL_USE",
+    "NO_VALIDATED_ERROR_RATES_YET",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "outputs": [
+    {
+      "bytes": 15118,
+      "hashes": {
+        "md5": "4940e7d33668bbfd05f42deb8075ed3f",
+        "sha256": "6eb268b5086f6816ed3acbcdc8a9d147817b9ea19e7ca775ba6a3d4a5b997ce3"
+      },
+      "kind": "chain",
+      "rel_path": "chain.json"
+    },
+    {
+      "bytes": 3738,
+      "hashes": {
+        "md5": "1b3d81c9fea5572e427da462ba748d61",
+        "sha256": "be43ff5c2ab565356fd2604f2ec9e88de25bdc70ed78e19cb4531ca4c98c8076"
+      },
+      "kind": "certificate_text",
+      "rel_path": "certificate.txt"
+    }
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 53,
+    "finished_utc": "2026-11-13T23:28:02.793Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T232802Z-2f0fe5",
+    "started_utc": "2026-11-13T23:28:02.740Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-certcheck",
+    "version": "0.2.2"
+  }
+}

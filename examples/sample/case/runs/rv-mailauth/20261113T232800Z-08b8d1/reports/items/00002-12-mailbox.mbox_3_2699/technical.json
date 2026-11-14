@@ -1,0 +1,296 @@
+{
+  "audit": {
+    "first_seq": 31,
+    "last_seq": 36
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T23:27:52.795Z",
+    "role": "analysis",
+    "status": null
+  },
+  "derived_from": {
+    "container": "R:\\evidence\\mail\\12-mailbox.mbox",
+    "container_hashes": {
+      "md5": "f4e8e05ccc50d543ed3703f21cb965d4",
+      "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+    },
+    "id": "R:\\evidence\\mail\\12-mailbox.mbox#3@2699",
+    "length": 490,
+    "message_offset": 2748,
+    "n": 3,
+    "separator_offset": 2699
+  },
+  "email": {
+    "kind": "mbox",
+    "mbox": null,
+    "message": {
+      "attachments": [],
+      "attachments_total": 0,
+      "bytes": 490,
+      "dkim": {
+        "arc": {
+          "instances": 0,
+          "reason": null,
+          "result": "none"
+        },
+        "evaluated": true,
+        "key_file": "R:\\inputs\\dkim-keys.txt",
+        "key_file_problems": [],
+        "key_file_sha256": "f5de4068b295824c6f4d9b27fd4a936ed63bcc624be6c67b24a3f0e85f09092e",
+        "keys_loaded": 4,
+        "mode": "offline",
+        "not_evaluated_reason": null,
+        "signatures": []
+      },
+      "headers": {
+        "auth_results": [],
+        "date_raw": "Wed, 11 Nov 2026 16:30:00 +0500",
+        "date_timestamp": 1794396600,
+        "date_tz_offset_min": 300,
+        "date_utc": "2026-11-11T11:30:00Z",
+        "from": [
+          {
+            "address": "bruno@example.org",
+            "domain": "example.org",
+            "name": "Bruno Proveedor"
+          }
+        ],
+        "header_count": 8,
+        "hops": [
+          {
+            "by": "mx.acme.example",
+            "date_raw": "Wed, 11 Nov 2026 09:40:00 +0000",
+            "date_utc": "2026-11-11T09:40:00Z",
+            "for_addr": null,
+            "from": "smtp.example.org",
+            "header_index": 0,
+            "id": "6A",
+            "position": 2,
+            "raw": "from smtp.example.org (smtp.example.org [192.0.2.25]) by mx.acme.example with ESMTPS id 6A; Wed, 11 Nov 2026 09:40:00 +0000",
+            "timestamp": 1794390000,
+            "tz_offset_min": 0,
+            "with": "ESMTPS"
+          },
+          {
+            "by": "smtp.example.org",
+            "date_raw": "Wed, 11 Nov 2026 10:00:00 +0000",
+            "date_utc": "2026-11-11T10:00:00Z",
+            "for_addr": null,
+            "from": "[192.0.2.30]",
+            "header_index": 1,
+            "id": "6B",
+            "position": 1,
+            "raw": "from [192.0.2.30] by smtp.example.org with ESMTPSA id 6B; Wed, 11 Nov 2026 10:00:00 +0000",
+            "timestamp": 1794391200,
+            "tz_offset_min": 0,
+            "with": "ESMTPSA"
+          }
+        ],
+        "hops_total": 2,
+        "kind": "eml",
+        "message_id": "x33@mailer.example.com",
+        "mime_parts": 1,
+        "msg": null,
+        "recipients": [
+          {
+            "address": "ana@acme.example",
+            "domain": "acme.example",
+            "name": "Ana Compras"
+          }
+        ],
+        "recipients_total": 1,
+        "reply_to": [],
+        "return_path": null,
+        "sender": null,
+        "structure_problems": [],
+        "subject": "Albarán 33"
+      },
+      "locator": {
+        "kind": "mbox",
+        "mbox": {
+          "container_hashes": {
+            "md5": "f4e8e05ccc50d543ed3703f21cb965d4",
+            "sha256": "2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe"
+          },
+          "container_path": "R:\\evidence\\mail\\12-mailbox.mbox",
+          "from_line": "From bruno@example.org Wed Nov 11 09:40:00 2026",
+          "id": "R:\\evidence\\mail\\12-mailbox.mbox#3@2699",
+          "length": 490,
+          "message_offset": 2748,
+          "n": 3,
+          "offset": 2699
+        }
+      },
+      "payment_terms": [],
+      "sha256": "9d13579ab0f6860e938f33c35b485fca29c2417dd5b6d57fa59c892eb6a4499a"
+    },
+    "message_analysis": "completed",
+    "outputs": [
+      {
+        "bytes": 2481,
+        "hashes": {
+          "md5": "8f24c28cdb300afe68646772d06eb0e2",
+          "sha256": "7e8bd2ff7d8863f93b44a808d7e4c8063664a88d042af873cef5f96bca3b14e7"
+        },
+        "kind": "headers",
+        "rel_path": "headers.json"
+      },
+      {
+        "bytes": 429,
+        "hashes": {
+          "md5": "89c8df517c799bdef19769cc6069a780",
+          "sha256": "bdd96dbaa00537c61cc388dc305d9fecec69ae98ef74516ff0c2c313b86fccda"
+        },
+        "kind": "dkim",
+        "rel_path": "dkim.json"
+      }
+    ],
+    "worker": {
+      "elapsed_ms": 89,
+      "memory_mb": 1024,
+      "network": {
+        "detail": "Windows: no OS network block for the worker (a Job Object cannot restrict network access); the worker code path has no network code",
+        "isolated": false,
+        "method": "none"
+      },
+      "protocol": "rv-mailauth-worker/1",
+      "status": "completed",
+      "timeout_s": 120
+    }
+  },
+  "findings": [
+    {
+      "code": "DKIM_NOT_SIGNED",
+      "params": {},
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Many legitimate servers do not sign, and a missing signature is common; it proves nothing about authenticity either way.",
+          "shows": "The message carries no DKIM-Signature header.",
+          "title": "No DKIM signature"
+        }
+      }
+    },
+    {
+      "code": "RECEIVED_TIME_NOT_MONOTONIC",
+      "params": {
+        "count": "1",
+        "earlier_by_s": "1200",
+        "hop": "2",
+        "hop_date": "2026-11-11T09:40:00Z",
+        "previous_date": "2026-11-11T10:00:00Z",
+        "previous_hop": "1"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Server clocks are sometimes wrong and some servers add Received headers out of order; it does not show that a header was inserted or edited.",
+          "shows": "Hop 2 was stamped 2026-11-11T09:40:00Z, 1200 s before the previous hop 1 (2026-11-11T10:00:00Z), beyond the tolerated clock difference (1 such step(s)).",
+          "title": "Received times go backwards"
+        }
+      }
+    },
+    {
+      "code": "DATE_AFTER_FIRST_HOP",
+      "params": {
+        "date": "2026-11-11T11:30:00Z",
+        "first_hop_date": "2026-11-11T10:00:00Z",
+        "later_by_s": "5400"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "The sender's clock may be wrong; it does not show that the date was changed after sending.",
+          "shows": "The Date header (2026-11-11T11:30:00Z) is 5400 s later than the time the first server received the message (2026-11-11T10:00:00Z).",
+          "title": "Date header later than the first server"
+        }
+      }
+    },
+    {
+      "code": "TIMEZONE_INCONSISTENT",
+      "params": {
+        "date_zone": "+0500",
+        "hop_zone": "+0000",
+        "reason": "sender_server_zone_differs"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Clients and servers are often set to different zones, travellers keep their home zone; it does not show that the date was edited.",
+          "shows": "The Date header uses zone +0500 while the sender organisation's first server used +0000 (sender_server_zone_differs).",
+          "title": "Time zone inconsistent"
+        }
+      }
+    },
+    {
+      "code": "MESSAGE_ID_DOMAIN_MISMATCH",
+      "params": {
+        "from_domain": "example.org",
+        "message_id_domain": "mailer.example.com"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Mail clients, sending services and webmail hosts generate Message-IDs with their own names; it does not show that the message is forged.",
+          "shows": "The Message-ID was generated under mailer.example.com, not under the From domain example.org.",
+          "title": "Message-ID from another domain"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "c00d9f9edc005b7e74a14f28fbad963e",
+    "sha256": "9d13579ab0f6860e938f33c35b485fca29c2417dd5b6d57fa59c892eb6a4499a"
+  },
+  "item": {
+    "detected_type": "Email message in an mbox (RFC 5322)",
+    "error": null,
+    "evidence_id": "E0016",
+    "extension": "mbox",
+    "file_name": "12-mailbox.mbox#3@2699",
+    "index": 2,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\mail\\12-mailbox.mbox#3@2699",
+    "size": 490,
+    "status": "attention"
+  },
+  "limitations": [
+    "DKIM_NEEDS_KEY_AT_SENDING_TIME",
+    "MISSING_SIGNATURE_PROVES_NOTHING",
+    "MSG_MAY_LACK_TRANSPORT_HEADERS",
+    "BEC_HEURISTICS_FALSE_POSITIVES",
+    "HEADERS_ARE_CLAIMS",
+    "MBOX_ESCAPING_AMBIGUOUS",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY"
+  ],
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 436,
+    "finished_utc": "2026-11-13T23:28:01.432Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "pdf_signer_certificate_sha256": null,
+    "run_id": "20261113T232800Z-08b8d1",
+    "started_utc": "2026-11-13T23:28:00.995Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-mailauth",
+    "version": "0.2.0"
+  }
+}

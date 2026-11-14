@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
-# Builds examples/sample/case/ (a Rakvor case folder with one completed run of each of the six tools), the tampered
-# copies in examples/sample/tampered/ and examples/sample/expected_timeline.json. See examples/sample/README.md.
+# Builds examples/sample/case/ (a Rakvor case folder with one completed run of each of the six tools, every output
+# kept) and examples/sample/expected_timeline.json. Its expectations for the three tampered copies come from copies
+# written to a temporary folder; the tests write them again with `make_sample_case.py tamper` (not committed).
+# See examples/sample/README.md.
 #
 # Usage: tests/make_sample_case.sh [RAKVOR_ROOT]
 #   RAKVOR_ROOT  folder holding the six tool repositories (rv-hashinv, rv-pdfauth, rv-imgauth, rv-rsmf,
 #                rv-mailauth, rv-certcheck), each built with `cargo build --release --locked -p <tool>-cli`.
 #                Default: the parent of this repository. The curated evidence is copied from their
 #                examples/sample/ folders; the executables are taken from <repo>/target/release/.
+#                Use the tools' main branches at their released versions.
 # Environment:
 #   RV_TEST_PYTHON     Python 3 (standard library only is needed). Default: python3.
 #   RV_PDFIUM_PATH     pdfium library for rv-pdfauth's visual comparison (optional; without it the run notes it).
 #   RV_SAMPLE_DRIVE    Windows only: free drive letter mapped with `subst` onto the work folder, so the paths the
 #                      tools record are neutral (R:\evidence\...) instead of the user's profile. Default: R:
 #   RV_SAMPLE_ROOT     Linux/macOS: work folder (its absolute path is recorded by the tools). Default: /tmp/rv-sample
+#   RV_TIMELINE_EXE    rv-timeline executable whose verify-case must accept the clean case too (it re-hashes every
+#                      recorded output). Default: target/release/rv-timeline of this repository.
 #
 # Deterministic: the evidence bytes and modification times, the tool options, the order of the runs, the evidence
 # ids and every time read from the evidence. Not deterministic (they are the clock of the run): run ids, the
@@ -28,6 +33,8 @@ helper="$here/tests/make_sample_case.py"
 tools="rv-hashinv rv-pdfauth rv-imgauth rv-rsmf rv-mailauth rv-certcheck"
 
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) windows=1; exe=.exe ;; *) windows=0; exe= ;; esac
+timeline=${RV_TIMELINE_EXE:-$here/target/release/rv-timeline$exe}
+[ -x "$timeline" ] || { echo "missing $timeline (cargo build --release --locked -p rv-timeline-cli)" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------------------------- work folder
 work=$(mktemp -d "${TMPDIR:-/tmp}/rv-sample-work.XXXXXX")
@@ -124,24 +131,21 @@ run rv-certcheck "0 3" analyze -i "$(w evidence/certs)" --anchor "$(w anchors/ra
   printf '\n  }\n}\n'
 } > "$work/tool-versions.json"
 
-# ---------------------------------------------------------------------------------------------- prune
-# Only the JSON outputs are read by the timeline; the HTML/PDF renderings of the reports, extracted PDF revisions and
-# preview/diff images under reports/ are removed to keep the committed case small (their digests stay in the audit
-# logs). verify-case checks the chains, not the report files, so it still passes (checked next).
-find "$root/case/runs" -path '*/reports/*' -type f ! -name '*.json' -delete
-find "$root/case/runs" -type d -empty -delete
-
 # ---------------------------------------------------------------------------------------------- verify + copy
+# Nothing is deleted after the runs: every output a run's audit log records stays, so verify-case (which re-hashes
+# them, src/core/src/outputs.rs) accepts the case with every tool and with rv-timeline.
 for t in $tools; do "$(bin "$t")" verify-case "$case_dir" > "$work/verify-$t.txt" || { cat "$work/verify-$t.txt"; echo "$t verify-case failed on the clean case" >&2; exit 1; }; done
-echo "verify-case: clean case OK with all six tools"
+"$timeline" verify-case "$root/case" > "$work/verify-rv-timeline.txt" || { cat "$work/verify-rv-timeline.txt"; echo "rv-timeline verify-case failed on the clean case" >&2; exit 1; }
+echo "verify-case: clean case OK with all six tools and rv-timeline"
 rm -rf "$sample/case" "$sample/tampered"
 cp -R "$root/case" "$sample/case"
 cp "$work/tool-versions.json" "$sample/tool-versions.json"
 cp "$root/derived.json" "$sample/derived-evidence.json"
 
-"$py" -I "$helper" tamper "$sample/case" "$sample/tampered"
-"$py" -I "$helper" expected "$sample/case" "$sample/tampered" "$sample/tool-versions.json" "$sample/expected_timeline.json"
+"$py" -I "$helper" tamper "$sample/case" "$work/tampered"
+"$py" -I "$helper" expected "$sample/case" "$work/tampered" "$sample/tool-versions.json" "$sample/expected_timeline.json"
 
-# The tampered copies, through every tool's verify-case (expected exit codes are in expected_timeline.json).
-"$py" -I "$helper" check-verify "$sample/expected_timeline.json" "$sample" $(for t in $tools; do bin "$t"; printf ' '; done)
-echo "sample case written to $sample/case ($(du -sh "$sample/case" | cut -f1)), tampered copies in $sample/tampered"
+# The clean case and the tampered copies through every tool's verify-case (expected exit codes: expected_timeline.json).
+"$py" -I "$helper" check-verify "$sample/expected_timeline.json" "$sample/case" "$work/tampered" \
+  $(for t in $tools; do bin "$t"; printf ' '; done) "$timeline"
+echo "sample case written to $sample/case ($(du -sh "$sample/case" | cut -f1)); the tests write the tampered copies"

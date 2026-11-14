@@ -155,10 +155,12 @@ default `R:`) with neutral host and user names, so the case records no local pat
    replacements, listed in `derived-evidence.json`); fix every modification time.
 2. Run rv-hashinv (intake), touch one file, run rv-hashinv again on it, then rv-pdfauth, rv-imgauth, rv-rsmf
    (`--timezone Europe/Paris`), rv-mailauth and rv-certcheck, all with `--case-dir`, `--no-timestamp`.
-3. Prune the HTML/PDF renderings (their digests stay in the audit logs); `verify-case` of each of the six tools
-   must pass.
+3. Keep every output (nothing is deleted after the runs): `verify-case` of each of the six tools and of
+   rv-timeline (`RV_TIMELINE_EXE`, default `target/release`; it re-hashes every recorded output) must pass.
 4. `make_sample_case.py tamper`: write the three tampered copies (`digest-mismatch`, `chain-broken`,
-   `not-finished`) and check each tool's `verify-case` verdict on them (`check-verify`).
+   `not-finished`) into the work folder and check each tool's `verify-case` verdict on the clean case and on them
+   (`check-verify`). They are not committed: the tests write them again from `examples/sample/case` into a
+   temporary folder with the same command (Python standard library, `RV_TEST_PYTHON`).
 5. `make_sample_case.py expected`: derive `expected_timeline.json` from the tools' outputs with the **standard
    library only** — independently of the Rust readers — following the conventions above.
 

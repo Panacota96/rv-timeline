@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical review — 12-mailbox.mbox</title><style>:root { --ink:#0D1117; --muted:#475467; --line:#E4E7EC; --accent:#2A5CFF; --violet:#6B00FF; --cyan:#00E5FF; --night:#0D1117; --night2:#1A1F26; --mist:#E6E6E6; --soft:#F5F7FB; --bg:#FFFFFF; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 "Segoe UI", "Inter", system-ui, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
+.band { background: linear-gradient(135deg, var(--night) 0%, var(--night2) 70%); color: var(--mist); border-bottom: 3px solid; border-image: linear-gradient(90deg, var(--accent), var(--violet), var(--cyan)) 1; }
+.band .inner { max-width: 920px; margin: 0 auto; padding: 14px 16px; display:flex; align-items:center; gap:14px; }
+.band .word { font-weight:800; letter-spacing:.22em; font-size:15px; }
+.band .desc { font-size:10.5px; letter-spacing:.14em; color: var(--cyan); }
+header { border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 22px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.mark { font-weight:800; letter-spacing:.18em; color:var(--accent); font-size:12px; }
+.tagline { font-style: italic; color: var(--muted); }
+.sign { margin-top: 28px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; color: var(--muted); min-height: 40px; }
+table.blank td { height: 34px; }
+h1 { font-size: 22px; margin: 6px 0 2px; }
+h2 { font-size: 16px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.meta { font-size: 13px; color: var(--muted); text-align:right; }
+table { width:100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { text-align:left; vertical-align:top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; background: var(--soft); }
+.mono { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; word-break: break-all; }
+.badge { color:#fff; border-radius: 999px; padding: 1px 9px; font-size: 11px; font-weight: 700; }
+.sev-high { background:#B42318; } .sev-medium { background:#B54708; } .sev-low { background:#2A5CFF; } .sev-info { background:#475467; }
+.finding { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:10px 0; break-inside: avoid; }
+.kv { display:grid; grid-template-columns: 210px 1fr; gap: 4px 12px; font-size: 13px; }
+.kv div:nth-child(odd) { color: var(--muted); }
+.status { font-size: 20px; font-weight: 700; padding: 14px 16px; border-left: 5px solid var(--accent); background: var(--soft); }
+.status-problem { border-color:#B42318; } .status-attention { border-color:#B54708; } .status-ok { border-color:#067647; }
+.note { padding: 10px 12px; background:#FFFAEB; border:1px solid #FEDF89; border-radius:8px; }
+footer { margin-top: 36px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 640px) { .kv { grid-template-columns: 1fr; } .meta { text-align:left; } }
+@media print { main { padding: 0; } .band { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style></head>
+<body><div class="band"><div class="inner"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" role="img" aria-label="RV">
+  <defs><linearGradient id="rvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A5CFF"/><stop offset=".55" stop-color="#4D23FF"/><stop offset="1" stop-color="#6B00FF"/></linearGradient></defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0D1117" stroke="url(#rvg)" stroke-width="4"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="800" font-size="26" fill="#E6E6E6">RV</text>
+  <rect x="18" y="47" width="28" height="3" rx="1.5" fill="#00E5FF"/>
+</svg>
+<div><div class="word">RAKVOR</div><div class="desc">FORENSICS | INCIDENT RESPONSE | SECURITY</div></div></div></div>
+<main>
+<header>
+  <div><h1>Technical review</h1><div>12-mailbox.mbox</div></div>
+  <div class="meta">
+    <div>Run ID: <strong>20261113T232800Z-08b8d1</strong></div>
+    <div>Item #2</div>
+    <div>Evidence ID: <strong>E0016</strong></div>
+    <div>Case: RV-SAMPLE-001</div>
+  </div>
+</header>
+
+<div class="kv">
+  <div>Path</div><div class="mono">R:\evidence\mail\12-mailbox.mbox</div>
+  <div>Size (bytes)</div><div>3238</div>
+  <div>Last modified (UTC)</div><div>2026-11-12T06:00:00Z</div>
+  <div>Extension</div><div>.mbox</div>
+  <div>Detected type (signature)</div><div>Mailbox (mbox)</div>
+  <div>Status</div><div>No issues found</div>
+  
+  <div>Case</div><div>RV-SAMPLE-001</div>
+  <div>Evidence ID</div><div class="mono">E0016</div>
+  <div>Case registry</div><div>Verified: identical to the registered evidence</div>
+  <div>Registered at intake (UTC)</div><div>2026-11-13T23:27:52.795Z</div>
+</div>
+
+<h2>Hashes</h2>
+<table><tr><th>Hash algorithms</th><th>Hex</th></tr>
+<tr><td>sha256</td><td class="mono">2e39de637dad0f16469632facf7544dfe4fc0d39bf7210dd579b7a74ba0f5ebe</td></tr><tr><td>md5</td><td class="mono">f4e8e05ccc50d543ed3703f21cb965d4</td></tr>
+</table>
+
+<h2>Findings</h2>
+<p>None</p>
+
+
+<h2>Email analysis</h2>
+<div class="kv">
+  <div>Messages in this mbox</div><div class="mono">3</div>
+  <div>#1 @0</div><div class="mono">R:\evidence\mail\12-mailbox.mbox#1@0 (1321 B) · From bruno@example.org Wed Nov 11 11:00:03 2026</div>
+  <div>#2 @1372</div><div class="mono">R:\evidence\mail\12-mailbox.mbox#2@1372 (1276 B) · From bruno@example.org Wed Nov 11 11:30:02 2026</div>
+  <div>#3 @2699</div><div class="mono">R:\evidence\mail\12-mailbox.mbox#3@2699 (490 B) · From bruno@example.org Wed Nov 11 09:40:00 2026</div>
+</div>
+
+<h2>Method</h2>
+<p>Each file was read once to compute its digests, then analysed as email: .eml as an RFC 5322 message, .msg through its MAPI properties, and each message of an mbox as an item of its own (each in a separate worker process with time and memory limits when worker isolation is on, as recorded in the audit log). The header section, Received hops and dates were read and compared; DKIM and ARC signatures were verified offline with the public keys the examiner supplied (no DNS query unless online mode was chosen); Authentication-Results were recorded as stated evidence; attachments were hashed; and BEC heuristics compared the addresses with the organisation&#x27;s own domains. Every step and every file written is recorded in the hash-chained audit log.</p>
+
+<h2>Audit trail</h2>
+<div class="kv">
+  <div>Audit entries</div><div>#13 – #18</div>
+  <div>Log folder</div><div class="mono">R:\case\runs\rv-mailauth\20261113T232800Z-08b8d1\logs</div>
+</div>
+
+<h2>Limitations</h2>
+<ul><li>DKIM results depend on the public keys supplied: a check is only meaningful with the key that was valid when the message was sent. Keys are rotated, so a current key can fail a genuine message and a missing key leaves the signature unchecked.</li><li>A missing DKIM signature is common and proves nothing; a valid signature covers only the signed header fields and the body, not who wrote the message.</li><li>Outlook .msg files do not keep the original message: the body is re-encoded (so DKIM cannot be checked) and the original header section is kept only when transport headers were stored.</li><li>Lookalike-domain, Reply-To, display-name and payment-wording checks are heuristics with false positives and false negatives; the organisational domain comes from the bundled Public Suffix List, whose version is recorded in environment.json and may differ from the list in force when the message was sent.</li><li>Received, Date and Authentication-Results headers are text that servers and clients wrote; unsigned headers can be added or edited by anyone who handled the file.</li><li>In an mbox, body lines starting with &quot;From &quot; are escaped with &#x27;&gt;&#x27;; un-escaping follows the selected variant (mboxrd by default) and cannot always restore the original line, which can affect DKIM body hashes.</li><li>A result without findings does not prove that a file is authentic or unaltered before acquisition.</li><li>Modification times come from the file system of the examined copy and may differ from the original source.</li><li>Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as suspicious.</li><li>A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source.</li></ul>
+<footer><div class="tagline">We uncover the hidden. We reconstruct what happened. We protect what matters.</div>Generated by rv-mailauth 0.2.0 · 20261113T232800Z-08b8d1 · This PDF is not digitally signed.</footer>
+</main></body></html>

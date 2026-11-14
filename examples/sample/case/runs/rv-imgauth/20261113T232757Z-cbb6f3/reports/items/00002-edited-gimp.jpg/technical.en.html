@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical review — edited-gimp.jpg</title><style>:root { --ink:#0D1117; --muted:#475467; --line:#E4E7EC; --accent:#2A5CFF; --violet:#6B00FF; --cyan:#00E5FF; --night:#0D1117; --night2:#1A1F26; --mist:#E6E6E6; --soft:#F5F7FB; --bg:#FFFFFF; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 "Segoe UI", "Inter", system-ui, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
+.band { background: linear-gradient(135deg, var(--night) 0%, var(--night2) 70%); color: var(--mist); border-bottom: 3px solid; border-image: linear-gradient(90deg, var(--accent), var(--violet), var(--cyan)) 1; }
+.band .inner { max-width: 920px; margin: 0 auto; padding: 14px 16px; display:flex; align-items:center; gap:14px; }
+.band .word { font-weight:800; letter-spacing:.22em; font-size:15px; }
+.band .desc { font-size:10.5px; letter-spacing:.14em; color: var(--cyan); }
+header { border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 22px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.mark { font-weight:800; letter-spacing:.18em; color:var(--accent); font-size:12px; }
+.tagline { font-style: italic; color: var(--muted); }
+.sign { margin-top: 28px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; color: var(--muted); min-height: 40px; }
+table.blank td { height: 34px; }
+h1 { font-size: 22px; margin: 6px 0 2px; }
+h2 { font-size: 16px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.meta { font-size: 13px; color: var(--muted); text-align:right; }
+table { width:100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { text-align:left; vertical-align:top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; background: var(--soft); }
+.mono { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; word-break: break-all; }
+.badge { color:#fff; border-radius: 999px; padding: 1px 9px; font-size: 11px; font-weight: 700; }
+.sev-high { background:#B42318; } .sev-medium { background:#B54708; } .sev-low { background:#2A5CFF; } .sev-info { background:#475467; }
+.finding { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:10px 0; break-inside: avoid; }
+.kv { display:grid; grid-template-columns: 210px 1fr; gap: 4px 12px; font-size: 13px; }
+.kv div:nth-child(odd) { color: var(--muted); }
+.status { font-size: 20px; font-weight: 700; padding: 14px 16px; border-left: 5px solid var(--accent); background: var(--soft); }
+.status-problem { border-color:#B42318; } .status-attention { border-color:#B54708; } .status-ok { border-color:#067647; }
+.note { padding: 10px 12px; background:#FFFAEB; border:1px solid #FEDF89; border-radius:8px; }
+footer { margin-top: 36px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+h3 { font-size: 14px; margin: 18px 0 6px; }
+.small { font-size: 12px; color: var(--muted); }
+.scroll { overflow-x: auto; }
+table.dense { font-size: 12px; } table.dense th, table.dense td { padding: 4px 6px; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 10px 0; }
+.thumbs a { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 6px; text-decoration: none; color: var(--ink); }
+.thumbs img { display: block; width: 100%; height: auto; border-radius: 4px; background: var(--soft); }
+.map { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 12px 0; }
+.map img { display: block; max-width: 100%; height: auto; border-radius: 4px; background: var(--soft); }
+.map h3 { margin: 0 0 8px; font-size: 14px; }
+pre.qt { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; margin: 4px 0 12px; }
+.seq { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; word-break: break-word; }
+@media (max-width: 640px) { .kv { grid-template-columns: 1fr; } .meta { text-align:left; } }
+@media print { main { padding: 0; } .band { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style></head>
+<body><div class="band"><div class="inner"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" role="img" aria-label="RV">
+  <defs><linearGradient id="rvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A5CFF"/><stop offset=".55" stop-color="#4D23FF"/><stop offset="1" stop-color="#6B00FF"/></linearGradient></defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0D1117" stroke="url(#rvg)" stroke-width="4"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="800" font-size="26" fill="#E6E6E6">RV</text>
+  <rect x="18" y="47" width="28" height="3" rx="1.5" fill="#00E5FF"/>
+</svg>
+<div><div class="word">RAKVOR</div><div class="desc">FORENSICS | INCIDENT RESPONSE | SECURITY</div></div></div></div>
+<main>
+<header>
+  <div><h1>Technical review</h1><div>edited-gimp.jpg</div></div>
+  <div class="meta">
+    <div>Run ID: <strong>20261113T232757Z-cbb6f3</strong></div>
+    <div>Item #2</div>
+    <div>Evidence ID: <strong>E0012</strong></div>
+    <div>Case: RV-SAMPLE-001</div>
+  </div>
+</header>
+
+<div class="kv">
+  <div>Path</div><div class="mono">R:\evidence\images\edited-gimp.jpg</div>
+  <div>Size (bytes)</div><div>105483</div>
+  <div>Last modified (UTC)</div><div>2026-11-12T06:00:00Z</div>
+  <div>Extension</div><div>.jpg</div>
+  <div>Detected type (signature)</div><div>JPEG image</div>
+  <div>Status</div><div>Needs attention</div>
+  <div>Case</div><div>RV-SAMPLE-001</div>
+  <div>Evidence ID</div><div class="mono">E0012</div>
+  <div>Case registry</div><div>Verified: identical to the registered evidence</div>
+  <div>Registered at intake (UTC)</div><div>2026-11-13T23:27:52.795Z</div>
+</div>
+
+<h2>Hashes</h2>
+<table><tr><th>Hash algorithms</th><th>Hex</th></tr>
+<tr><td>sha256</td><td class="mono">1a37e10d99d05c6ff552cc2ea29b218b133e1ee319b5b477d5ca64989ddff3f5</td></tr><tr><td>md5</td><td class="mono">636327633cd387f9e4f80193cd87112e</td></tr>
+</table>
+
+<h2>Findings</h2>
+
+<div class="finding">
+  <div><span class="badge sev-medium">Medium</span> <strong>Saved by editing or processing software</strong> <span class="mono">EXIF_SOFTWARE_EDITOR</span></div>
+  <div class="kv"><div>What it shows</div><div>The metadata names GIMP 2.10.36 (EXIF Software, XMP CreatorTool, JPEG comment, XMP history).</div><div>What it does not prove</div><div>Editors are used for legitimate tasks (rotating, resizing, converting); it shows which program saved the file, not what was changed.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-medium">Medium</span> <strong>Edit history in XMP</strong> <span class="mono">XMP_EDIT_HISTORY</span></div>
+  <div class="kv"><div>What it shows</div><div>The XMP history lists 2 event(s); the last by Gimp 2.10 (Linux).</div><div>What it does not prove</div><div>The history records software actions (saved, converted, cropped…) as written by the software; it can be incomplete or edited and does not show what the picture looked like before.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-medium">Medium</span> <strong>Metadata dates do not agree</strong> <span class="mono">METADATA_DATES_INCONSISTENT</span></div>
+  <div class="kv"><div>What it shows</div><div>EXIF DateTime 2026:05:16 18:02:10 is 2.3 days after DateTimeOriginal 2026:05:14 10:21:33 and a Software tag is present.</div><div>What it does not prove</div><div>Clocks, time zones and software that rewrites dates all cause this; it does not show when the picture was taken or changed.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Standard (IJG) compression tables</strong> <span class="mono">QT_STANDARD_IJG</span></div>
+  <div class="kv"><div>What it shows</div><div>The quantization tables are the IJG standard tables at quality 85.</div><div>What it does not prove</div><div>Very many programs and devices use these tables; they identify a family of encoders, not one program or camera.</div></div>
+</div>
+<div class="finding">
+  <div><span class="badge sev-info">Informational</span> <strong>Compression tables not in the database</strong> <span class="mono">QT_UNKNOWN</span></div>
+  <div class="kv"><div>What it shows</div><div>No entry of the fingerprint databases matches these tables (SHA-256 43920728cfe021cebc3e0bf197ec4338c16eec09bf89e4b7a5cac6f67651ebfa).</div><div>What it does not prove</div><div>The database covers few devices and apps; an unknown table says nothing about authenticity. Add known originals with `fingerprints learn`.</div></div>
+</div>
+
+
+<h2>Image analysis</h2>
+<div class="kv">
+  <div>Status</div><div>Completed</div>
+  <div>Format</div><div>JPEG</div><div>Dimensions (pixels)</div><div>1200 × 900</div>
+</div>
+
+<h2>Original image (decoded preview)</h2>
+<p>Lossless PNG of the decoded pixels, exactly as the analyses saw them (stored orientation; EXIF rotation not applied). The maps below have the same size and can be laid over it.</p>
+<div class="map"><a href="maps&#x2f;original.png"><img src="maps&#x2f;original.png" alt="Original image (decoded preview)" loading="lazy"></a>
+<div class="mono">maps&#x2f;original.png (1200x900)</div></div>
+
+<h2>Metadata summary</h2>
+<p>Key fields only; metadata.json in the item folder holds every tag read. Metadata is written by the device or program that saved the file and can be edited or forged.</p>
+<div class="kv"><div>Tags read</div><div>39</div><div>Tags per group</div><div>COM 1, Exif 13, IFD0 8, IFD1 6, XMP 11</div><div>GPS tags</div><div>absent</div><div>MakerNote</div><div>present</div><div>XMP packet</div><div>present</div><div>Embedded thumbnail</div><div>present</div><div>ICC profile (SHA-256)</div><div>—</div></div>
+<div class="scroll"><table class="dense"><tr><th>Group</th><th>Field</th><th>Value</th></tr>
+<tr><td>IFD0</td><td class="mono">Make</td><td>Canon</td></tr><tr><td>IFD0</td><td class="mono">Model</td><td>Canon EOS R6</td></tr><tr><td>IFD0</td><td class="mono">Software</td><td>GIMP 2.10.36</td></tr><tr><td>IFD0</td><td class="mono">DateTime</td><td>2026:05:16 18:02:10</td></tr><tr><td>Exif</td><td class="mono">DateTimeOriginal</td><td>2026:05:14 10:21:33</td></tr><tr><td>Exif</td><td class="mono">DateTimeDigitized</td><td>2026:05:14 10:21:33</td></tr><tr><td>Exif</td><td class="mono">OffsetTime</td><td>+02:00</td></tr><tr><td>Exif</td><td class="mono">OffsetTimeOriginal</td><td>+02:00</td></tr><tr><td>Exif</td><td class="mono">PixelXDimension</td><td>1200</td></tr><tr><td>Exif</td><td class="mono">PixelYDimension</td><td>900</td></tr><tr><td>IFD0</td><td class="mono">Orientation</td><td>1 (row 0 at top and column 0 at left)</td></tr><tr><td>XMP</td><td class="mono">xmp:CreatorTool</td><td>GIMP 2.10</td></tr><tr><td>XMP</td><td class="mono">xmp:ModifyDate</td><td>2026-05-16T18:02:10+02:00</td></tr><tr><td>XMP</td><td class="mono">xmp:MetadataDate</td><td>2026-05-16T18:02:10+02:00</td></tr><tr><td>COM</td><td class="mono">Comment</td><td>Created with GIMP</td></tr>
+</table></div>
+<h3>XMP edit history (xmpMM:History)</h3>
+<div class="scroll"><table class="dense"><tr><th>Action</th><th>When</th><th>Software</th><th>Changed</th></tr>
+<tr><td>saved</td><td>2026-05-16T17:40:02+02:00</td><td>Gimp 2.10 (Linux)</td><td>&#x2f;</td></tr><tr><td>saved</td><td>2026-05-16T18:02:10+02:00</td><td>Gimp 2.10 (Linux)</td><td>&#x2f;</td></tr>
+</table></div>
+
+
+
+<h2>Structure summary</h2>
+<p>Top-level segments in file order (JPEG markers, PNG chunks, RIFF chunks or HEIF boxes); structure.json holds the full tree with byte offsets.</p>
+<div class="kv"><div>Top-level segments</div><div>15</div><div>frame (SOF)</div><div>SOF0</div><div>chroma subsampling</div><div>4:2:0</div><div>components</div><div>3</div><div>restart interval</div><div>0</div><div>quantization tables</div><div>2</div><div>Huffman tables</div><div>4</div><div>bytes after EOI</div><div>0</div><div>comments (COM)</div><div>1</div>
+  <div>Marker &#x2f; chunk &#x2f; box sequence</div><div class="seq">SOI · APP0&#x2f;JFIF · APP1&#x2f;Exif · APP1&#x2f;XMP · COM · DQT ×2 · SOF0 · DHT ×4 · SOS · EOI</div></div>
+
+<h2>Quantization tables</h2>
+<p>Values in natural (row-major) order, as stored in the DQT segments. The IJG comparison names a standard libjpeg quality only on an exact match; otherwise the nearest quality and its distance (sum of absolute differences) are given, which is not a quality percentage.</p>
+<div class="kv"><div>IJG comparison</div><div>IJG-standard q=85</div><div>Database match</div><div>no entry in the loaded databases</div><div>Table hash (SHA-256)</div><div class="mono">43920728cfe021cebc3e0bf197ec4338c16eec09bf89e4b7a5cac6f67651ebfa</div></div>
+<h3>Table 0 · 8-bit · Used by components: 1</h3>
+<pre class="qt">  5   3   3   5   7  12  15  18
+  4   4   4   6   8  17  18  17
+  4   4   5   7  12  17  21  17
+  4   5   7   9  15  26  24  19
+  5   7  11  17  20  33  31  23
+  7  11  17  19  24  31  34  28
+ 15  19  23  26  31  36  36  30
+ 22  28  29  29  34  30  31  30
+</pre><h3>Table 1 · 8-bit · Used by components: 2, 3</h3>
+<pre class="qt">  5   5   7  14  30  30  30  30
+  5   6   8  20  30  30  30  30
+  7   8  17  30  30  30  30  30
+ 14  20  30  30  30  30  30  30
+ 30  30  30  30  30  30  30  30
+ 30  30  30  30  30  30  30  30
+ 30  30  30  30  30  30  30  30
+ 30  30  30  30  30  30  30  30
+</pre>
+
+<h2>Fingerprint databases</h2>
+<div class="scroll"><table class="dense"><tr><th>Role</th><th>Database</th><th>Version</th><th>Entries</th><th>Status</th><th>SHA-256</th></tr>
+<tr><td>starter</td><td>rakvor-starter</td><td>0</td><td>0</td><td>loaded</td><td class="mono">e0b0c87e4b79e5c5402e920d343436056c25bb959a5bb757a7d0519b95ab4be8</td></tr><tr><td>local</td><td>—</td><td>—</td><td>—</td><td>absent</td><td class="mono">—</td></tr>
+</table></div>
+
+<h2>Analysis maps</h2>
+<p class="note">Visual aid, requires interpretation: these maps have no score and the tool draws no conclusion from them. Bright areas are not proof of a change; authentic edges, textures and noise produce them too.</p>
+<div class="map"><h3>Thumbnail vs main image difference</h3>
+<a href="maps&#x2f;thumbnail-diff.png"><img src="maps&#x2f;thumbnail-diff.png" alt="thumbnail-diff.png" loading="lazy"></a>
+<div class="mono">maps&#x2f;thumbnail-diff.png</div>
+<div class="kv"><div>compared_area</div><div>160x120 at 0,0 (black bars trimmed)</div><div>gain</div><div>4</div><div>largest_block_difference</div><div>33.1</div><div>mean_difference</div><div>3.5</div><div>resize</div><div>main image area-averaged to the thumbnail size</div><div>thumbnail_size</div><div>160x120</div><div>upscale</div><div>4</div></div>
+</div>
+
+
+<h2>Copy-move shift vectors</h2>
+<p>No copy-move candidate was found (scaled or rotated copies are not detected).</p>
+
+
+
+
+<h2>Extracted files</h2>
+<div class="scroll"><table class="dense"><tr><th>File</th><th>Category</th><th>Bytes</th><th>Hashes</th></tr>
+<tr><td class="mono"><a href="structure.json">structure.json</a></td><td>structure</td><td>11358</td><td class="mono"><div>md5: 47b0cd5763e460c0a4fa48bdceeaf932</div><div>sha256: 74bb3029b6ddf4b6fee3aee320cb722c4f3f99c79be20d813006525fa4e12ef9</div></td></tr><tr><td class="mono"><a href="metadata.json">metadata.json</a></td><td>metadata</td><td>6405</td><td class="mono"><div>md5: 455bd7695741478667ed2cf21623f740</div><div>sha256: 6d9a9d70212eb2428a487968e14dba0902f63b07590114e2746e4ca42970ad28</div></td></tr><tr><td class="mono"><a href="maps&#x2f;original.png">maps&#x2f;original.png</a></td><td>original_preview</td><td>1076768</td><td class="mono"><div>md5: 07cc9ec0c4cc1933390357eeabc62b92</div><div>sha256: 8e9e44761c4d9c9b1eb1d4811de96affdf0257986d9d9251bbae7593bf8ce038</div></td></tr><tr><td class="mono"><a href="maps&#x2f;thumbnail-diff.png">maps&#x2f;thumbnail-diff.png</a></td><td>map</td><td>70868</td><td class="mono"><div>md5: 61d8546f750f09cb20df0cb97fd4cbc9</div><div>sha256: d9b738f183865a3326a9de0cc997f0a866f27c713fcaf23c7f97e4ede642e334</div></td></tr>
+</table></div>
+
+<h2>Method</h2>
+<p>Each file was opened read-only and hashed in a single pass with the selected algorithms, and its real type was identified from its signature. JPEG, HEIC, PNG and WebP images were then re-read in an isolated process and the bytes read were hashed again and compared with the first pass. The image analysis read the file structure and metadata, compared the JPEG quantization tables with the IJG standard and the fingerprint databases, looked for double JPEG compression, wrote the selected visual maps (error level, noise, JPEG ghosts), searched for copied-and-moved regions, compared the embedded thumbnail with the main image and, when reference images were given, compared the image with them. HEIC pixels are not decoded (structure and metadata only). Every action and every file written was recorded in a hash-chained audit log.</p>
+
+<h2>Audit trail</h2>
+<div class="kv">
+  <div>Audit entries</div><div>#14 – #22</div>
+  <div>Log folder</div><div class="mono">R:\case\runs\rv-imgauth\20261113T232757Z-cbb6f3\logs</div>
+</div>
+
+<h2>Limitations</h2>
+<ul><li>An image without findings is not proven authentic: careful edits can leave none of the traces these checks look for, and it is impossible to prove a negative (SWGDE 18-I-001).</li><li>Error level, noise and ghost maps are visual aids for a trained examiner; the tool gives them no score and draws no conclusion from them.</li><li>Double JPEG compression shows the image was saved more than once; ordinary sharing and exporting do this.</li><li>The compression-table database covers few devices and apps (built from Rakvor&#x27;s own captures plus local learning); an absent or matching entry is weak evidence on its own.</li><li>Copy-move detection compares blocks at the same scale and orientation on a downscaled image: scaled, rotated or small copies are not found.</li><li>Error rates of these checks have not yet been measured on a documented validation corpus; the findings are signals to be weighed by the examiner.</li><li>Modification times come from the file system of the examined copy and may differ from the original source.</li><li>A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source.</li><li>Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as suspicious.</li></ul>
+<footer><div class="tagline">We uncover the hidden. We reconstruct what happened. We protect what matters.</div>Generated by rv-imgauth 0.3.1 · 20261113T232757Z-cbb6f3 · This PDF is not digitally signed.</footer>
+</main></body></html>

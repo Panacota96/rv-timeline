@@ -1,0 +1,96 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Title (Customer summary) /Producer (rv-mailauth 0.2.0) /Creator (rv-mailauth 0.2.0) /CreationDate (D:20261113232801Z) >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 5146 >>
+stream
+0.051 0.067 0.090 rg 0 780.00 595 62 re f
+0.165 0.361 1.000 rg 0.00 777.80 198.33 2.2 re f
+0.420 0.000 1.000 rg 198.33 777.80 198.33 2.2 re f
+0.000 0.898 1.000 rg 396.67 777.80 198.33 2.2 re f
+0.102 0.122 0.149 rg 0.165 0.361 1.000 RG 1.6 w 50 790 42 42 re B
+0.902 0.902 0.902 rg BT /F2 17 Tf 58.50 805.00 Td (RV) Tj ET
+0.000 0.898 1.000 rg 60.00 798.00 22 2 re f
+0.902 0.902 0.902 rg BT /F2 13 Tf 4 Tc 106.00 812.00 Td (RAKVOR) Tj ET 0 Tc
+0.000 0.898 1.000 rg BT /F1 7.5 Tf 106.00 799.00 Td (FORENSICS | INCIDENT RESPONSE | SECURITY) Tj ET
+0.051 0.067 0.090 rg BT /F2 18 Tf 50.00 719.70 Td (Customer summary) Tj ET
+0.278 0.329 0.404 rg BT /F1 10 Tf 50.00 706.20 Td (12-mailbox.mbox#3@2699 \267 Evidence ID: E0016 \267 Case: RV-SAMPLE-001) Tj ET
+0.165 0.361 1.000 RG 2 w 50 698.20 m 545 698.20 l S
+0.165 0.361 1.000 rg 50.00 662.20 4.00 24.00 re f
+0.051 0.067 0.090 rg BT /F2 14 Tf 62.00 661.30 Td (Needs attention) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 642.47 Td (The file was hashed and checked. Some points need attention.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 613.27 Td (What we did) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 609.27 m 545 609.27 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 594.45 Td (Each file was read once to compute its digests, then analysed as email: .eml as an RFC 5322 message, .msg through) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 581.62 Td (its MAPI properties, and each message of an mbox as an item of its own \(each in a separate worker process with) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 568.80 Td (time and memory limits when worker isolation is on, as recorded in the audit log\). The header section, Received hops) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 555.97 Td (and dates were read and compared; DKIM and ARC signatures were verified offline with the public keys the examiner) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 543.15 Td (supplied \(no DNS query unless online mode was chosen\); Authentication-Results were recorded as stated evidence;) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 530.32 Td (attachments were hashed; and BEC heuristics compared the addresses with the organisation's own domains. Every) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 517.50 Td (step and every file written is recorded in the hash-chained audit log.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 488.30 Td (What we found) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 484.30 m 545 484.30 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 469.47 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 469.47 Td (No DKIM signature. The message carries no DKIM-Signature header.) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 456.65 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 456.65 Td (Received times go backwards. Hop 2 was stamped 2026-11-11T09:40:00Z, 1200 s before the previous hop 1) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 443.82 Td (\(2026-11-11T10:00:00Z\), beyond the tolerated clock difference \(1 such step\(s\)\).) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 431.00 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 431.00 Td (Date header later than the first server. The Date header \(2026-11-11T11:30:00Z\) is 5400 s later than the time the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 418.17 Td (first server received the message \(2026-11-11T10:00:00Z\).) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 405.35 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 405.35 Td (Time zone inconsistent. The Date header uses zone +0500 while the sender organisation's first server used) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 392.52 Td (+0000 \(sender_server_zone_differs\).) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 52.00 379.70 Td (\225) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 379.70 Td (Message-ID from another domain. The Message-ID was generated under mailer.example.com, not under the) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 64.00 366.87 Td (From domain example.org.) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 340.67 Td (Digital fingerprint) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 336.67 m 545 336.67 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 321.85 Td (This fingerprint identifies the exact content of the file. Any change, even of one character, would produce a different) Tj ET
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 309.02 Td (value.) Tj ET
+0.278 0.329 0.404 rg BT /F1 9 Tf 50.00 291.87 Td (sha256) Tj ET
+0.051 0.067 0.090 rg BT /F3 8 Tf 215.00 291.87 Td (9d13579ab0f6860e938f33c35b485fca29c2417dd5b6d57fa59c892eb6a4499a) Tj ET
+0.051 0.067 0.090 rg BT /F2 12 Tf 50.00 262.67 Td (Recommended next step) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 258.67 m 545 258.67 l S
+0.051 0.067 0.090 rg BT /F1 9.5 Tf 50.00 243.85 Td (Review the findings below with your examiner before relying on this file.) Tj ET
+0.894 0.906 0.925 RG 0.6 w 50 44 m 545 44 l S
+0.278 0.329 0.404 rg BT /F1 7.5 Tf 50 32 Td (Generated by rv-mailauth 0.2.0 \267 20261113T232800Z-08b8d1  \227  Page 1 of 1) Tj ET
+0.278 0.329 0.404 rg BT /F1 6.8 Tf 50 22 Td (We uncover the hidden. We reconstruct what happened. We protect what matters.) Tj ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000320 00000 n 
+0000000415 00000 n 
+0000000555 00000 n 
+0000000701 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R /Info 6 0 R >>
+startxref
+5898
+%%EOF

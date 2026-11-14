@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "888c2e483ad86a072a759a3bdd58dd0242d0302394ac04d0acc309d1c4651e9e"
+  },
+  "item": {
+    "evidence_id": "E0003",
+    "file_name": "intermediate.crl",
+    "index": 3
+  },
+  "run_id": "20261113T232752Z-fb64f6",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

@@ -100,14 +100,15 @@ DONE (to review: excluded runs or medium/high signals)  run 20261113T115004Z-dcb
 ```
 
 Exit code 3 here means "to review": every run verified, and the sample plants medium- and high-severity signals.
-The same command on the tampered copy `examples/sample/tampered/digest-mismatch` (one rv-imgauth output changed
-after its run) leaves that run out and says why:
+The same command on the tampered copy `digest-mismatch` (one rv-imgauth output changed after its run; write the
+three copies with `python tests/make_sample_case.py tamper examples/sample/case <folder>`) leaves that run out
+and says why:
 
 ```text
   runs:     verified 6, excluded 1, skipped 0
   events:   132 (zone unknown: 3)  items: 21
   signals:  high 0, medium 5, low 1, info 1
-  excluded: runs/rv-imgauth/20261113T065648Z-b151c3 (digest_mismatch: reports/items/00003-future-exif.jpg/metadata.json: md5 differs from logs/audit.jsonl)
+  excluded: runs/rv-imgauth/20261113T232757Z-cbb6f3 (digest_mismatch: reports/items/00003-future-exif.jpg/metadata.json: md5 differs from logs/audit.jsonl)
 ```
 
 The planted `EXIF_AFTER_INTAKE` disappears with the excluded run: its events are not in the timeline at all.
@@ -156,13 +157,20 @@ RV Hub (the Rakvor launcher) finds the installed tools and opens them on a case 
 ```powershell
 rv-timeline verify-case R:\case
 # OK  case RV-SAMPLE-001: 19 case-log entries, 21 registered items, 8 runs verified: R:\case
+#     review logs: 0 entries across the runs, all verified
+#     outputs: 1016 verified of 1016 recorded by the runs' audit logs
 rv-timeline verify-log R:\case\runs\rv-timeline\20261113T115004Z-dcb88e\logs
 # OK  67 entries, chain intact: …\audit.jsonl
 #     truncation: the final entry #67 is anchored by the case log (run_finished)
 #     review log: none
+#     outputs: 409 verified of 409 recorded (md5, sha256)
 ```
 
-`verify-case` also prints `review logs: <n> entries across the runs, all verified`; after viewing in the GUI,
+`verify-log` re-hashes every file the build's audit log records (`timeline.jsonl`, reports, `hashes.csv`,
+`environment.json`); `verify-case` does the same for every run of the case and prints
+`outputs: N verified of M recorded by the runs' audit logs`. An edited, deleted or replaced output is named
+(`output reports/timeline.jsonl: sha256 differs from audit entry #…`) and gives exit 3. `verify-case` also prints
+`review logs: <n> entries across the runs, all verified`; after viewing in the GUI,
 `verify-log` prints `review log: <n> entries, chain intact`. Then hand over the whole case folder.
 
 ## 3. Reading the outputs
@@ -248,14 +256,15 @@ Anyone — you, a colleague, an opposing expert — can check a build with the c
 
 | Step | Command | Proves |
 | --- | --- | --- |
-| 1 | `rv-timeline verify-log <RUN>\logs` (exit 0 intact, 3 broken or truncated) | No entry edited, deleted or reordered; timestamp tokens match; the log reaches the final entry the case log recorded; `review.jsonl` intact and anchored to this build |
+| 1 | `rv-timeline verify-log <RUN>\logs` (exit 0 intact, 3 broken, truncated or an output changed) | No entry edited, deleted or reordered; timestamp tokens match; the log reaches the final entry the case log recorded; `review.jsonl` intact and anchored to this build; every output the log records still has its digests (`outputs:` line) |
 | 2 | `python tests/verify_chain.py <RUN>/logs` (source tree) | Same, with an independent implementation; also re-hashes the files listed in `hashes.csv` |
-| 3 | `rv-timeline verify-case <CASE>` (add `--rehash` where the evidence is reachable) | Every run, the build's included, is the one the case log announced and complete; the registry is intact |
-| 4 | Script below | `timeline.jsonl`, every report, `environment.json` and `hashes.csv` still have the digests recorded in the log |
+| 3 | `rv-timeline verify-case <CASE>` (add `--rehash` where the evidence is reachable) | Every run, the build's included, is the one the case log announced and complete, with every recorded output unchanged; the registry is intact |
+| 4 | Step 1 (`outputs:` line); script below for an independent check | `timeline.jsonl`, every report, `environment.json` and `hashes.csv` still have the digests recorded in the log |
 | 5 | Rebuild on a **copy** of the case with the same options | The same `timeline.jsonl` SHA-256 ([theory.md B14](theory.md#b14-determinism-and-repeatability)) |
 | 6 | `python tests/validate_reports.py <RUN>/reports` | Every JSON report matches its schema |
 
-Step 4 (no built-in command yet, gap G19):
+Step 4 is built into `verify-log` and `verify-case`. To check it with code you can read in one screen (an
+independent implementation, e.g. for an opposing expert), re-hash every file the build recorded:
 
 ```bash
 python - "<RUN>/logs" "<RUN>/reports" <<'EOF'
@@ -296,7 +305,7 @@ A single file in PowerShell: `(Get-FileHash <file> -Algorithm SHA256).Hash.ToLow
 | Command | 0 | 1 | 2 | 3 | 130 |
 | --- | --- | --- | --- | --- | --- |
 | `build` | built; every run verified, no medium/high signal | runtime error (case log locked, output not writable, certificate unreadable) | usage error (unknown option, tool or display zone, three algorithms, unsupported language, `--from`/`--to` not RFC 3339 or reversed, `--max-events 0`, not a case folder, `--case` of another case) | built with ≥ 1 excluded run or ≥ 1 medium/high signal; or the case fails verification (nothing written) | cancelled (Ctrl+C), partial reports written |
-| `verify-log` | intact | log or `--tsa-ca` unreadable | — | broken chain, token mismatch, or truncated | — |
+| `verify-log` | intact | log or `--tsa-ca` unreadable | — | broken chain, token mismatch, truncated, or a recorded output edited, deleted or replaced | — |
 | `verify-case` | case intact (warnings printed) | not a case folder (no `case.json`) | — | at least one check failed | — |
 | `timestamp` | obtained and logged | TSA unreachable (nothing changed) | — | log missing or broken (nothing added) | — |
 | `self-test` | all pass | a failure: do not use the build | — | — | — |

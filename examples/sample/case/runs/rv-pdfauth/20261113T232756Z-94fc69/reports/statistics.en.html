@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run statistics report — 20261113T232756Z-94fc69</title><style>:root { --ink:#0D1117; --muted:#475467; --line:#E4E7EC; --accent:#2A5CFF; --violet:#6B00FF; --cyan:#00E5FF; --night:#0D1117; --night2:#1A1F26; --mist:#E6E6E6; --soft:#F5F7FB; --bg:#FFFFFF; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 "Segoe UI", "Inter", system-ui, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
+.band { background: linear-gradient(135deg, var(--night) 0%, var(--night2) 70%); color: var(--mist); border-bottom: 3px solid; border-image: linear-gradient(90deg, var(--accent), var(--violet), var(--cyan)) 1; }
+.band .inner { max-width: 920px; margin: 0 auto; padding: 14px 16px; display:flex; align-items:center; gap:14px; }
+.band .word { font-weight:800; letter-spacing:.22em; font-size:15px; }
+.band .desc { font-size:10.5px; letter-spacing:.14em; color: var(--cyan); }
+header { border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 22px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.mark { font-weight:800; letter-spacing:.18em; color:var(--accent); font-size:12px; }
+.tagline { font-style: italic; color: var(--muted); }
+.sign { margin-top: 28px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sign div { border-top: 1px solid var(--ink); padding-top: 6px; font-size: 12px; color: var(--muted); min-height: 40px; }
+table.blank td { height: 34px; }
+h1 { font-size: 22px; margin: 6px 0 2px; }
+h2 { font-size: 16px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.meta { font-size: 13px; color: var(--muted); text-align:right; }
+table { width:100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { text-align:left; vertical-align:top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; background: var(--soft); }
+.mono { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 12px; word-break: break-all; }
+.badge { color:#fff; border-radius: 999px; padding: 1px 9px; font-size: 11px; font-weight: 700; }
+.sev-high { background:#B42318; } .sev-medium { background:#B54708; } .sev-low { background:#2A5CFF; } .sev-info { background:#475467; }
+.finding { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:10px 0; break-inside: avoid; }
+.kv { display:grid; grid-template-columns: 210px 1fr; gap: 4px 12px; font-size: 13px; }
+.kv div:nth-child(odd) { color: var(--muted); }
+.status { font-size: 20px; font-weight: 700; padding: 14px 16px; border-left: 5px solid var(--accent); background: var(--soft); }
+.status-problem { border-color:#B42318; } .status-attention { border-color:#B54708; } .status-ok { border-color:#067647; }
+.note { padding: 10px 12px; background:#FFFAEB; border:1px solid #FEDF89; border-radius:8px; }
+footer { margin-top: 36px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+h3 { font-size: 14px; margin: 18px 0 6px; }
+.small { font-size: 12px; color: var(--muted); }
+.scroll { overflow-x: auto; }
+table.dense { font-size: 12px; } table.dense th, table.dense td { padding: 4px 6px; }
+.timeline { position: relative; height: 128px; margin: 8px 0 4px; }
+.tl-axis { position: absolute; left: 0; right: 0; top: 62px; height: 3px; background: linear-gradient(90deg, var(--accent), var(--violet), var(--cyan)); border-radius: 2px; }
+.tl-pt { position: absolute; top: 56px; transform: translateX(-50%); }
+.tl-dot { display: block; width: 15px; height: 15px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); }
+.tl-lbl { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 11px; line-height: 1.3; text-align: center; white-space: nowrap; color: var(--muted); }
+.tl-up .tl-lbl { top: auto; bottom: 20px; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 10px 0; }
+.thumbs a { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 6px; text-decoration: none; color: var(--ink); }
+.thumbs img { display: block; width: 100%; height: auto; border-radius: 4px; background: var(--soft); }
+@media (max-width: 640px) { .kv { grid-template-columns: 1fr; } .meta { text-align:left; } }
+@media print { main { padding: 0; } .band { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style></head>
+<body><div class="band"><div class="inner"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" role="img" aria-label="RV">
+  <defs><linearGradient id="rvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A5CFF"/><stop offset=".55" stop-color="#4D23FF"/><stop offset="1" stop-color="#6B00FF"/></linearGradient></defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0D1117" stroke="url(#rvg)" stroke-width="4"/>
+  <text x="32" y="41" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="800" font-size="26" fill="#E6E6E6">RV</text>
+  <rect x="18" y="47" width="28" height="3" rx="1.5" fill="#00E5FF"/>
+</svg>
+<div><div class="word">RAKVOR</div><div class="desc">FORENSICS | INCIDENT RESPONSE | SECURITY</div></div></div></div>
+<main>
+<header>
+  <div><h1>Run statistics report</h1><div>rv-pdfauth 0.4.1</div></div>
+  <div class="meta">
+    <div>Run ID: <strong>20261113T232756Z-94fc69</strong></div>
+    <div>Case: RV-SAMPLE-001</div>
+    <div>Examiner: Sample Examiner</div>
+  </div>
+</header>
+
+
+<div class="kv">
+  <div>Started (UTC)</div><div>2026-11-13T23:27:56.175Z</div>
+  <div>Finished (UTC)</div><div>2026-11-13T23:27:57.157Z</div>
+  <div>Duration</div><div>1.0 s</div>
+  <div>Interface</div><div>cli</div>
+  <div>Hash algorithms</div><div>sha256 + md5</div>
+  <div>Items</div><div>4</div>
+  <div>Bytes</div><div>20854</div>
+  <div>Errors</div><div>0</div>
+  <div>Throughput</div><div>20.8 KiB&#x2f;s</div>
+</div>
+
+<h2>Findings by severity</h2>
+<table><tr><th>Severity</th><th>Findings</th></tr>
+<tr><td><span class="badge sev-high">High</span></td><td>2</td></tr><tr><td><span class="badge sev-medium">Medium</span></td><td>12</td></tr><tr><td><span class="badge sev-low">Low</span></td><td>3</td></tr><tr><td><span class="badge sev-info">Informational</span></td><td>5</td></tr>
+</table>
+
+<h2>Findings by type</h2>
+<table><tr><th>Findings</th><th>Items</th></tr>
+<tr><td>Content changed after signing</td><td>1</td></tr><tr><td>Changes not allowed by the certification signature</td><td>1</td></tr><tr><td>PDF editor fingerprint</td><td>2</td></tr><tr><td>Font added in a later revision</td><td>2</td></tr><tr><td>Incremental updates</td><td>3</td></tr><tr><td>Different software between revisions</td><td>2</td></tr><tr><td>Revision dated before the previous one</td><td>1</td></tr><tr><td>Time gap between revisions</td><td>4</td></tr><tr><td>Digital signature present (trust not verified)</td><td>1</td></tr><tr><td>Visible change between revisions</td><td>5</td></tr>
+</table>
+
+<h2>Items by detected type</h2>
+<table><tr><th>Detected type (signature)</th><th>Items</th></tr>
+<tr><td>PDF document</td><td>4</td></tr>
+</table>
+
+<h2>Duplicate groups</h2>
+<p>None</p>
+
+<h2>PDF overview</h2>
+<table><tr><th>PDF overview</th><th>Items</th></tr>
+<tr><td>PDFs analysed</td><td>4</td></tr><tr><td>PDFs with more than one revision</td><td>3</td></tr><tr><td>PDFs with digital signatures</td><td>1</td></tr><tr><td>PDFs with an online-editor fingerprint</td><td>0</td></tr><tr><td>Items without report files (--item-reports flagged, no issues found)</td><td>0</td></tr>
+</table>
+
+<h2>Case folder</h2>
+<div class="kv">
+  <div>Case</div><div><strong>RV-SAMPLE-001</strong></div>
+  <div>With an evidence ID from intake</div><div>0</div>
+  <div>Newly registered by this run</div><div>0</div>
+  <div>Verified against the registry</div><div>4</div>
+  <div>Different from the registry</div><div>0</div>
+  <div>Not in the registry</div><div>0</div>
+  <div>Case folder</div><div class="mono">R:\case</div>
+</div>
+
+<h2>Items</h2>
+<table><tr><th>#</th><th>Evidence ID</th><th>File</th><th>Size (bytes)</th><th>Status</th><th>Findings</th></tr>
+<tr><td>1</td><td class="mono">E0018</td><td><a href="items&#x2f;00001-backdated-revision.pdf&#x2f;technical.en.html">backdated-revision.pdf</a></td><td>3613</td><td>Needs attention</td><td>8</td></tr><tr><td>2</td><td class="mono">E0019</td><td><a href="items&#x2f;00002-edited-incremental.pdf&#x2f;technical.en.html">edited-incremental.pdf</a></td><td>3613</td><td>Needs attention</td><td>8</td></tr><tr><td>3</td><td class="mono">E0020</td><td><a href="items&#x2f;00003-original.pdf&#x2f;technical.en.html">original.pdf</a></td><td>1648</td><td>No issues found</td><td>0</td></tr><tr><td>4</td><td class="mono">E0021</td><td><a href="items&#x2f;00004-signed-then-modified.pdf&#x2f;technical.en.html">signed-then-modified.pdf</a></td><td>11980</td><td>Problem found</td><td>6</td></tr>
+</table>
+
+<h2>Limitations</h2>
+<ul><li>Type detection uses a limited table of common file signatures; unknown types are reported as unknown, not as suspicious.</li><li>Modification times come from the file system of the examined copy and may differ from the original source.</li><li>A result without findings does not prove that a file is authentic or unaltered before acquisition.</li><li>A trusted timestamp proves the audit log existed in this exact form at the stated time; it does not prove that the examined copy matches the original source.</li><li>The absence of findings does not prove that a PDF is authentic or unaltered: a document can be forged before it is saved, or re-created so that no trace remains.</li><li>When a PDF is printed to PDF, flattened, optimised or regenerated, its earlier revisions and most editing traces are lost; only its last state can be examined.</li><li>Producer fingerprints come from a limited database (vendor documentation and files generated by Rakvor); producer strings can be typed by hand, and unknown or spoofed values cannot be recognised.</li><li>Digital signatures are checked for byte coverage and cryptographic integrity only; certificate chains, revocation and the signer&#x27;s identity are not validated.</li><li>The visual comparison between revisions renders only a limited number of pages per revision; pages beyond that limit are compared structurally only.</li></ul>
+
+<h2>Trusted timestamp (RFC 3161)</h2>
+<div class="kv">
+  <div>Status</div><div>Not requested</div>
+  
+  
+</div>
+
+<h2>Audit trail</h2>
+<div class="kv">
+  <div>Audit chain head (SHA-256)</div><div class="mono">ca8975aaf65268c67f1411f453e14d957d4ac4999de9adc2b6387c6adde5489d</div>
+  <div>Audit entries</div><div>51</div>
+  <div>Log folder</div><div class="mono">R:\case\runs\rv-pdfauth\20261113T232756Z-94fc69\logs</div>
+</div>
+<footer><div class="tagline">We uncover the hidden. We reconstruct what happened. We protect what matters.</div>Generated by rv-pdfauth 0.4.1 · 20261113T232756Z-94fc69 · This PDF is not digitally signed.</footer>
+</main></body></html>

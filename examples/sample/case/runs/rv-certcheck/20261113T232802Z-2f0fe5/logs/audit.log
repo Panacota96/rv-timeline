@@ -1,0 +1,67 @@
+2026-11-13T23:28:02.741Z  #00001  run_started          algorithms=sha256+md5 case_dir=R:\case case_id=RV-SAMPLE-001 evidence_ids= frontend=cli input_list=null inputs=R:\evidence\certs jurisdiction=co langs=en out_dir=rakvor-out recursive=false sign_cert=null tool=rv-certcheck tsa_url=null version=0.2.2
+2026-11-13T23:28:02.742Z  #00002  case_linked          case_created=false case_dir=R:\case case_id=RV-SAMPLE-001 case_log_head_at_start=69a75ea87aabcf1c327c91239cac568182de169cb6e1139e7eef46c7e13f244b case_log_seq_at_start=16 jurisdiction=co registry_items=21 registry_sha256=10e914634e4e9a434c36b67a3d9d676acd0cebf23465b18ceee9b60b11de2737 requested_jurisdiction=co role=analysis run_dir=runs/rv-certcheck/20261113T232802Z-2f0fe5
+2026-11-13T23:28:02.743Z  #00003  environment_recorded environment.json  md5=67788b15ba24f134e4f79e3963281206 sha256=6b0fc35415c58e8757de3f244e104be9ca1e4dc51d2113dac6227a3f9e8303b9
+2026-11-13T23:28:02.745Z  #00004  validation_options   anchor_files={"path":"R:\\anchors\\rakvor-lab-root.crt","sha256":"cdfedfca139cf04e968e16b3a5675d811df78fd0ecf720b7040add94b29ac41f"} anchors=file:R:\anchors\rakvor-lab-root.crt anchors_resolved={"certificates":["8be85a7dc7dbf6f9e3748b2d9483fb7c4d7c0629a4716015bd00a0dccb02cb62"],"source_sha256":"cdfedfca139cf04e968e16b3a5675d811df78fd0ecf720b7040add94b29ac41f","spec":"file:R:\\anchors\\rakvor-lab-root.crt"} at=2026-06-01T00:00:00Z crl_files= ocsp_files= online=false openssl=OpenSSL 3.6.3 9 Jun 2026 p12_password=none purpose=any
+2026-11-13T23:28:02.746Z  #00005  inputs_resolved      bytes=10364 items=8
+2026-11-13T23:28:02.746Z  #00006  item_started         R:\evidence\certs\data.tsr  index=1 modified_utc=2026-11-12T06:00:00Z size=2557
+2026-11-13T23:28:02.747Z  #00007  item_hashed          R:\evidence\certs\data.tsr  bytes_read=2557 index=1 mtime_unchanged=true
+2026-11-13T23:28:02.749Z  #00008  evidence_verified_against_case R:\evidence\certs\data.tsr  algorithm=sha256+md5 evidence_id=E0001 index=1 match=true matched_by=path
+2026-11-13T23:28:02.750Z  #00009  item_analyzed        R:\evidence\certs\data.tsr  crypto_kind=timestamp_token detected_type=RFC 3161 timestamp token extension=tsr findings= index=1 status=ok
+2026-11-13T23:28:02.751Z  #00010  item_started         R:\evidence\certs\data.txt  index=2 modified_utc=2026-11-12T06:00:00Z size=44
+2026-11-13T23:28:02.751Z  #00011  item_hashed          R:\evidence\certs\data.txt  bytes_read=44 index=2 mtime_unchanged=true
+2026-11-13T23:28:02.751Z  #00012  evidence_verified_against_case R:\evidence\certs\data.txt  algorithm=sha256+md5 evidence_id=E0002 index=2 match=true matched_by=path
+2026-11-13T23:28:02.751Z  #00013  item_analyzed        R:\evidence\certs\data.txt  crypto_kind=unknown detected_type=null extension=txt findings={"code":"CRYPTO_INPUT_NOT_RECOGNISED","params":{"kind":"unknown"},"severity":"info"} index=2 status=ok
+2026-11-13T23:28:02.752Z  #00014  item_started         R:\evidence\certs\intermediate.crl  index=3 modified_utc=2026-11-12T06:00:00Z size=458
+2026-11-13T23:28:02.753Z  #00015  item_hashed          R:\evidence\certs\intermediate.crl  bytes_read=458 index=3 mtime_unchanged=true
+2026-11-13T23:28:02.753Z  #00016  evidence_verified_against_case R:\evidence\certs\intermediate.crl  algorithm=sha256+md5 evidence_id=E0003 index=3 match=true matched_by=path
+2026-11-13T23:28:02.753Z  #00017  item_analyzed        R:\evidence\certs\intermediate.crl  crypto_kind=crl detected_type=X.509 certificate revocation list extension=crl findings= index=3 status=ok
+2026-11-13T23:28:02.754Z  #00018  item_started         R:\evidence\certs\intermediate.crt  index=4 modified_utc=2026-11-12T06:00:00Z size=1330
+2026-11-13T23:28:02.754Z  #00019  item_hashed          R:\evidence\certs\intermediate.crt  bytes_read=1330 index=4 mtime_unchanged=true
+2026-11-13T23:28:02.755Z  #00020  evidence_verified_against_case R:\evidence\certs\intermediate.crt  algorithm=sha256+md5 evidence_id=E0004 index=4 match=true matched_by=path
+2026-11-13T23:28:02.755Z  #00021  item_analyzed        R:\evidence\certs\intermediate.crt  crypto_kind=certificate detected_type=X.509 certificate extension=crt findings= index=4 status=ok
+2026-11-13T23:28:02.756Z  #00022  item_started         R:\evidence\certs\leaf-expired.crt  index=5 modified_utc=2026-11-12T06:00:00Z size=1574
+2026-11-13T23:28:02.757Z  #00023  item_hashed          R:\evidence\certs\leaf-expired.crt  bytes_read=1574 index=5 mtime_unchanged=true
+2026-11-13T23:28:02.757Z  #00024  evidence_verified_against_case R:\evidence\certs\leaf-expired.crt  algorithm=sha256+md5 evidence_id=E0005 index=5 match=true matched_by=path
+2026-11-13T23:28:02.758Z  #00025  item_analyzed        R:\evidence\certs\leaf-expired.crt  crypto_kind=certificate detected_type=X.509 certificate extension=crt findings= index=5 status=ok
+2026-11-13T23:28:02.758Z  #00026  item_started         R:\evidence\certs\leaf-revoked.crt  index=6 modified_utc=2026-11-12T06:00:00Z size=1574
+2026-11-13T23:28:02.758Z  #00027  item_hashed          R:\evidence\certs\leaf-revoked.crt  bytes_read=1574 index=6 mtime_unchanged=true
+2026-11-13T23:28:02.759Z  #00028  evidence_verified_against_case R:\evidence\certs\leaf-revoked.crt  algorithm=sha256+md5 evidence_id=E0006 index=6 match=true matched_by=path
+2026-11-13T23:28:02.759Z  #00029  item_analyzed        R:\evidence\certs\leaf-revoked.crt  crypto_kind=certificate detected_type=X.509 certificate extension=crt findings= index=6 status=ok
+2026-11-13T23:28:02.759Z  #00030  item_started         R:\evidence\certs\leaf.crt  index=7 modified_utc=2026-11-12T06:00:00Z size=1566
+2026-11-13T23:28:02.760Z  #00031  item_hashed          R:\evidence\certs\leaf.crt  bytes_read=1566 index=7 mtime_unchanged=true
+2026-11-13T23:28:02.760Z  #00032  evidence_verified_against_case R:\evidence\certs\leaf.crt  algorithm=sha256+md5 evidence_id=E0007 index=7 match=true matched_by=path
+2026-11-13T23:28:02.760Z  #00033  item_analyzed        R:\evidence\certs\leaf.crt  crypto_kind=certificate detected_type=X.509 certificate extension=crt findings= index=7 status=ok
+2026-11-13T23:28:02.760Z  #00034  item_started         R:\evidence\certs\tsa.crt  index=8 modified_utc=2026-11-12T06:00:00Z size=1261
+2026-11-13T23:28:02.761Z  #00035  item_hashed          R:\evidence\certs\tsa.crt  bytes_read=1261 index=8 mtime_unchanged=true
+2026-11-13T23:28:02.761Z  #00036  evidence_verified_against_case R:\evidence\certs\tsa.crt  algorithm=sha256+md5 evidence_id=E0008 index=8 match=true matched_by=path
+2026-11-13T23:28:02.762Z  #00037  item_analyzed        R:\evidence\certs\tsa.crt  crypto_kind=certificate detected_type=X.509 certificate extension=crt findings= index=8 status=ok
+2026-11-13T23:28:02.785Z  #00038  output_written       R:\evidence\certs\data.tsr  file=items/00001-data.tsr/chain.json index=1 kind=chain
+2026-11-13T23:28:02.785Z  #00039  item_certificates_checked R:\evidence\certs\data.tsr  index=1 status=ok
+2026-11-13T23:28:02.786Z  #00040  output_written       R:\evidence\certs\intermediate.crl  file=items/00003-intermediate.crl/chain.json index=3 kind=chain
+2026-11-13T23:28:02.786Z  #00041  item_certificates_checked R:\evidence\certs\intermediate.crl  index=3 status=ok
+2026-11-13T23:28:02.787Z  #00042  output_written       R:\evidence\certs\intermediate.crt  file=items/00004-intermediate.crt/chain.json index=4 kind=chain
+2026-11-13T23:28:02.788Z  #00043  output_written       R:\evidence\certs\intermediate.crt  file=items/00004-intermediate.crt/certificate.txt index=4 kind=certificate_text
+2026-11-13T23:28:02.788Z  #00044  item_certificates_checked R:\evidence\certs\intermediate.crt  index=4 status=attention
+2026-11-13T23:28:02.789Z  #00045  output_written       R:\evidence\certs\leaf-expired.crt  file=items/00005-leaf-expired.crt/chain.json index=5 kind=chain
+2026-11-13T23:28:02.789Z  #00046  output_written       R:\evidence\certs\leaf-expired.crt  file=items/00005-leaf-expired.crt/certificate.txt index=5 kind=certificate_text
+2026-11-13T23:28:02.789Z  #00047  item_certificates_checked R:\evidence\certs\leaf-expired.crt  index=5 status=problem
+2026-11-13T23:28:02.790Z  #00048  output_written       R:\evidence\certs\leaf-revoked.crt  file=items/00006-leaf-revoked.crt/chain.json index=6 kind=chain
+2026-11-13T23:28:02.790Z  #00049  output_written       R:\evidence\certs\leaf-revoked.crt  file=items/00006-leaf-revoked.crt/certificate.txt index=6 kind=certificate_text
+2026-11-13T23:28:02.790Z  #00050  item_certificates_checked R:\evidence\certs\leaf-revoked.crt  index=6 status=problem
+2026-11-13T23:28:02.791Z  #00051  output_written       R:\evidence\certs\leaf.crt  file=items/00007-leaf.crt/chain.json index=7 kind=chain
+2026-11-13T23:28:02.792Z  #00052  output_written       R:\evidence\certs\leaf.crt  file=items/00007-leaf.crt/certificate.txt index=7 kind=certificate_text
+2026-11-13T23:28:02.792Z  #00053  item_certificates_checked R:\evidence\certs\leaf.crt  index=7 status=ok
+2026-11-13T23:28:02.792Z  #00054  output_written       R:\evidence\certs\tsa.crt  file=items/00008-tsa.crt/chain.json index=8 kind=chain
+2026-11-13T23:28:02.793Z  #00055  output_written       R:\evidence\certs\tsa.crt  file=items/00008-tsa.crt/certificate.txt index=8 kind=certificate_text
+2026-11-13T23:28:02.793Z  #00056  item_certificates_checked R:\evidence\certs\tsa.crt  index=8 status=ok
+2026-11-13T23:28:02.793Z  #00057  hash_register_written hashes.csv  md5=9d301dc6cbab9d5a6a0b43e0d71627b9 sha256=bd474a0d3c42302ad58636d80af198bb307e478ac4653fc63792d9893e2fd856
+2026-11-13T23:28:02.800Z  #00058  item_reports_written R:\evidence\certs\data.tsr  folder=items/00001-data.tsr
+2026-11-13T23:28:02.805Z  #00059  item_reports_written R:\evidence\certs\data.txt  folder=items/00002-data.txt
+2026-11-13T23:28:02.810Z  #00060  item_reports_written R:\evidence\certs\intermediate.crl  folder=items/00003-intermediate.crl
+2026-11-13T23:28:02.815Z  #00061  item_reports_written R:\evidence\certs\intermediate.crt  folder=items/00004-intermediate.crt
+2026-11-13T23:28:02.821Z  #00062  item_reports_written R:\evidence\certs\leaf-expired.crt  folder=items/00005-leaf-expired.crt
+2026-11-13T23:28:02.826Z  #00063  item_reports_written R:\evidence\certs\leaf-revoked.crt  folder=items/00006-leaf-revoked.crt
+2026-11-13T23:28:02.831Z  #00064  item_reports_written R:\evidence\certs\leaf.crt  folder=items/00007-leaf.crt
+2026-11-13T23:28:02.836Z  #00065  item_reports_written R:\evidence\certs\tsa.crt  folder=items/00008-tsa.crt
+2026-11-13T23:28:02.838Z  #00066  statistics_report_written 
+2026-11-13T23:28:02.838Z  #00067  run_finished         bytes=10364 cancelled=false elapsed_ms=97 errors=0 high=2 info=6 items=8 low=0 medium=1

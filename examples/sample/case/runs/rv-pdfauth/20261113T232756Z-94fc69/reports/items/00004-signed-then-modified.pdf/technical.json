@@ -1,0 +1,444 @@
+{
+  "audit": {
+    "first_seq": 36,
+    "last_seq": 46
+  },
+  "case": {
+    "case_dir": "R:\\case",
+    "case_id": "RV-SAMPLE-001",
+    "intake_utc": "2026-11-13T23:27:52.795Z",
+    "role": "analysis",
+    "status": "verified"
+  },
+  "extracted_files": [
+    {
+      "bytes": 123,
+      "hashes": {
+        "md5": "251720985f0ba1c888116538bc3da921",
+        "sha256": "9dfdca46175986eda2dbcd6912894e5d123f4f0d267ee0e0b018d8d96fc149ae"
+      },
+      "kind": "parser_warnings",
+      "rel_path": "warnings.json"
+    },
+    {
+      "bytes": 1646,
+      "hashes": {
+        "md5": "1fcc3fbbcdfeb78ad30a7097b7c7f9c2",
+        "sha256": "63cbba08c3f6ac14827c95cf554a0fb5180dbe9f6cfc11d399c43e4401deb94a"
+      },
+      "kind": "revision",
+      "rel_path": "revisions/rev-01.pdf"
+    },
+    {
+      "bytes": 10975,
+      "hashes": {
+        "md5": "2003920f3ccc73ba80d8677562e97e5b",
+        "sha256": "9bcad4dfc32943d7b047f5ce98e37e5bee63f580ab9e547526495fcec1851dbf"
+      },
+      "kind": "revision",
+      "rel_path": "revisions/rev-02.pdf"
+    },
+    {
+      "bytes": 11980,
+      "hashes": {
+        "md5": "6f259789b37be1219f161c23960fd169",
+        "sha256": "a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3"
+      },
+      "kind": "revision",
+      "rel_path": "revisions/rev-03.pdf"
+    },
+    {
+      "bytes": 7550,
+      "hashes": {
+        "md5": "7d044db38918abc53413a8310cbbe0e3",
+        "sha256": "8f61a943df1fecbc8875b2151044a819785bcddd8934fcca944a499491430843"
+      },
+      "kind": "objects_dump",
+      "rel_path": "objects.json"
+    },
+    {
+      "bytes": 29281,
+      "hashes": {
+        "md5": "877c0147b627af6d6766bd5ead608012",
+        "sha256": "f60dae90cb2300301de4ae82bdb132847cf40480b60d56b37f64423495f062cc"
+      },
+      "kind": "visual_diff",
+      "rel_path": "visual/rev-02-vs-03-page-001.png"
+    }
+  ],
+  "findings": [
+    {
+      "code": "CONTENT_CHANGED_AFTER_SIGNATURE",
+      "params": {
+        "field": "Signature1",
+        "revisions": "3"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "The signature remains mathematically valid for the signed revision; this does not show who made the later changes or whether the signer agreed to them. Compare the signed revision with the final one.",
+          "shows": "Signature Signature1 covers an earlier revision; revision(s) 3, added afterwards, change page content or document structure, which the signature does not cover.",
+          "title": "Content changed after signing"
+        }
+      }
+    },
+    {
+      "code": "DOCMDP_VIOLATION",
+      "params": {
+        "field": "Signature1",
+        "level": "2",
+        "revisions": "3"
+      },
+      "severity": "high",
+      "text": {
+        "en": {
+          "does_not_prove": "The classification of changes is heuristic and some PDF viewers apply permissions differently; this shows a conflict with the declared permissions, not intent.",
+          "shows": "Signature Signature1 certifies the document with permission level 2 (1 = no changes, 2 = form filling and signing, 3 = also annotations), but revision(s) 3 contain changes outside that level.",
+          "title": "Changes not allowed by the certification signature"
+        }
+      }
+    },
+    {
+      "code": "INCREMENTAL_UPDATES",
+      "params": {
+        "revisions": "3"
+      },
+      "severity": "low",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental saving is normal when a PDF is filled in, signed, annotated or re-saved by many programs; it does not show who changed the file or that a change was improper.",
+          "shows": "The file contains 3 revisions: the original save plus later updates appended to the end of the file. Each earlier version can be extracted and compared.",
+          "title": "Incremental updates"
+        }
+      }
+    },
+    {
+      "code": "REVISION_TIME_GAP",
+      "params": {
+        "from_rev": "2",
+        "gap": "3 d 0 h 0 min",
+        "to_rev": "3"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "Metadata dates are written by the editing software from the computer clock and can be set freely; the gap does not prove when the changes were really made or by whom.",
+          "shows": "Revision 3 is dated 3 d 0 h 0 min after revision 2 (according to their modification dates).",
+          "title": "Time gap between revisions"
+        }
+      }
+    },
+    {
+      "code": "SIGNATURE_PRESENT_TRUST_NOT_VERIFIED",
+      "params": {
+        "field": "Signature1",
+        "signer": "O=Rakvor TEST,CN=Ana Ruiz (TEST examiner)"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "This tool does not validate the certificate chain, revocation or the signer's identity; a signature can be technically intact and still come from an untrusted or self-made certificate.",
+          "shows": "The file contains signature Signature1, signed by O=Rakvor TEST,CN=Ana Ruiz (TEST examiner). Its byte coverage and cryptographic integrity are reported separately.",
+          "title": "Digital signature present (trust not verified)"
+        }
+      }
+    },
+    {
+      "code": "VISUAL_CHANGE_BETWEEN_REVISIONS",
+      "params": {
+        "changed_ratio_max": "0.000314",
+        "from_rev": "2",
+        "pages": "1",
+        "pages_added": "-",
+        "pages_removed": "-",
+        "to_rev": "3"
+      },
+      "severity": "medium",
+      "text": {
+        "en": {
+          "does_not_prove": "Incremental updates are normal when forms are filled, documents are signed or comments are added. It does not show who made the change, when, or with what intent.",
+          "shows": "Rendering revision 2 and revision 3 gives different images on page(s) 1 (largest changed share 0.000314); pages added: -; pages removed: -. The changed areas are outlined in the comparison images.",
+          "title": "Visible change between revisions"
+        }
+      }
+    }
+  ],
+  "hashes": {
+    "md5": "6f259789b37be1219f161c23960fd169",
+    "sha256": "a6e9f4503e7a5fd6fabfff5a2e7b99d949f934e04a65dfe46814cc8ed578a0b3"
+  },
+  "item": {
+    "detected_type": "PDF document",
+    "error": null,
+    "evidence_id": "E0021",
+    "extension": "pdf",
+    "file_name": "signed-then-modified.pdf",
+    "index": 4,
+    "modified_utc": "2026-11-12T06:00:00Z",
+    "path": "R:\\evidence\\pdf\\signed-then-modified.pdf",
+    "size": 11980,
+    "status": "problem"
+  },
+  "limitations": [
+    "SIGNATURE_TABLE_LIMITED",
+    "TIMESTAMPS_FROM_FILESYSTEM",
+    "CLEAN_RESULT_IS_NOT_AUTHENTICITY",
+    "TIMESTAMP_PROVES_EXISTENCE_ONLY",
+    "NO_FINDING_IS_NOT_AUTHENTICITY",
+    "FLATTENED_OR_REGENERATED_PDF_LOSES_HISTORY",
+    "FINGERPRINT_DB_COVERAGE",
+    "SIGNATURE_TRUST_NOT_VALIDATED",
+    "RENDERING_PAGE_CAP"
+  ],
+  "pdf": {
+    "encrypted": false,
+    "fingerprint_dbs": [
+      {
+        "entries": 37,
+        "name": "rakvor-starter",
+        "role": "starter",
+        "sha256": "0b8df17b3ba7f33932cfc072932f198cdfdba98ad1332b33ac84c5c2f9068795",
+        "status": "loaded",
+        "version": "2026.10.21"
+      },
+      {
+        "path": "R:\\profile\\local\\Rakvor\\rv-pdfauth\\fingerprints.local.json",
+        "role": "local",
+        "status": "absent"
+      }
+    ],
+    "fingerprint_matches": [
+      {
+        "category": "pdf_library",
+        "db": "rakvor-starter",
+        "entry_id": "reportlab",
+        "label": "ReportLab PDF Library",
+        "matched_on": "producer",
+        "matched_value": "ReportLab PDF Library - (opensource)",
+        "revision": 1,
+        "trait_mismatches": []
+      }
+    ],
+    "fonts": [
+      {
+        "embedded": false,
+        "first_revision": 1,
+        "name": "Helvetica",
+        "object": "2 0",
+        "subset_prefix": null
+      },
+      {
+        "embedded": false,
+        "first_revision": 1,
+        "name": "Helvetica-Bold",
+        "object": "3 0",
+        "subset_prefix": null
+      }
+    ],
+    "page_count": 1,
+    "revision_source": "parser",
+    "revisions": [
+      {
+        "bytes": 1646,
+        "change_kind": [],
+        "creator": "Rakvor make_samples.py",
+        "end_offset": 1646,
+        "index": 1,
+        "objects_added": 8,
+        "objects_changed": 0,
+        "objects_deleted": 0,
+        "pages_changed": [],
+        "producer": "ReportLab PDF Library - (opensource)",
+        "saved_at": "2026-05-04T13:00:00Z",
+        "saved_at_info": "2026-05-04T13:00:00Z",
+        "saved_at_xmp": null,
+        "signed_by": [],
+        "since_previous_s": null,
+        "start_offset": 0,
+        "xref_kind": "table"
+      },
+      {
+        "bytes": 9329,
+        "change_kind": [
+          "signature"
+        ],
+        "creator": "Rakvor make_samples.py",
+        "end_offset": 10975,
+        "index": 2,
+        "objects_added": 3,
+        "objects_changed": 2,
+        "objects_deleted": 0,
+        "pages_changed": [],
+        "producer": "ReportLab PDF Library - (opensource)",
+        "saved_at": "2026-05-04T13:00:00Z",
+        "saved_at_info": "2026-05-04T13:00:00Z",
+        "saved_at_xmp": null,
+        "signed_by": [
+          "Signature1"
+        ],
+        "since_previous_s": 0,
+        "start_offset": 1646,
+        "xref_kind": "table"
+      },
+      {
+        "bytes": 1005,
+        "change_kind": [
+          "metadata",
+          "other"
+        ],
+        "creator": "Rakvor make_samples.py",
+        "end_offset": 11980,
+        "index": 3,
+        "objects_added": 1,
+        "objects_changed": 2,
+        "objects_deleted": 0,
+        "pages_changed": [
+          1
+        ],
+        "producer": "ReportLab PDF Library - (opensource)",
+        "saved_at": "2026-05-07T13:00:00Z",
+        "saved_at_info": "2026-05-07T13:00:00Z",
+        "saved_at_xmp": null,
+        "signed_by": [],
+        "since_previous_s": 259200,
+        "start_offset": 10975,
+        "xref_kind": "table"
+      }
+    ],
+    "signatures": [
+      {
+        "covers_revision": true,
+        "digest_ok": true,
+        "docmdp": 2,
+        "field": "Signature1",
+        "later_revisions": [
+          3
+        ],
+        "revision": 2,
+        "signature_ok": true,
+        "signer_subject": "O=Rakvor TEST,CN=Ana Ruiz (TEST examiner)",
+        "signing_time": "2026-05-04T13:20:00Z",
+        "sub_filter": "adbe.pkcs7.detached"
+      }
+    ],
+    "version": "1.3",
+    "visual": {
+      "dpi": 110,
+      "images": [
+        "visual/rev-02-vs-03-page-001.png"
+      ],
+      "limitation": null,
+      "pages_changed": 1,
+      "pairs": [
+        {
+          "changed_ratio_max": "0.000000",
+          "from_rev": 1,
+          "pages": [
+            {
+              "boxes": [],
+              "boxes_truncated": false,
+              "changed": false,
+              "changed_pixels": 0,
+              "changed_ppm": 0,
+              "changed_ratio": "0.000000",
+              "dpi": 110,
+              "height": 1210,
+              "page": 1,
+              "size_changed": false,
+              "status": "compared",
+              "width": 935
+            }
+          ],
+          "pages_added": [],
+          "pages_beyond_cap": 0,
+          "pages_changed": [],
+          "pages_compared": 1,
+          "pages_from": 1,
+          "pages_removed": [],
+          "pages_to": 1,
+          "status": "done",
+          "to_rev": 2
+        },
+        {
+          "changed_ratio_max": "0.000314",
+          "from_rev": 2,
+          "pages": [
+            {
+              "boxes": [
+                {
+                  "h": 25,
+                  "w": 23,
+                  "x": 269,
+                  "y": 168
+                },
+                {
+                  "h": 23,
+                  "w": 43,
+                  "x": 305,
+                  "y": 168
+                }
+              ],
+              "boxes_truncated": false,
+              "changed": true,
+              "changed_pixels": 356,
+              "changed_ppm": 314,
+              "changed_ratio": "0.000314",
+              "dpi": 110,
+              "height": 1210,
+              "page": 1,
+              "png": "visual/rev-02-vs-03-page-001.png",
+              "size_changed": false,
+              "status": "compared",
+              "width": 935
+            }
+          ],
+          "pages_added": [],
+          "pages_beyond_cap": 0,
+          "pages_changed": [
+            1
+          ],
+          "pages_compared": 1,
+          "pages_from": 1,
+          "pages_removed": [],
+          "pages_to": 1,
+          "status": "done",
+          "to_rev": 3
+        }
+      ],
+      "pairs_compared": 2,
+      "reason": null,
+      "status": "done"
+    },
+    "warnings": {
+      "count": 0,
+      "file": "warnings.json",
+      "parser_cap_reached": false,
+      "shown": [],
+      "truncated": false
+    }
+  },
+  "run": {
+    "actor": "Sample Examiner",
+    "algorithms": [
+      "sha256",
+      "md5"
+    ],
+    "cancelled": false,
+    "case_id": "RV-SAMPLE-001",
+    "elapsed_ms": 981,
+    "finished_utc": "2026-11-13T23:27:57.157Z",
+    "frontend": "cli",
+    "jurisdiction": "co",
+    "langs": [
+      "en"
+    ],
+    "pdf_signed_by": null,
+    "run_id": "20261113T232756Z-94fc69",
+    "started_utc": "2026-11-13T23:27:56.175Z"
+  },
+  "schema": "rakvor.item-technical/1",
+  "tool": {
+    "name": "rv-pdfauth",
+    "version": "0.4.1"
+  }
+}

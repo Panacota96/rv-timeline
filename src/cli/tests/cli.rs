@@ -1,5 +1,5 @@
 //! End-to-end tests of the rv-timeline binary: the contract every Rakvor CLI must meet, on the sample case
-//! (examples/sample/case) and its tampered copies.
+//! (examples/sample/case) and its tampered copies (written at test time by tests/make_sample_case.py tamper).
 
 use assert_cmd::Command;
 use predicates::prelude::*;
@@ -84,9 +84,31 @@ fn copy_dir(from: &Path, to: &Path) {
     }
 }
 
-/// A fresh copy of examples/sample/case (or of a tampered copy: `tampered/<name>`), so tests never write into
-/// the repository.
+/// Writes the three tampered copies of examples/sample/case into `dst/<name>` with `tests/make_sample_case.py tamper`
+/// (the same edits that produced expected_timeline.json; the copies are not committed). Needs Python 3, standard
+/// library only (RV_TEST_PYTHON, default python3).
+fn write_tampered(dst: &Path) {
+    let py = std::env::var("RV_TEST_PYTHON").unwrap_or_else(|_| "python3".into());
+    let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let o = std::process::Command::new(&py)
+        .arg("-I")
+        .arg(base.join("tests/make_sample_case.py"))
+        .arg("tamper")
+        .arg(base.join("examples/sample/case"))
+        .arg(dst)
+        .output()
+        .unwrap_or_else(|e| panic!("{py} (RV_TEST_PYTHON) for make_sample_case.py tamper: {e}"));
+    assert!(o.status.success(), "make_sample_case.py tamper: {o:?}");
+}
+
+/// A fresh copy of examples/sample/case (or a tampered copy: `tampered/<name>`, written from it by
+/// [`write_tampered`]), so tests never write into the repository.
 fn case_copy(rel: &str, dest: &Path) -> PathBuf {
+    if let Some(name) = rel.strip_prefix("tampered/") {
+        let root = dest.join("TAMPERED");
+        write_tampered(&root);
+        return root.join(name);
+    }
     let case = dest.join("CASE");
     copy_dir(&sample_dir().join(rel), &case);
     case
@@ -507,6 +529,68 @@ fn a_broken_case_is_never_extended() {
         std::fs::read_to_string(&log).unwrap(),
         text.replacen("\"seq\":2", "\"seq\":7", 1)
     );
+}
+
+/// verify-log and verify-case re-hash every output the build's audit log records (outputs.rs): an edited
+/// timeline.jsonl or report and a deleted one are named, exit 3; restored, verify-log passes again.
+#[test]
+fn edited_or_deleted_outputs_fail_verify_log_and_verify_case() {
+    let tmp = tempfile::tempdir().unwrap();
+    let case = case_copy("case", tmp.path());
+    let out = build(&case)
+        .args(["--hash", "sha256,md5", "--lang", "en"])
+        .assert()
+        .code(3);
+    let run = run_folder(&out.get_output().stdout);
+    let logs = run.join("logs");
+    let rid = run.file_name().unwrap().to_string_lossy().into_owned();
+    let ok = bin().arg("verify-log").arg(&logs).assert().code(0);
+    let text = String::from_utf8_lossy(&ok.get_output().stdout).into_owned();
+    let line = text
+        .lines()
+        .find_map(|l| l.trim().strip_prefix("outputs: "))
+        .expect("outputs line");
+    let (verified, rest) = line.split_once(" verified of ").unwrap();
+    assert!(
+        rest == format!("{} recorded (md5, sha256)", verified),
+        "{}",
+        line
+    );
+    assert!(verified.parse::<u32>().unwrap() > 21, "{}", line);
+
+    let jsonl = run.join("reports/timeline.jsonl");
+    let saved = std::fs::read(&jsonl).unwrap();
+    std::fs::write(
+        &jsonl,
+        b"{\"edited\": true}
+",
+    )
+    .unwrap();
+    let stats = run.join("reports/statistics.json");
+    std::fs::rename(&stats, tmp.path().join("moved.json")).unwrap();
+    bin().arg("verify-log").arg(&logs).assert().code(3).stdout(
+        predicate::str::contains("output reports/timeline.jsonl: md5 differs from audit entry #")
+            .and(predicate::str::contains(
+                "output reports/statistics.json: missing",
+            ))
+            .and(predicate::str::contains("1 missing, 1 changed")),
+    );
+    bin()
+        .arg("verify-case")
+        .arg(&case)
+        .assert()
+        .code(3)
+        .stdout(predicate::str::contains(format!(
+            "run {}: output reports/timeline.jsonl: md5 differs from audit entry #",
+            rid
+        )))
+        .stdout(predicate::str::contains(format!(
+            "run {}: output reports/statistics.json: missing",
+            rid
+        )));
+    std::fs::write(&jsonl, saved).unwrap();
+    std::fs::rename(tmp.path().join("moved.json"), &stats).unwrap();
+    bin().arg("verify-log").arg(&logs).assert().code(0);
 }
 
 /// examples/sample/run.sh builds the timeline on a copy of the sample case and checks the exit code and that

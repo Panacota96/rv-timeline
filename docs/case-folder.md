@@ -140,11 +140,28 @@ rv-timeline verify-log E:\CASE-014\runs\rv-timeline\<RUN-ID>\logs   # one build,
 
 `verify-case` checks, for every `run_started` in the case log: the run's `audit.jsonl` chain and timestamp tokens;
 that its `case_linked` names this case and quotes the `run_started` hash; that entry `audit_entries` has hash
-`audit_head`, with only `timestamp_obtained` after it; and the run's `review.jsonl` when present. It warns about
-run folders the case log never announced and runs still in progress. It does **not** re-check other tools' output
-files against their digests — `rv-timeline build` does that for the files it reads, which is why the tampered copy
-`digest-mismatch` of the sample passes `verify-case` and is caught by the build
-([examples/sample](../examples/sample/README.md#tampered-copies)).
+`audit_head`, with only `timestamp_obtained` after it; the run's `review.jsonl` when present; and every output file
+the run's audit log records (reports, `timeline.jsonl`, `hashes.csv`, `environment.json`), re-hashed with every
+recorded algorithm ([outputs.rs](../src/core/src/outputs.rs)): an edited, deleted or replaced output is exit 3,
+named as `run <RUN-ID>: output reports/…`, and the output ends with `outputs: N verified of M recorded by the runs'
+audit logs`. It warns about run folders the case log never announced and runs still in progress.
+
+```mermaid
+flowchart LR
+    C["verify-case"] --> L{"case log, case.json,<br/>registry intact?"}
+    L -- no --> X["BROKEN (exit 3)"]
+    L -- yes --> R{"every run: chain, tokens,<br/>links, final entry?"}
+    R -- no --> X
+    R -- yes --> O{"every output its<br/>audit.jsonl records unchanged?"}
+    O -- no --> X
+    O -- yes --> OK["OK (exit 0)"]
+```
+
+`rv-timeline build` checks the runs it reads separately (and only the machine-readable files a reader parses), so a
+run whose report renderings were deleted is still read, while `verify-case` reports each deleted file as missing.
+The committed sample case ([examples/sample](../examples/sample/README.md)) keeps every output, so `verify-case`
+accepts it with every tool (`outputs: 844 verified of 844 recorded`); its tampered copy `digest-mismatch` is
+caught by both `verify-case` (exit 3) and the build (`digest_mismatch`).
 
 ## Tests
 

@@ -5,7 +5,11 @@ examples/sample/expected_timeline.json for the rv-timeline sample case.
     make_sample_case.py evidence <rakvor-root> <dst>     copy + derive the synthetic evidence set
     make_sample_case.py tamper   <clean-case> <dst-root>  write the three tampered copies of the clean case
     make_sample_case.py expected <clean-case> <tampered-root> <versions.json> <out.json>
-    make_sample_case.py check-verify <expected.json> <examples/sample> <exe>...  verify-case on the tampered copies
+    make_sample_case.py check-verify <expected.json> <clean-case> <tampered-root> <exe>...  verify-case on the clean
+                                                          case and on the tampered copies
+
+The tampered copies are not committed: the tests write them from examples/sample/case into a temporary folder with
+`tamper` (the same edits every time); their expectations stay in expected_timeline.json.
 
 Standard library only. Every value written to expected_timeline.json is read from the tools' own outputs (case.json,
 case-log.jsonl, registry.json, the runs' audit.jsonl and JSON reports); the only things this script decides are
@@ -790,17 +794,19 @@ def cmd_expected(clean: Path, tampered: Path, versions: Path, out: Path) -> None
         "event_id": "<tool>:<run_id>:<evidence_id>[/<sub>]:<kind>:<n> (run-level events: <evidence_id> = 'run'); "
                     "n counts from 0 per (run, item/sub, kind) in the order of the values in the source file",
         "clean": summarize(clean, "examples/sample/case"),
+        "clean_verify_case_exit": 0,
         "tampered": {},
     }
     for name, t in TAMPERED.items():
         case = tampered / name
         run = run_of(case, t["tool"])
         x = {"tool": t["tool"], "run_id": run["run_id"], "reason": t["reason"], "what": t["what"]}
-        s = summarize(case, f"examples/sample/tampered/{name}", [x])
+        s = summarize(case, f"tampered/{name} (written by make_sample_case.py tamper)", [x])
         doc["tampered"][name] = {
             "excluded_run": {"tool": t["tool"], "run_id": run["run_id"], "run_dir": run["run_dir"],
                              "reason": t["reason"], "what": t["what"]},
             "verify_case_exit": TAMPERED_VERIFY[name],
+            "verify_case_exit_without_output_rehash": TAMPERED_VERIFY_NO_REHASH[name],
             "runs": s["runs"], "events_total": s["events_total"],
             "signals": s["signals"],
             "signals_total": len(s["signals"]),
@@ -809,25 +815,37 @@ def cmd_expected(clean: Path, tampered: Path, versions: Path, out: Path) -> None
     out.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
 
-# Exit code every tool's `verify-case` gives on each copy (0 intact, 3 broken). verify-case checks the case log, the
-# registry and every run's audit chain and its anchoring, not the report files: an edited report and an interrupted
-# run (no run_finished, warning only) are detected by rv-timeline's own checks, not by verify-case.
-TAMPERED_VERIFY = {"digest-mismatch": 0, "chain-broken": 3, "not-finished": 0}
+# Exit code `verify-case` gives on each copy (0 intact, 3 broken). verify-case checks the case log, the registry and
+# every run's audit chain and its anchoring, and (src/core/src/outputs.rs: rv-timeline and every tool that has it)
+# re-hashes every output a run's audit log records, so the edited metadata.json of digest-mismatch is exit 3. A tool
+# whose verify-case does not re-hash outputs yet (it prints no "outputs:" line) gives the second value. An interrupted
+# run (no run_finished) is a warning only; rv-timeline's own checks exclude it.
+TAMPERED_VERIFY = {"digest-mismatch": 3, "chain-broken": 3, "not-finished": 0}
+TAMPERED_VERIFY_NO_REHASH = {"digest-mismatch": 0, "chain-broken": 3, "not-finished": 0}
 
 
-def cmd_check_verify(expected: Path, sample: Path, exes: list[str]) -> None:
+def cmd_check_verify(expected: Path, clean: Path, tampered: Path, exes: list[str]) -> None:
     import subprocess
     doc = json.loads(expected.read_text(encoding="utf-8"))
     bad = 0
+    rehash = {}
+    for exe in exes:
+        p = subprocess.run([exe, "verify-case", str(clean)], capture_output=True, text=True)
+        rehash[exe] = any(x.strip().startswith("outputs:") for x in p.stdout.splitlines())
+        print(f"{'clean':16} {Path(exe).stem:13} exit {p.returncode} (re-hashes outputs: {rehash[exe]})")
+        if p.returncode != doc["clean_verify_case_exit"]:
+            print(f"  expected exit {doc['clean_verify_case_exit']}:\n{p.stdout}{p.stderr}")
+            bad = 1
     for name, t in doc["tampered"].items():
-        case = sample / "tampered" / name
+        case = tampered / name
         for exe in exes:
             p = subprocess.run([exe, "verify-case", str(case)], capture_output=True, text=True)
             first = (p.stdout.strip().splitlines() or [""])[0]
             warn = "warning" in (p.stdout + p.stderr).lower() or "no run_finished" in (p.stdout + p.stderr)
             print(f"{name:16} {Path(exe).stem:13} exit {p.returncode} {first[:100]}")
-            if p.returncode != t["verify_case_exit"]:
-                print(f"  expected exit {t['verify_case_exit']}:\n{p.stdout}{p.stderr}")
+            want = t["verify_case_exit"] if rehash[exe] else t["verify_case_exit_without_output_rehash"]
+            if p.returncode != want:
+                print(f"  expected exit {want}:\n{p.stdout}{p.stderr}")
                 bad = 1
             if name == "not-finished" and not warn:
                 print("  expected a 'no run_finished' warning"); bad = 1
@@ -843,7 +861,7 @@ if __name__ == "__main__":
         cmd_tamper(Path(a[1]), Path(a[2]))
     elif a[:1] == ["expected"] and len(a) == 5:
         cmd_expected(Path(a[1]), Path(a[2]), Path(a[3]), Path(a[4]))
-    elif a[:1] == ["check-verify"] and len(a) >= 4:
-        cmd_check_verify(Path(a[1]), Path(a[2]), a[3:])
+    elif a[:1] == ["check-verify"] and len(a) >= 5:
+        cmd_check_verify(Path(a[1]), Path(a[2]), Path(a[3]), a[4:])
     else:
         sys.exit(__doc__)

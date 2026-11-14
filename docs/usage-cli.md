@@ -318,7 +318,14 @@ CHECKS:
   - the review log (review.jsonl next to audit.jsonl, written when the timeline is viewed after
     the run): its chain, its anchor to this run's run_finished entry and the run id of every
     entry. The output prints its entry count ("review log: none" when there is none); an
-    edited or misplaced review log is a problem.
+    edited or misplaced review log is a problem;
+  - recorded outputs: every file the log says the run wrote (timeline.jsonl, item reports,
+    statistics, hashes.csv, environment.json) is re-hashed with each algorithm recorded and
+    compared; the latest entry for a file wins. A missing, edited or replaced file is a
+    problem; a recorded path that is absolute, contains .. or resolves outside the run folder
+    (symlink, junction) is rejected and not read. Timestamp tokens (checked above) are listed
+    as not re-hashed, with the reason. Output: "outputs: N verified of M recorded
+    (algorithms)".
 
 EXAMPLES:
   rv-timeline verify-log rakvor-out/logs/20261019T101500Z-a1b2c3/audit.jsonl
@@ -327,11 +334,16 @@ EXAMPLES:
   rv-timeline verify-log rakvor-out/logs/20261019T101500Z-a1b2c3 --tsa-ca digicert-tsa-roots.pem
 
 EXIT CODES:
-  0  The chain is intact and agrees with its timestamps and case record (if any).
+  0  The chain is intact and agrees with its timestamps and case record (if any), and every
+     output file it records (timeline.jsonl, reports, hashes.csv, environment.json) still has
+     the recorded digests.
   1  The log or the --tsa-ca file cannot be read.
   3  The chain is broken (an entry was edited, deleted or re-ordered), a timestamp does not
      match or does not verify (altered token, invalid TSA signature, chain not trusted by
-     --tsa-ca), or the log is shorter than its timestamp or case record says (truncated).
+     --tsa-ca), the log is shorter than its timestamp or case record says (truncated), the
+     review log is edited or misplaced, or a recorded output file was edited, deleted or
+     replaced after the run (named in the output; a recorded path that leads outside the run
+     folder is rejected, not read).
 ```
 
 ## rv-timeline self-test
@@ -421,6 +433,9 @@ CHECKS:
     recorded at run_finished is its final entry (only timestamp_obtained may follow);
   - every run's review log (review.jsonl, viewing after the run), when present: its chain and its
     anchor to that run; the output prints the review entries counted across the runs;
+  - every output file a run's audit log records (timeline.jsonl, reports, hashes.csv,
+    environment.json) is re-hashed and compared with the recorded digests (edited, deleted or
+    replaced: a problem);
   - with --rehash: every registered item still reachable at its registered path is read again
     and its digests are compared with the registry (the latest registration of a path).
 
@@ -432,8 +447,9 @@ EXIT CODES:
   0  The case folder is intact (warnings, e.g. a run still in progress or an item not
      reachable for --rehash, are printed).
   1  The folder is not a case folder (no case.json).
-  3  At least one check failed: the case was edited, truncated or re-ordered, or (--rehash)
-     an evidence file differs from the registry.
+  3  At least one check failed: the case was edited, truncated or re-ordered, a run's
+     recorded output (timeline, report, register) was edited, deleted or replaced, or
+     (--rehash) an evidence file differs from the registry.
 ```
 
 ## rv-timeline describe

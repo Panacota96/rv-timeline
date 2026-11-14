@@ -273,7 +273,8 @@ reads it (`RunData::check_file`), so a file changed between verification and rea
 output path is accepted only as a plain relative path (forward slashes; no `..`, root, drive, empty component or
 `:`), and the file, resolved, must stay inside the run folder: a symlink or junction leading out of the case is
 refused (`unreadable`). A reader error
-also excludes the run. HTML and PDF renderings are not read and not checked (the sample case even prunes them).
+also excludes the run. HTML and PDF renderings are not read and not checked here; `verify-log` and `verify-case` re-hash them
+([forensic-audit.md](forensic-audit.md)).
 
 Supported versions (the reader table): rv-hashinv **0.4.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
 **0.3.x**, rv-mailauth **0.2.x**, rv-certcheck **0.2.x**. A new minor version of a tool is excluded
@@ -329,7 +330,7 @@ classDiagram
   `<conversation id>/<day>`, certificate `c<n>` of a file holding several (none when it holds one).
 - `<n>` counts **from 0** per (run, item/sub, kind), in the order the values appear in the source file.
 
-Example from the sample: `rv-mailauth:20261113T065654Z-2f7708:E0016/#3:mail.hop:1` is the second Received hop read
+Example from the sample: `rv-mailauth:20261113T232800Z-08b8d1:E0016/#3:mail.hop:1` is the second Received hop read
 (in file order) of message 3 of the mbox registered as E0016. Ids are unique in a timeline and identical on every
 rebuild of the same case, so a signal, a report or a Timesketch annotation can refer to them.
 
@@ -543,7 +544,13 @@ timeline build of the sample case:
 OK  67 entries, chain intact: …/runs/rv-timeline/20261113T131620Z-d8af51/logs\audit.jsonl
     truncation: the final entry #67 is anchored by the case log (run_finished)
     review log: none
+    outputs: 409 verified of 409 recorded (md5, sha256)
 ```
+
+The `outputs:` line is the re-hash of every file the log says the build wrote (`timeline.jsonl`, reports,
+`hashes.csv`, `environment.json`) with every recorded algorithm ([outputs.rs](../src/core/src/outputs.rs), shared
+byte-identical by every Rakvor tool); an edited, deleted or replaced file is a problem (exit 3). `verify-case` does
+the same for every run of the case.
 
 The review log (`review.jsonl`) is a second chain whose first entry carries `anchor_seq`/`anchor_hash` = the run's
 `run_finished` entry: viewing after the run cannot be added to the closed audit chain, and an edited review log, or

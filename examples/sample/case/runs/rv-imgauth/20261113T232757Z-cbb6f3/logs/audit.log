@@ -1,0 +1,46 @@
+2026-11-13T23:27:57.878Z  #00001  run_started          algorithms=sha256+md5 case_dir=R:\case case_id=RV-SAMPLE-001 evidence_ids= frontend=cli input_list=null inputs=R:\evidence\images jurisdiction=co langs=en out_dir=rakvor-out recursive=false sign_cert=null tool=rv-imgauth tsa_url=null version=0.3.1
+2026-11-13T23:27:57.879Z  #00002  case_linked          case_created=false case_dir=R:\case case_id=RV-SAMPLE-001 case_log_head_at_start=a65d93ec28d570f981c24d0ee63471a6bca2d186c1034f37e248cff8861e852b case_log_seq_at_start=10 jurisdiction=co registry_items=21 registry_sha256=10e914634e4e9a434c36b67a3d9d676acd0cebf23465b18ceee9b60b11de2737 requested_jurisdiction=co role=analysis run_dir=runs/rv-imgauth/20261113T232757Z-cbb6f3
+2026-11-13T23:27:57.880Z  #00003  environment_recorded environment.json  md5=27beddeffd0182c2c0cc7a427779aa90 sha256=3f07c5d0f9e4b117cbf6eed7fb3bc6e99bab4c16bfeb3095cc986d26e8a41a78
+2026-11-13T23:27:57.880Z  #00004  inputs_resolved      bytes=540281 items=4
+2026-11-13T23:27:57.880Z  #00005  item_started         R:\evidence\images\camera-original.jpg  index=1 modified_utc=2026-11-13T23:27:55Z size=121033
+2026-11-13T23:27:57.882Z  #00006  item_hashed          R:\evidence\images\camera-original.jpg  bytes_read=121033 index=1 mtime_unchanged=true
+2026-11-13T23:27:57.882Z  #00007  evidence_verified_against_case R:\evidence\images\camera-original.jpg  algorithm=sha256+md5 evidence_id=E0011 index=1 match=true matched_by=path
+2026-11-13T23:27:57.882Z  #00008  analysis_started     R:\evidence\images\camera-original.jpg  index=1 isolation=worker_process
+2026-11-13T23:27:58.122Z  #00009  output_written       R:\evidence\images\camera-original.jpg  bytes=11002 file=items/00001-camera-original.jpg/structure.json index=1 kind=structure
+2026-11-13T23:27:58.124Z  #00010  output_written       R:\evidence\images\camera-original.jpg  bytes=3014 file=items/00001-camera-original.jpg/metadata.json index=1 kind=metadata
+2026-11-13T23:27:58.132Z  #00011  output_written       R:\evidence\images\camera-original.jpg  bytes=1182569 file=items/00001-camera-original.jpg/maps/original.png index=1 kind=original_preview
+2026-11-13T23:27:58.132Z  #00012  output_written       R:\evidence\images\camera-original.jpg  bytes=70712 file=items/00001-camera-original.jpg/maps/thumbnail-diff.png index=1 kind=map
+2026-11-13T23:27:58.133Z  #00013  item_analyzed        R:\evidence\images\camera-original.jpg  detected_type=JPEG image extension=jpg findings={"code":"QT_NON_STANDARD","params":{"distance":"578","nearest":"90"},"severity":"info"}+{"code":"QT_UNKNOWN","params":{"hash":"cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545"},"severity":"info"} index=1 status=ok
+2026-11-13T23:27:58.133Z  #00014  item_started         R:\evidence\images\edited-gimp.jpg  index=2 modified_utc=2026-11-12T06:00:00Z size=105483
+2026-11-13T23:27:58.134Z  #00015  item_hashed          R:\evidence\images\edited-gimp.jpg  bytes_read=105483 index=2 mtime_unchanged=true
+2026-11-13T23:27:58.134Z  #00016  evidence_verified_against_case R:\evidence\images\edited-gimp.jpg  algorithm=sha256+md5 evidence_id=E0012 index=2 match=true matched_by=path
+2026-11-13T23:27:58.134Z  #00017  analysis_started     R:\evidence\images\edited-gimp.jpg  index=2 isolation=worker_process
+2026-11-13T23:27:58.373Z  #00018  output_written       R:\evidence\images\edited-gimp.jpg  bytes=11358 file=items/00002-edited-gimp.jpg/structure.json index=2 kind=structure
+2026-11-13T23:27:58.373Z  #00019  output_written       R:\evidence\images\edited-gimp.jpg  bytes=6405 file=items/00002-edited-gimp.jpg/metadata.json index=2 kind=metadata
+2026-11-13T23:27:58.380Z  #00020  output_written       R:\evidence\images\edited-gimp.jpg  bytes=1076768 file=items/00002-edited-gimp.jpg/maps/original.png index=2 kind=original_preview
+2026-11-13T23:27:58.381Z  #00021  output_written       R:\evidence\images\edited-gimp.jpg  bytes=70868 file=items/00002-edited-gimp.jpg/maps/thumbnail-diff.png index=2 kind=map
+2026-11-13T23:27:58.381Z  #00022  item_analyzed        R:\evidence\images\edited-gimp.jpg  detected_type=JPEG image extension=jpg findings={"code":"EXIF_SOFTWARE_EDITOR","params":{"editor":"GIMP","software":"GIMP 2.10.36","source":"EXIF Software, XMP CreatorTool, JPEG comment, XMP history"},"severity":"medium"}+{"code":"XMP_EDIT_HISTORY","params":{"actions":"saved, saved","events":"2","last_agent":"Gimp 2.10 (Linux)"},"severity":"medium"}+{"code":"METADATA_DATES_INCONSISTENT","params":{"details":"EXIF DateTime 2026:05:16 18:02:10 is 2.3 days after DateTimeOriginal 2026:05:14 10:21:33 and a Software tag is present"},"severity":"medium"}+{"code":"QT_STANDARD_IJG","params":{"quality":"85"},"severity":"info"}+{"code":"QT_UNKNOWN","params":{"hash":"43920728cfe021cebc3e0bf197ec4338c16eec09bf89e4b7a5cac6f67651ebfa"},"severity":"info"} index=2 status=attention
+2026-11-13T23:27:58.381Z  #00023  item_started         R:\evidence\images\future-exif.jpg  index=3 modified_utc=2026-11-12T06:00:00Z size=120443
+2026-11-13T23:27:58.382Z  #00024  item_hashed          R:\evidence\images\future-exif.jpg  bytes_read=120443 index=3 mtime_unchanged=true
+2026-11-13T23:27:58.383Z  #00025  evidence_verified_against_case R:\evidence\images\future-exif.jpg  algorithm=sha256+md5 evidence_id=E0013 index=3 match=true matched_by=path
+2026-11-13T23:27:58.383Z  #00026  analysis_started     R:\evidence\images\future-exif.jpg  index=3 isolation=worker_process
+2026-11-13T23:27:58.605Z  #00027  output_written       R:\evidence\images\future-exif.jpg  bytes=11002 file=items/00003-future-exif.jpg/structure.json index=3 kind=structure
+2026-11-13T23:27:58.605Z  #00028  output_written       R:\evidence\images\future-exif.jpg  bytes=3014 file=items/00003-future-exif.jpg/metadata.json index=3 kind=metadata
+2026-11-13T23:27:58.612Z  #00029  output_written       R:\evidence\images\future-exif.jpg  bytes=1181973 file=items/00003-future-exif.jpg/maps/original.png index=3 kind=original_preview
+2026-11-13T23:27:58.613Z  #00030  output_written       R:\evidence\images\future-exif.jpg  bytes=69967 file=items/00003-future-exif.jpg/maps/thumbnail-diff.png index=3 kind=map
+2026-11-13T23:27:58.613Z  #00031  item_analyzed        R:\evidence\images\future-exif.jpg  detected_type=JPEG image extension=jpg findings={"code":"QT_NON_STANDARD","params":{"distance":"578","nearest":"90"},"severity":"info"}+{"code":"QT_UNKNOWN","params":{"hash":"cfe3218ae132279888e3a2b4c6949ea5cfa8df2c92a42e1dac9597d5b622b545"},"severity":"info"} index=3 status=ok
+2026-11-13T23:27:58.613Z  #00032  item_started         R:\evidence\images\screenshot.png  index=4 modified_utc=2026-11-12T06:00:00Z size=193322
+2026-11-13T23:27:58.615Z  #00033  item_hashed          R:\evidence\images\screenshot.png  bytes_read=193322 index=4 mtime_unchanged=true
+2026-11-13T23:27:58.615Z  #00034  evidence_verified_against_case R:\evidence\images\screenshot.png  algorithm=sha256+md5 evidence_id=E0014 index=4 match=true matched_by=path
+2026-11-13T23:27:58.615Z  #00035  analysis_started     R:\evidence\images\screenshot.png  index=4 isolation=worker_process
+2026-11-13T23:27:58.721Z  #00036  output_written       R:\evidence\images\screenshot.png  bytes=1739 file=items/00004-screenshot.png/structure.json index=4 kind=structure
+2026-11-13T23:27:58.721Z  #00037  output_written       R:\evidence\images\screenshot.png  bytes=1387 file=items/00004-screenshot.png/metadata.json index=4 kind=metadata
+2026-11-13T23:27:58.723Z  #00038  output_written       R:\evidence\images\screenshot.png  bytes=205956 file=items/00004-screenshot.png/maps/original.png index=4 kind=original_preview
+2026-11-13T23:27:58.723Z  #00039  item_analyzed        R:\evidence\images\screenshot.png  detected_type=PNG image extension=png findings={"code":"METADATA_DATES_INCONSISTENT","params":{"details":"PNG tIME 2026-03-04 08:00:00 (UTC) and EXIF DateTime 2026:03:01 09:15:00 are 2.9 days apart"},"severity":"medium"} index=4 status=attention
+2026-11-13T23:27:58.723Z  #00040  hash_register_written hashes.csv  md5=0cd40665d0f6079374215129c6a66117 sha256=264c9458a05855a5089d05fc6e2813f14bfc1b4a64441a71592f8c194bde5f7e
+2026-11-13T23:27:58.766Z  #00041  item_reports_written R:\evidence\images\camera-original.jpg  folder=items/00001-camera-original.jpg
+2026-11-13T23:27:58.824Z  #00042  item_reports_written R:\evidence\images\edited-gimp.jpg  folder=items/00002-edited-gimp.jpg
+2026-11-13T23:27:58.875Z  #00043  item_reports_written R:\evidence\images\future-exif.jpg  folder=items/00003-future-exif.jpg
+2026-11-13T23:27:58.886Z  #00044  item_reports_written R:\evidence\images\screenshot.png  folder=items/00004-screenshot.png
+2026-11-13T23:27:58.889Z  #00045  statistics_report_written 
+2026-11-13T23:27:58.889Z  #00046  run_finished         bytes=540281 cancelled=false elapsed_ms=1012 errors=0 high=0 info=6 items=4 low=0 medium=4

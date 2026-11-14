@@ -1,0 +1,38 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [
+    {
+      "code": "PART_OF_EXPORT",
+      "params": {
+        "export": "WhatsApp Chat with Ana Ruiz.txt"
+      },
+      "severity": "info",
+      "text": {
+        "en": {
+          "does_not_prove": "It does not show which message refers to it; see the trace map.",
+          "shows": "This file is part of the export WhatsApp Chat with Ana Ruiz.txt (media or attachment) and was converted with it.",
+          "title": "File belongs to a chat export"
+        }
+      }
+    }
+  ],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "322fb2142f200460e463b11e657390e44bb1b8b86cfb84a76b3113cd129fc762"
+  },
+  "item": {
+    "evidence_id": "E0009",
+    "file_name": "IMG-20260302-WA0001.jpg",
+    "index": 1
+  },
+  "run_id": "20261113T232759Z-440d07",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}

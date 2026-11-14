@@ -1,0 +1,23 @@
+{
+  "case_id": "RV-SAMPLE-001",
+  "findings": [],
+  "fingerprint": {
+    "algorithm": "sha256",
+    "value": "88e5924ddfef6952f1fab164adbb9b04bfb21a593dfdf3d949022fb33577811c"
+  },
+  "item": {
+    "evidence_id": "E0013",
+    "file_name": "future-exif.jpg",
+    "index": 13
+  },
+  "run_id": "20261113T232752Z-fb64f6",
+  "schema": "rakvor.item-summary/1",
+  "status": "ok",
+  "text": {
+    "en": {
+      "next_step": "No action needed for this file.",
+      "status": "No issues found",
+      "summary": "The file was hashed and checked. The checks applied found no issues."
+    }
+  }
+}
