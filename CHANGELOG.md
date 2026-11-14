@@ -5,6 +5,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries are generated from
 [Conventional Commits](https://www.conventionalcommits.org/) by release-please and reviewed by a human.
 
+## [0.2.0](https://github.com/Panacota96/rv-timeline/compare/v0.1.0...v0.2.0) (2026-11-14)
+
+
+### Features
+
+* RV Timeline v0.1 — cited case timeline from the Rakvor tools' outputs ([#3](https://github.com/Panacota96/rv-timeline/issues/3)) ([76bf02d](https://github.com/Panacota96/rv-timeline/commit/76bf02d4f257757a130ecd651451e0136e268bca))
+
+
+### Bug Fixes
+
+* **core:** late audit entries and redirected run folders cannot hide an edited output ([e7850ab](https://github.com/Panacota96/rv-timeline/commit/e7850ab69933690b8fe0faa018ad803bb201a4fe))
+* **core:** re-hash the outputs a run's audit log records in verify-log and verify-case ([cf4515c](https://github.com/Panacota96/rv-timeline/commit/cf4515cf82949423c72409f6b8f0380e198dd668))
+* verify-log and verify-case re-hash the outputs the audit log records ([accace9](https://github.com/Panacota96/rv-timeline/commit/accace9ff3edc24679c59240540b3ce6aeb172dd))
+
 ## [Unreleased]
 
 ### Added
