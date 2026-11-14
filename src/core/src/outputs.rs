@@ -281,16 +281,31 @@ pub fn verify_with_layout(layout: &RunLayout, audit: &[Value]) -> OutputsCheck {
             continue;
         };
         for r in recs {
-            let r = match r {
-                Rec::Check(p, _) if finished => Rec::Skip(
-                    p,
-                    "recorded after run_finished, outside the run's anchored log".into(),
-                ),
-                r => r,
-            };
             let path = match &r {
                 Rec::Check(p, _) | Rec::Skip(p, _) => p.clone(),
             };
+            if finished {
+                // Nothing a tool writes is recorded after run_finished. A late entry never replaces what the run
+                // recorded before it (else appending one could hide an edited report); it is only noted.
+                let reason =
+                    "recorded after run_finished, outside the run's anchored log".to_string();
+                match latest.entry(path) {
+                    std::collections::btree_map::Entry::Occupied(o) => c.skipped.push(Skipped {
+                        file: o.key().clone(),
+                        seq,
+                        reason: format!("{reason}: the earlier record is the one checked"),
+                    }),
+                    std::collections::btree_map::Entry::Vacant(v) => {
+                        // An entry that is not re-hashed anyway (an RFC 3161 token) keeps its own reason.
+                        let r = match r {
+                            Rec::Check(..) => Rec::Skip(v.key().clone(), reason),
+                            skip => skip,
+                        };
+                        v.insert((seq, r));
+                    }
+                }
+                continue;
+            }
             latest.insert(path, (seq, r));
         }
     }
@@ -343,10 +358,19 @@ pub fn verify_with_layout(layout: &RunLayout, audit: &[Value]) -> OutputsCheck {
         }
         let root = roots
             .entry(area.to_string())
-            .or_insert_with(|| {
-                std::fs::canonicalize(layout.run_dir.as_deref().unwrap_or(area_dir)).ok()
+            .or_insert_with(|| match layout.run_dir.as_deref() {
+                Some(run) => trusted_root(run, 1),
+                None => trusted_root(area_dir, 2),
             })
             .clone();
+        let Some(root) = root else {
+            c.rejected += 1;
+            c.problems.push(problem(
+                ProblemKind::Rejected,
+                "the run's folder resolves elsewhere (symlink or junction): not read".into(),
+            ));
+            continue;
+        };
         let real = match std::fs::canonicalize(area_dir.join(rest)) {
             Ok(r) => r,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -364,7 +388,7 @@ pub fn verify_with_layout(layout: &RunLayout, audit: &[Value]) -> OutputsCheck {
                 continue;
             }
         };
-        if !root.as_ref().is_some_and(|r| real.starts_with(r)) {
+        if !real.starts_with(&root) {
             c.rejected += 1;
             c.problems.push(problem(
                 ProblemKind::Rejected,
@@ -529,6 +553,24 @@ pub fn safe_rel(rel: &str) -> bool {
             .all(|c| matches!(c, Component::Normal(_)))
 }
 
+/// The canonical form of `dir`, only if it is where its path says: the last `levels` components must not be
+/// redirected (a symlink or junction in place of `<RUN>`, or of `<OUT>/<area>` and `<OUT>/<area>/<ID>` for a
+/// standalone run, would otherwise move the containment root itself to another folder).
+fn trusted_root(dir: &Path, levels: usize) -> Option<PathBuf> {
+    let mut base = dir;
+    let mut names = Vec::with_capacity(levels);
+    for _ in 0..levels {
+        names.push(base.file_name()?.to_os_string());
+        base = base.parent()?;
+    }
+    let mut expected = std::fs::canonicalize(base).ok()?;
+    for n in names.iter().rev() {
+        expected.push(n);
+    }
+    let real = std::fs::canonicalize(dir).ok()?;
+    (real == expected).then_some(real)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -621,6 +663,95 @@ mod tests {
         let c = verify_recorded_outputs(&run.join("logs"), &audit);
         assert!(c.is_clean(), "{:?}", c.problems);
         assert_eq!(c.verified, 3);
+    }
+
+    #[test]
+    fn a_late_entry_never_replaces_an_earlier_record() {
+        // An edited report plus a correctly chained entry appended after run_finished with the new digest:
+        // the earlier record is still checked, so the edit is found.
+        let (_d, run, mut audit) = run();
+        std::fs::write(run.join("reports/statistics.json"), "edited").unwrap();
+        audit.push(json!({"seq": 6, "action": "statistics_report_written",
+                          "details": {"files": {"statistics.json": {"sha256": sha(b"edited")}}}}));
+        let c = verify_recorded_outputs(&run.join("logs"), &audit);
+        assert_eq!((c.mismatched, c.verified), (1, 2), "{:?}", c.problems);
+        assert!(
+            c.problems[0]
+                .to_string()
+                .contains("differs from audit entry #4")
+        );
+        assert!(
+            c.skipped_lines()
+                .join("\n")
+                .contains("the earlier record is the one checked")
+        );
+    }
+
+    /// Replaces `link` (an existing folder) by a link to `target`: a junction on Windows, a symlink elsewhere.
+    fn redirect(link: &Path, target: &Path) -> bool {
+        std::fs::remove_dir_all(link).unwrap();
+        #[cfg(windows)]
+        {
+            std::process::Command::new("cmd")
+                .arg("/C")
+                .arg("mklink")
+                .arg("/J")
+                .arg(link)
+                .arg(target)
+                .output()
+                .is_ok_and(|o| o.status.success())
+        }
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink(target, link).is_ok()
+        }
+    }
+
+    fn copy_tree(from: &Path, to: &Path) {
+        for e in std::fs::read_dir(from).unwrap() {
+            let e = e.unwrap();
+            let dest = to.join(e.file_name());
+            if e.file_type().unwrap().is_dir() {
+                std::fs::create_dir_all(&dest).unwrap();
+                copy_tree(&e.path(), &dest);
+            } else {
+                std::fs::copy(e.path(), dest).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn a_redirected_run_or_area_folder_is_rejected() {
+        // Case run: the whole reports/ tree is fine, but the run folder itself redirected elsewhere is not.
+        let (d, run, audit) = run();
+        let elsewhere = d.path().join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).unwrap();
+        copy_tree(&run, &elsewhere);
+        if !redirect(&run, &elsewhere) {
+            eprintln!("skipping: cannot create a junction or symlink here");
+            return;
+        }
+        let c = verify_recorded_outputs(&run.join("logs"), &audit);
+        assert_eq!((c.verified, c.rejected), (0, 3), "{:?}", c.problems);
+        assert!(c.problems[0].to_string().contains("resolves elsewhere"));
+
+        // Standalone run: <OUT>/reports/<ID> redirected to a copy with matching files.
+        let out = d.path().join("OUT");
+        let id = "20260101T000000Z-abc";
+        let rep = out.join("reports").join(id);
+        std::fs::create_dir_all(&rep).unwrap();
+        std::fs::create_dir_all(out.join("logs").join(id)).unwrap();
+        std::fs::write(rep.join("statistics.json"), "s").unwrap();
+        let other = d.path().join("other");
+        std::fs::create_dir_all(&other).unwrap();
+        std::fs::write(other.join("statistics.json"), "s").unwrap();
+        let a = vec![json!({"seq": 1, "action": "statistics_report_written",
+                            "details": {"files": {"statistics.json": {"sha256": sha(b"s")}}}})];
+        let layout = RunLayout::of_log_dir(&out.join("logs").join(id));
+        assert_eq!(verify_with_layout(&layout, &a).verified, 1);
+        assert!(redirect(&rep, &other));
+        let c = verify_with_layout(&layout, &a);
+        assert_eq!((c.verified, c.rejected), (0, 1), "{:?}", c.problems);
     }
 
     #[test]
