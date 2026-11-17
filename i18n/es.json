@@ -121,6 +121,7 @@
     "run_status_verified": "Verificada",
     "run_status_excluded": "Excluida",
     "skip_self": "ejecución de línea de tiempo (no es una fuente)",
+    "skip_verification": "ejecución de verificación del caso (RV Hub, no es una fuente)",
     "skip_tool_filter": "no seleccionada por el filtro de herramientas",
     "window": "Ventana de tiempo (UTC)",
     "all_tools": "todas las herramientas admitidas",

@@ -121,6 +121,7 @@
     "run_status_verified": "Vérifiée",
     "run_status_excluded": "Écartée",
     "skip_self": "exécution de chronologie (pas une source)",
+    "skip_verification": "exécution de vérification du dossier (RV Hub, pas une source)",
     "skip_tool_filter": "non retenue par le filtre d'outils",
     "window": "Fenêtre de temps (UTC)",
     "all_tools": "tous les outils pris en charge",

@@ -75,7 +75,7 @@ pub struct RunInfo {
     pub timeline: Option<TimelineInfo>,
 }
 
-/// A run found in the case folder but not used as a source (`self`, `tool_filter`, `max_events`).
+/// A run found in the case folder but not used as a source (`self`, `verification`, `tool_filter`, `max_events`).
 #[derive(Clone, Debug)]
 pub struct SkippedRun {
     pub run: RunRef,

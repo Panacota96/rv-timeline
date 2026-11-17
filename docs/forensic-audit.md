@@ -178,7 +178,7 @@ physical transfers. This is a working aid, not legal advice: check it against th
 | `environment_recorded` | | digests of `environment.json` |
 | `signing_certificate_loaded` | with `--sign-cert` | subject, SHA-256 fingerprint |
 | `runs_discovered` | | every run found (tool, version, run id, folder) |
-| `run_skipped` | per run not considered | reason `self`, `tool_filter` or `max_events` |
+| `run_skipped` | per run not considered | reason `self`, `verification` (an RV Hub run: it verifies the case and holds no events), `tool_filter` or `max_events` |
 | `run_verified` | per run that passed verification | the run |
 | `run_read` | per run read | events read, kept, outside the filters |
 | `event_cap_reached` | when `--max-events` is reached | events dropped, total kept |
