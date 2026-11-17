@@ -793,8 +793,8 @@ fn check_tsa_eku(signer: &Certificate) -> Result<(), String> {
 }
 
 fn unix_of(gen_time: &str) -> Result<u64, String> {
-    chrono::DateTime::parse_from_rfc3339(gen_time)
-        .map(|d| d.timestamp().max(0) as u64)
+    crate::time::rfc3339_unix(gen_time)
+        .map(|t| t.max(0) as u64)
         .map_err(|e| format!("bad genTime {}: {}", gen_time, e))
 }
 

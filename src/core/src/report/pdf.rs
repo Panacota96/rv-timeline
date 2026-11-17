@@ -577,7 +577,7 @@ pub fn render(blocks: &[Block], meta: &Meta, sign: Option<SignFn>) -> Result<Vec
             name
         ));
     }
-    let date = chrono::Utc::now().format("D:%Y%m%d%H%M%SZ").to_string();
+    let date = crate::time::pdf_date(std::time::SystemTime::now());
     objects.push(format!(
         "<< /Title {} /Producer {} /Creator {} /CreationDate ({}) >>",
         pdf_string(title),
