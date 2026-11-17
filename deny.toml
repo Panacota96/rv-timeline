@@ -53,4 +53,13 @@ ignore = [
     # public keys; Marvin needs private-key operations, so verification is not affected.
     # Revisit when a stable cms 0.3 (rsa 0.10) is out, and when mail-auth moves to rsa 0.10.
     { id = "RUSTSEC-2023-0071", reason = "rsa 0.9 via cms 0.2 (sign-only, blinded, offline) and mail-auth 0.15 (verify-only); revisit with cms 0.3" },
+    # chrono is unmaintained (RUSTSEC-2026-0543, 2026-11): an "unmaintained" notice, not a vulnerability, and no
+    # fixed version will come. The tools use it to format timestamps (audit logs, reports) and to parse dates read
+    # from evidence (EXIF, mail headers, chat exports); no known bug, but future ones would not be fixed. Accepted for
+    # now; replace it with jiff in every tool and the templates together (the audit-log timestamp format must not
+    # change).
+    { id = "RUSTSEC-2026-0543", reason = "chrono unmaintained (no vulnerability); migrate every tool to jiff together" },
+    # chrono-tz (time-zone database for chrono, used by rv-rsmf to read chat exports in a given zone) is flagged
+    # unmaintained with chrono (RUSTSEC-2026-0555); jiff ships its own zone handling, so it goes with the same move.
+    { id = "RUSTSEC-2026-0555", reason = "chrono-tz unmaintained (no vulnerability); replaced with chrono by jiff" },
 ]
