@@ -59,4 +59,7 @@ ignore = [
     # now; replace it with jiff in every tool and the templates together (the audit-log timestamp format must not
     # change).
     { id = "RUSTSEC-2026-0543", reason = "chrono unmaintained (no vulnerability); migrate every tool to jiff together" },
+    # chrono-tz (time-zone database for chrono, used by rv-rsmf to read chat exports in a given zone) is flagged
+    # unmaintained with chrono (RUSTSEC-2026-0555); jiff ships its own zone handling, so it goes with the same move.
+    { id = "RUSTSEC-2026-0555", reason = "chrono-tz unmaintained (no vulnerability); replaced with chrono by jiff" },
 ]
