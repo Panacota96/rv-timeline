@@ -121,6 +121,7 @@
     "run_status_verified": "Verified",
     "run_status_excluded": "Excluded",
     "skip_self": "timeline run (not a source)",
+    "skip_verification": "case verification run (RV Hub, not a source)",
     "skip_tool_filter": "not selected by the tool filter",
     "window": "Time window (UTC)",
     "all_tools": "all supported tools",

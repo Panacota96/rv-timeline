@@ -220,7 +220,7 @@ sequenceDiagram
     R->>L: runs_discovered
     loop every run, sorted by (tool, run id)
         alt own tool, --tool filter, or cap reached
-            R->>L: run_skipped {reason self | tool_filter | max_events}
+            R->>L: run_skipped {reason self | verification | tool_filter | max_events}
         else
             R->>RD: verify_run
             alt verified

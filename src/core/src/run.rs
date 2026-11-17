@@ -269,6 +269,10 @@ fn csv_field(s: &str) -> String {
     }
 }
 
+/// Tools whose runs only verify the case (no events to read): skipped with reason `verification`, never
+/// counted as excluded (an exclusion means a source run could not be used and makes the build exit 3).
+pub const VERIFICATION_TOOLS: [&str; 1] = ["rv-hub"];
+
 /// Runs the whole pipeline. Events go to `sink`; set `cancel` to stop after the current chunk
 /// (partial reports are still written and the cancellation is audited).
 pub fn run(
@@ -1352,6 +1356,9 @@ fn timeline_pipeline(
         }
         let skip = if r.tool == cfg.tool_name {
             Some("self")
+        } else if VERIFICATION_TOOLS.contains(&r.tool.as_str()) {
+            // RV Hub's runs verify the case; they hold no events, so they are not a source (and not "excluded").
+            Some("verification")
         } else if !opts.tools.is_empty() && !opts.tools.contains(&r.tool) {
             Some("tool_filter")
         } else if cap_reached {
@@ -2328,6 +2335,43 @@ mod tests {
                 out.push(p);
             }
         }
+    }
+
+    /// QA report 2026-11-17, D2: a case verified by RV Hub before the timeline is built must not be "to review".
+    #[test]
+    fn hub_verification_runs_are_skipped_not_excluded() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (case, intake) = timeline_case(tmp.path());
+        let img = src_run("rv-imgauth", "20991231T000000Z-aaaaaa");
+        let hub = src_run("rv-hub", "20991231T000000Z-eeeeee");
+        let fake = Fake {
+            runs: vec![hub, img.clone()],
+            excluded: BTreeMap::new(),
+            events: [(
+                img.run_id.clone(),
+                Ok(vec![tev(&img, "E0001", "fs.modified", intake - 86_400, 1)]),
+            )]
+            .into_iter()
+            .collect(),
+        };
+        let s = run_timeline_with(
+            &tl_cfg(),
+            &tl_opts(&case),
+            &fake,
+            engine::DEFAULT_SORT_THRESHOLD,
+            &mut |_| {},
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        let stats: Value = serde_json::from_str(
+            &std::fs::read_to_string(s.report_dir.join("statistics.json")).unwrap(),
+        )
+        .unwrap();
+        let tl = &stats["timeline"];
+        assert_eq!(tl["runs_excluded"].as_u64(), Some(0), "{tl}");
+        assert_eq!(tl["runs_verified"].as_u64(), Some(1));
+        assert_eq!(tl["skipped"][0]["reason"], "verification");
+        assert!(actions(&s.log_dir).iter().all(|a| a != "run_excluded"));
     }
 
     #[test]
