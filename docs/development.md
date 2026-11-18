@@ -42,7 +42,7 @@ Rust code uses `std::path` throughout and is not affected by the limit.
 | --- | --- | --- |
 | `rust-toolchain.toml` | **1.97.0** (rustfmt, clippy, minimal profile) | One compiler for local builds, CI and releases, so lints do not drift and an auditor rebuilds a release with the compiler recorded in its `environment.json` (`tool.rustc`). Bump it deliberately, in this one file, with a green CI. |
 | `rust-version` (workspace `Cargo.toml`) | **1.88** | The minimum (edition 2024; the fixed versions of `time` and `tokio`, [ADR 0003](adr/0003-dependency-advisories.md)). |
-| `chrono` | workspace | Calendar arithmetic for the strict parsers, the CET/CEST rule and formatting; no tz database is used. |
+| `jiff` | workspace (`jiff = "1"`, replaced chrono, RUSTSEC-2026-0543) | Date validation for the strict parsers and RFC 3339 (`civil::DateTime`). The CET/CEST rule, UTC formatting and run-id stamps use exact integer calendar arithmetic in `engine.rs` (range ±262143 years, as before; jiff stops at 9999); no tz database is used. Golden vectors: `src/core/tests/golden_time.rs`. |
 
 ## How the code is organised
 

@@ -17,7 +17,6 @@ use crate::model::{
     ItemRef, Precision, RunRef, RunStatus, Severity, Signal, TimeEvent, Timeline, TimelineOptions,
     ZoneInfo,
 };
-use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime};
 use serde_json::{Map, Value, json};
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
@@ -92,24 +91,88 @@ pub fn offset_text(min: i32) -> String {
     format!("{}{:02}:{:02}", sign, a / 60, a % 60)
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Proleptic Gregorian calendar
+// ---------------------------------------------------------------------------------------------------------------
+//
+// The instants the timeline formats span years -262143 to 262142 (the range of the timeline since its first
+// version; jiff's own range ends in 9999), so the UTC calendar is computed here, exactly, with integers. Outside it
+// a time is written `@<seconds>`.
+
+/// First and last second the timeline formats: -262143-01-01T00:00:00Z and 262142-12-31T23:59:59Z.
+const MIN_UTC_S: i64 = -8_334_601_228_800;
+const MAX_UTC_S: i64 = 8_210_266_876_799;
+const MIN_YEAR: i64 = -262_143;
+const MAX_YEAR: i64 = 262_142;
+
+/// Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's `days_from_civil`).
+fn days_from_civil(y: i64, m: u32, d: u32) -> i64 {
+    let y = y - i64::from(m <= 2);
+    let era = y.div_euclid(400);
+    let yoe = y.rem_euclid(400);
+    let mp = i64::from((m + 9) % 12);
+    let doy = (153 * mp + 2) / 5 + i64::from(d) - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146_097 + doe - 719_468
+}
+
+/// (year, month, day) of a day count since 1970-01-01 (H. Hinnant's `civil_from_days`).
+fn civil_from_days(days: i64) -> (i64, u32, u32) {
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 } as u32;
+    (yoe + era * 400 + i64::from(m <= 2), m, d)
+}
+
+fn days_in_month(y: i64, m: u32) -> u32 {
+    match m {
+        2 if y % 4 == 0 && (y % 100 != 0 || y % 400 == 0) => 29,
+        2 => 28,
+        4 | 6 | 9 | 11 => 30,
+        _ => 31,
+    }
+}
+
+/// The year as ISO 8601 writes it: 4 digits, with a sign outside 0000–9999 (`+10000`, `-0001`).
+fn year_text(y: i64) -> String {
+    if (0..=9999).contains(&y) {
+        format!("{y:04}")
+    } else if y > 9999 {
+        format!("+{y}")
+    } else {
+        format!("-{:04}", -y)
+    }
+}
+
+/// UTC calendar fields of an instant: (year, month, day, hour, minute, second). `None` out of range.
+fn utc_fields(s: i64) -> Option<(i64, u32, u32, u32, u32, u32)> {
+    if !(MIN_UTC_S..=MAX_UTC_S).contains(&s) {
+        return None;
+    }
+    let (days, sod) = (s.div_euclid(86_400), s.rem_euclid(86_400) as u32);
+    let (y, m, d) = civil_from_days(days);
+    Some((y, m, d, sod / 3600, sod % 3600 / 60, sod % 60))
+}
+
 /// Last Sunday of `month` (31-day months only: March, October) at 01:00 UTC, seconds since the epoch.
-fn last_sunday_0100_utc(year: i32, month: u32) -> Option<i64> {
-    let d = NaiveDate::from_ymd_opt(year, month, 31)?;
-    let back = d.weekday().num_days_from_sunday() as u64;
-    let sunday = d.checked_sub_days(chrono::Days::new(back))?;
-    Some(sunday.and_hms_opt(1, 0, 0)?.and_utc().timestamp())
+fn last_sunday_0100_utc(year: i64, month: u32) -> i64 {
+    let d = days_from_civil(year, month, 31);
+    // 1970-01-01 was a Thursday: days since the previous Sunday.
+    let back = (d + 4).rem_euclid(7);
+    (d - back) * 86_400 + 3600
 }
 
 /// Whether Paris is on summer time (CEST) at this instant.
 pub fn paris_summer_time(utc_s: i64) -> bool {
-    let Some(dt) = DateTime::from_timestamp(utc_s, 0) else {
+    let Some((y, ..)) = utc_fields(utc_s) else {
         return false;
     };
-    let y = dt.year();
-    match (last_sunday_0100_utc(y, 3), last_sunday_0100_utc(y, 10)) {
-        (Some(start), Some(end)) => utc_s >= start && utc_s < end,
-        _ => false,
-    }
+    utc_s >= last_sunday_0100_utc(y, 3) && utc_s < last_sunday_0100_utc(y, 10)
 }
 
 impl DisplayZone {
@@ -205,25 +268,27 @@ fn fraction(ns: u32, precision: Precision) -> String {
 
 /// `YYYY-MM-DD HH:MM:SS[.fff]` of a wall-clock instant (no zone); `@<seconds>` when out of range.
 pub fn wall_clock(s: i64, ns: u32, precision: Precision) -> String {
-    let Some(dt) = DateTime::from_timestamp(s, 0) else {
-        return format!("@{}", s);
-    };
-    match precision {
-        Precision::Day => dt.format("%Y-%m-%d").to_string(),
-        Precision::Minute => dt.format("%Y-%m-%d %H:%M").to_string(),
-        p => format!("{}{}", dt.format("%Y-%m-%d %H:%M:%S"), fraction(ns, p)),
-    }
+    calendar_text(s, ns, precision, ' ', "")
 }
 
 /// ISO 8601 UTC with the event's precision: `2026-11-10T10:00:00Z`, `2026-11-10T10:00:00.123Z`, `2026-11-10`.
 pub fn fmt_utc(s: i64, ns: u32, precision: Precision) -> String {
-    let Some(dt) = DateTime::from_timestamp(s, 0) else {
+    calendar_text(s, ns, precision, 'T', "Z")
+}
+
+/// `YYYY-MM-DD`, or `YYYY-MM-DD<sep>HH:MM[:SS[.f]]<suffix>` by precision; `@<seconds>` when out of range.
+fn calendar_text(s: i64, ns: u32, precision: Precision, sep: char, suffix: &str) -> String {
+    let Some((y, mo, d, h, mi, sec)) = utc_fields(s) else {
         return format!("@{}", s);
     };
+    let date = format!("{}-{:02}-{:02}", year_text(y), mo, d);
     match precision {
-        Precision::Day => dt.format("%Y-%m-%d").to_string(),
-        Precision::Minute => dt.format("%Y-%m-%dT%H:%MZ").to_string(),
-        p => format!("{}{}Z", dt.format("%Y-%m-%dT%H:%M:%S"), fraction(ns, p)),
+        Precision::Day => date,
+        Precision::Minute => format!("{date}{sep}{h:02}:{mi:02}{suffix}"),
+        p => format!(
+            "{date}{sep}{h:02}:{mi:02}:{sec:02}{}{suffix}",
+            fraction(ns, p)
+        ),
     }
 }
 
@@ -587,18 +652,139 @@ fn revision_number(e: &TimeEvent) -> Option<u32> {
 }
 
 /// Start time encoded in a Rakvor run id (`20261110T100000Z-ab12cd`).
+///
+/// The 16-character stamp is read as the `%Y%m%dT%H%M%SZ` pattern always has been (golden-tested): whitespace may
+/// precede each number, a number has 1 to its width digits (the year 1–4, or any count after a `+`/`-` sign), `T`
+/// and `Z` are literal, a second of 60 is a leap second (counted as :59), the year is within ±262143.
 pub fn run_id_start(run_id: &str) -> Option<i64> {
-    let stamp = run_id.get(..16)?;
-    NaiveDateTime::parse_from_str(stamp, "%Y%m%dT%H%M%SZ")
-        .ok()
-        .map(|d| d.and_utc().timestamp())
+    /// Up to `max` ASCII digits (at least one).
+    fn digits(s: &mut &str, max: usize) -> Option<i64> {
+        let t = *s;
+        let n = t.bytes().take(max).take_while(u8::is_ascii_digit).count();
+        if n == 0 {
+            return None;
+        }
+        let mut v = 0i64;
+        for c in t[..n].bytes() {
+            v = v.checked_mul(10)?.checked_add(i64::from(c - b'0'))?;
+        }
+        *s = &t[n..];
+        Some(v)
+    }
+    /// Optional whitespace, then up to `max` digits.
+    fn number(s: &mut &str, max: usize) -> Option<i64> {
+        *s = s.trim_start();
+        digits(s, max)
+    }
+    fn literal(s: &mut &str, c: char) -> Option<()> {
+        *s = s.strip_prefix(c)?;
+        Some(())
+    }
+    let mut s = run_id.get(..16)?.trim_start();
+    let year = if let Some(rest) = s.strip_prefix('-') {
+        s = rest;
+        -digits(&mut s, usize::MAX)?
+    } else if let Some(rest) = s.strip_prefix('+') {
+        s = rest;
+        digits(&mut s, usize::MAX)?
+    } else {
+        digits(&mut s, 4)?
+    };
+    let (mo, d) = (number(&mut s, 2)?, number(&mut s, 2)?);
+    literal(&mut s, 'T')?;
+    let (h, mi, sec) = (number(&mut s, 2)?, number(&mut s, 2)?, number(&mut s, 2)?);
+    literal(&mut s, 'Z')?;
+    if !s.is_empty()
+        || !(MIN_YEAR..=MAX_YEAR).contains(&year)
+        || !(1..=12).contains(&mo)
+        || !(1..=i64::from(days_in_month(year, mo as u32))).contains(&d)
+        || h > 23
+        || mi > 59
+        || sec > 60
+    {
+        return None;
+    }
+    Some(days_from_civil(year, mo as u32, d as u32) * 86_400 + h * 3600 + mi * 60 + sec.min(59))
 }
 
-/// Parses an RFC 3339 / ISO 8601 UTC time (`2026-11-10T10:00:00.123Z`) to seconds.
+/// Parses an RFC 3339 date-time (`2026-11-10T10:00:00.123Z`, `…+01:00`; surrounding whitespace ignored) to seconds,
+/// floored. Exactly as the timeline always has (golden-tested), which is stricter than jiff's ISO 8601 parser:
+/// `YYYY-MM-DD`, `T`/`t`/space, `hh:mm:ss` (`:60` is a leap second, counted as :59), optional `.` and 1+ digits
+/// (digits past the 9th ignored), then `Z`/`z` or `±hh:mm` (the sign may be U+2212, the offset below 24 h).
 pub fn parse_rfc3339(s: &str) -> Option<i64> {
-    DateTime::parse_from_rfc3339(s.trim())
-        .ok()
-        .map(|d| d.timestamp())
+    let s = s.trim();
+    let b = s.as_bytes();
+    let num = |at: usize, n: usize| -> Option<i64> {
+        let d = b.get(at..at + n)?;
+        d.iter()
+            .all(u8::is_ascii_digit)
+            .then(|| d.iter().fold(0, |a, c| a * 10 + i64::from(c - b'0')))
+    };
+    let (y, mo, d) = (num(0, 4)?, num(5, 2)?, num(8, 2)?);
+    let (h, mi, sec) = (num(11, 2)?, num(14, 2)?, num(17, 2)?);
+    if b[4] != b'-'
+        || b[7] != b'-'
+        || !matches!(b[10], b'T' | b't' | b' ')
+        || b[13] != b':'
+        || b[16] != b':'
+    {
+        return None;
+    }
+    // Calendar date (year 0000–9999) and time of day; a second of 60 is a leap second.
+    jiff::civil::DateTime::new(
+        y as i16,
+        mo as i8,
+        d as i8,
+        h as i8,
+        mi as i8,
+        sec.min(59) as i8,
+        0,
+    )
+    .ok()?;
+    if sec > 60 {
+        return None;
+    }
+    let mut rest = &s[19..];
+    if let Some(f) = rest.strip_prefix('.') {
+        let n = f.bytes().take_while(u8::is_ascii_digit).count();
+        if n == 0 {
+            return None;
+        }
+        rest = &f[n..];
+    }
+    let offset_s = if let Some(r) = rest.strip_prefix(['Z', 'z']) {
+        rest = r;
+        0
+    } else {
+        let (sign, r) = if let Some(r) = rest.strip_prefix('+') {
+            (1, r)
+        } else {
+            (-1, rest.strip_prefix(['-', '\u{2212}'])?)
+        };
+        let o = r.as_bytes();
+        if o.len() != 5
+            || !o[..2].iter().all(u8::is_ascii_digit)
+            || o[2] != b':'
+            || !(b'0'..=b'5').contains(&o[3])
+            || !o[4].is_ascii_digit()
+        {
+            return None;
+        }
+        let oh = i64::from(o[0] - b'0') * 10 + i64::from(o[1] - b'0');
+        let om = i64::from(o[3] - b'0') * 10 + i64::from(o[4] - b'0');
+        if oh > 23 {
+            return None;
+        }
+        rest = "";
+        sign * (oh * 3600 + om * 60)
+    };
+    if !rest.is_empty() {
+        return None;
+    }
+    Some(
+        days_from_civil(y, mo as u32, d as u32) * 86_400 + h * 3600 + mi * 60 + sec.min(59)
+            - offset_s,
+    )
 }
 
 fn p(pairs: &[(&str, String)]) -> BTreeMap<String, String> {
@@ -1254,11 +1440,23 @@ pub fn kind_label(lang: &str, kind: &str) -> String {
 
 /// `2026-11-10T10:00:00+00:00` (with microseconds when the event has them): the `datetime` Timesketch reads.
 pub fn timesketch_datetime(e: &TimeEvent) -> String {
-    match DateTime::from_timestamp(e.utc_s, e.utc_ns) {
-        Some(dt) if e.utc_ns / 1000 != 0 => dt.format("%Y-%m-%dT%H:%M:%S%.6f+00:00").to_string(),
-        Some(dt) => dt.format("%Y-%m-%dT%H:%M:%S+00:00").to_string(),
-        None => format!("@{}", e.utc_s),
-    }
+    let (s, ns) = (e.utc_s, e.utc_ns);
+    // Nanoseconds from 1e9 mark a leap second, written :60 (only on a :59 second); beyond 2e9 they are invalid.
+    let leap = ns >= 1_000_000_000;
+    let fields = utc_fields(s).filter(|_| ns < 2_000_000_000 && (!leap || s.rem_euclid(60) == 59));
+    let Some((y, mo, d, h, mi, sec)) = fields else {
+        return format!("@{}", s);
+    };
+    let sec = sec + u32::from(leap);
+    let frac = if ns / 1000 != 0 {
+        format!(".{:06}", ns / 1000 % 1_000_000)
+    } else {
+        String::new()
+    };
+    format!(
+        "{}-{mo:02}-{d:02}T{h:02}:{mi:02}:{sec:02}{frac}+00:00",
+        year_text(y)
+    )
 }
 
 /// One Timesketch JSONL line for an event (`message`, `datetime`, `timestamp_desc`, plus Rakvor fields). Keys are
