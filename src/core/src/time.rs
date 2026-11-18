@@ -1,6 +1,5 @@
 //! UTC timestamps and durations in one place, so every output uses the same format.
 
-use jiff::Timestamp;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Whole seconds since the Unix epoch (floored, like a calendar) and the nanoseconds past them.
@@ -85,57 +84,94 @@ pub fn pdf_date(t: SystemTime) -> String {
     format!("D:{}", compact_of(t).replace('T', ""))
 }
 
-/// True for the RFC 3339 `date-time` shape: `YYYY-MM-DD`, `T`/`t`/space, `hh:mm:ss`, optional fraction,
-/// `Z`/`z` or `±hh:mm`. Stricter than jiff's ISO 8601 parser (which also takes basic formats, `+hhmm` and a
-/// missing seconds field): only what RFC 3339 allows is accepted, exactly as before.
-fn rfc3339_shape(s: &str) -> bool {
-    let b = s.as_bytes();
-    let digits =
-        |r: std::ops::Range<usize>| b.get(r).is_some_and(|x| x.iter().all(u8::is_ascii_digit));
-    if b.len() < 20
-        || !digits(0..4)
-        || b[4] != b'-'
-        || !digits(5..7)
-        || b[7] != b'-'
-        || !digits(8..10)
-        || !matches!(b[10], b'T' | b't' | b' ')
-        || !digits(11..13)
-        || b[13] != b':'
-        || !digits(14..16)
-        || b[16] != b':'
-        || !digits(17..19)
-    {
-        return false;
-    }
-    let mut i = 19;
-    if b[i] == b'.' {
-        let n = b[i + 1..].iter().take_while(|c| c.is_ascii_digit()).count();
-        if n == 0 {
-            return false;
-        }
-        i += 1 + n;
-    }
-    match &b[i..] {
-        [b'Z' | b'z'] => true,
-        [b'+' | b'-', h1, h2, b':', m1, m2] => [h1, h2, m1, m2].iter().all(|c| c.is_ascii_digit()),
-        _ => false,
+/// Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's `days_from_civil`).
+fn days_from_civil(y: i64, m: u32, d: u32) -> i64 {
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = y.div_euclid(400);
+    let yoe = y.rem_euclid(400);
+    let mp = (i64::from(m) + 9) % 12;
+    let doy = (153 * mp + 2) / 5 + i64::from(d) - 1;
+    era * 146_097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719_468
+}
+
+fn days_in_month(y: i64, m: i64) -> i64 {
+    let leap = y.rem_euclid(4) == 0 && (y.rem_euclid(100) != 0 || y.rem_euclid(400) == 0);
+    match m {
+        2 if leap => 29,
+        2 => 28,
+        4 | 6 | 9 | 11 => 30,
+        _ => 31,
     }
 }
 
-/// Seconds since the Unix epoch of an RFC 3339 date-time (e.g. an RFC 3161 genTime as written in the audit log).
-/// A leap second (`:60`) counts as `:59`.
+/// Seconds since the Unix epoch of an RFC 3339 date-time (e.g. an RFC 3161 genTime as written in the audit log),
+/// with exactly the grammar of chrono's `parse_from_rfc3339`, which this replaces: `YYYY-MM-DD`, `T`/`t`/space,
+/// `hh:mm:ss`, an optional fraction (ignored: the result is floored seconds), `Z`/`z` or `±hh:mm` (`-` or U+2212,
+/// hours ≤ 23). A leap second (`:60`) counts as `:59`.
 pub fn rfc3339_unix(s: &str) -> Result<i64, String> {
-    if !rfc3339_shape(s) {
-        return Err(format!("not an RFC 3339 date-time: {s:?}"));
+    let bad = || format!("not an RFC 3339 date-time: {s:?}");
+    let b = s.as_bytes();
+    let num = |at: usize, n: usize| -> Option<i64> {
+        let d = b.get(at..at + n)?;
+        d.iter()
+            .all(u8::is_ascii_digit)
+            .then(|| d.iter().fold(0, |a, c| a * 10 + i64::from(c - b'0')))
+    };
+    let field = |at, n| num(at, n).ok_or_else(bad);
+    let (y, mo, d) = (field(0, 4)?, field(5, 2)?, field(8, 2)?);
+    let (h, mi, sec) = (field(11, 2)?, field(14, 2)?, field(17, 2)?);
+    if b[4] != b'-'
+        || b[7] != b'-'
+        || !matches!(b[10], b'T' | b't' | b' ')
+        || b[13] != b':'
+        || b[16] != b':'
+    {
+        return Err(bad());
     }
-    let mut norm = s.to_string();
-    if &s[17..19] == "60" {
-        norm.replace_range(17..19, "59");
+    if !(1..=12).contains(&mo) || d < 1 || d > days_in_month(y, mo) || h > 23 || mi > 59 || sec > 60
+    {
+        return Err(bad());
     }
-    norm.parse::<Timestamp>()
-        // floored, like the formatting (-0.5 s is second -1)
-        .map(|t| t.as_second() - i64::from(t.subsec_nanosecond() < 0))
-        .map_err(|e| e.to_string())
+    let mut rest = &s[19..];
+    if let Some(f) = rest.strip_prefix('.') {
+        let n = f.bytes().take_while(u8::is_ascii_digit).count();
+        if n == 0 {
+            return Err(bad());
+        }
+        rest = &f[n..];
+    }
+    let offset = if let Some(r) = rest.strip_prefix(['Z', 'z']) {
+        rest = r;
+        0
+    } else {
+        let (sign, r) = match rest.strip_prefix('+') {
+            Some(r) => (1, r),
+            None => (-1, rest.strip_prefix(['-', '\u{2212}']).ok_or_else(bad)?),
+        };
+        let o = r.as_bytes();
+        if o.len() != 5
+            || !o[..2].iter().all(u8::is_ascii_digit)
+            || o[2] != b':'
+            || !(b'0'..=b'5').contains(&o[3])
+            || !o[4].is_ascii_digit()
+        {
+            return Err(bad());
+        }
+        let oh = i64::from(o[0] - b'0') * 10 + i64::from(o[1] - b'0');
+        let om = i64::from(o[3] - b'0') * 10 + i64::from(o[4] - b'0');
+        if oh > 23 {
+            return Err(bad());
+        }
+        rest = "";
+        sign * (oh * 3600 + om * 60)
+    };
+    if !rest.is_empty() {
+        return Err(bad());
+    }
+    Ok(
+        days_from_civil(y, mo as u32, d as u32) * 86_400 + h * 3600 + mi * 60 + sec.min(59)
+            - offset,
+    )
 }
 
 /// "1 h 02 min 03 s", "4 min 05 s", "12.3 s"
@@ -177,7 +213,7 @@ mod tests {
         ]
     }
 
-    const PARSE_INPUTS: [&str; 16] = [
+    const PARSE_INPUTS: [&str; 28] = [
         "2026-11-15T10:00:00Z",
         "2026-11-15T10:00:00.123456789Z",
         "2026-11-15T10:00:00+01:00",
@@ -194,6 +230,18 @@ mod tests {
         " 2026-11-15T10:00:00Z",
         "1969-12-31T23:59:59.5Z",
         "",
+        "2026-11-15T10:00:00\u{2212}05:00",
+        "2026-11-15T10:00:00+24:00",
+        "2026-11-15T10:00:00+25:59",
+        "2026-11-15T10:00:00+23:59",
+        "9999-12-31T23:59:59-23:59",
+        "2026-11-15T10:00:00+01:60",
+        "2026-11-15T10:00:60Z",
+        "2026-11-15T10:00:00.1234567890123Z",
+        "0000-01-01T00:00:00Z",
+        "2026-11-15T10:00:00+00:00",
+        "2026-11-15T10:00:00-00:00",
+        "2026-11-15T10:00:00Z ",
     ];
 
     /// Frozen from chrono 0.4 (before the move to jiff): every format must stay byte-identical, every parse
@@ -277,7 +325,7 @@ mod tests {
 
     #[test]
     fn golden_parse() {
-        let want: [Option<i64>; 16] = [
+        let want: [Option<i64>; 28] = [
             Some(1794736800),
             Some(1794736800),
             Some(1794733200),
@@ -293,6 +341,18 @@ mod tests {
             None,
             None,
             Some(-1),
+            None,
+            Some(1794754800),
+            None,
+            None,
+            Some(1794650460),
+            Some(253402387139),
+            None,
+            Some(1794736859),
+            Some(1794736800),
+            Some(-62167219200),
+            Some(1794736800),
+            Some(1794736800),
             None,
         ];
         for (s, w) in PARSE_INPUTS.into_iter().zip(want) {
