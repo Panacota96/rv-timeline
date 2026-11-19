@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries are generated from
 [Conventional Commits](https://www.conventionalcommits.org/) by release-please and reviewed by a human.
 
+## [0.2.2](https://github.com/Panacota96/rv-timeline/compare/v0.2.1...v0.2.2) (2026-11-19)
+
+
+### Bug Fixes
+
+* **deps:** drop the unmaintained chrono dependency (RUSTSEC-2026-0543); every date written or read is golden-tested byte-identical ([3681e5c](https://github.com/Panacota96/rv-timeline/commit/3681e5cab62e59c679f81ebb8115c2454c3d66a6))
+
 ## [0.2.1](https://github.com/Panacota96/rv-timeline/compare/v0.2.0...v0.2.1) (2026-11-17)
 
 
