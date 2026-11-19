@@ -50,14 +50,19 @@ pub const MAX_WARNINGS: usize = 100;
 
 type ReadFn = fn(&Path, &RunRef) -> Result<ReadOutcome, ReadError>;
 
-/// (tool, supported major.minor, reader function).
-const TABLE: [(&str, (u64, u64), ReadFn); 6] = [
-    ("rv-hashinv", (0, 4), hashinv::read),
-    ("rv-pdfauth", (0, 4), pdfauth::read),
-    ("rv-imgauth", (0, 3), imgauth::read),
-    ("rv-rsmf", (0, 3), rsmf::read),
-    ("rv-mailauth", (0, 2), mailauth::read),
-    ("rv-certcheck", (0, 2), certcheck::read),
+/// (tool, supported major.minor versions, reader function). A minor release of a source tool that keeps its
+/// output formats is added here (rv-hashinv 0.5 only added the `collection_linked` audit entry and two finding
+/// codes; its hashes.csv, registry rows and reports are unchanged).
+/// `major.minor` versions a reader supports.
+type Versions = &'static [(u64, u64)];
+
+const TABLE: [(&str, Versions, ReadFn); 6] = [
+    ("rv-hashinv", &[(0, 4), (0, 5)], hashinv::read),
+    ("rv-pdfauth", &[(0, 4)], pdfauth::read),
+    ("rv-imgauth", &[(0, 3)], imgauth::read),
+    ("rv-rsmf", &[(0, 3)], rsmf::read),
+    ("rv-mailauth", &[(0, 2)], mailauth::read),
+    ("rv-certcheck", &[(0, 2)], certcheck::read),
 ];
 
 /// `major.minor` of a semver string (`0.4.1`, `0.4.1-rc.1`).
@@ -73,7 +78,7 @@ fn major_minor(v: &str) -> Option<(u64, u64)> {
 /// One reader of the built-in table.
 pub struct TableReader {
     tool: &'static str,
-    version: (u64, u64),
+    versions: Versions,
     read: ReadFn,
 }
 
@@ -82,7 +87,7 @@ impl SourceReader for TableReader {
         self.tool
     }
     fn supports(&self, tool_version: &str) -> bool {
-        major_minor(tool_version) == Some(self.version)
+        major_minor(tool_version).is_some_and(|v| self.versions.contains(&v))
     }
     fn read(&self, case_dir: &Path, run: &RunRef) -> Result<Vec<TimeEvent>, ReadError> {
         (self.read)(case_dir, run).map(|o| o.events)
@@ -93,10 +98,10 @@ impl SourceReader for TableReader {
 pub fn all() -> Vec<Box<dyn SourceReader>> {
     TABLE
         .iter()
-        .map(|(tool, version, read)| {
+        .map(|(tool, versions, read)| {
             Box::new(TableReader {
                 tool,
-                version: *version,
+                versions,
                 read: *read,
             }) as Box<dyn SourceReader>
         })
@@ -107,14 +112,19 @@ pub fn all() -> Vec<Box<dyn SourceReader>> {
 pub fn supported_versions() -> Vec<(String, String)> {
     TABLE
         .iter()
-        .map(|(t, (a, b), _)| (t.to_string(), format!("{a}.{b}.x")))
+        .map(|(t, vs, _)| {
+            let list: Vec<String> = vs.iter().map(|(a, b)| format!("{a}.{b}.x")).collect();
+            (t.to_string(), list.join(", "))
+        })
         .collect()
 }
 
 /// Like [`read_run`] with the skipped-time count and warnings (built-in readers only).
 pub fn read_run_outcome(case_dir: &Path, run: &RunRef) -> Result<ReadOutcome, ReadError> {
     match TABLE.iter().find(|(t, _, _)| *t == run.tool) {
-        Some((_, v, f)) if major_minor(&run.tool_version) == Some(*v) => f(case_dir, run),
+        Some((_, vs, f)) if major_minor(&run.tool_version).is_some_and(|v| vs.contains(&v)) => {
+            f(case_dir, run)
+        }
         Some(_) => Err(err("unsupported_version", &run.tool_version)),
         None => Err(err("unsupported_tool", &run.tool)),
     }
@@ -403,7 +413,7 @@ fn check_run(case_dir: &Path, run: &RunRef) -> Result<(), ReadError> {
     // A reader for this tool and version.
     match TABLE.iter().find(|(t, _, _)| *t == run.tool) {
         None => return Err(err("unsupported_tool", &run.tool)),
-        Some((_, v, _)) if major_minor(&run.tool_version) != Some(*v) => {
+        Some((_, vs, _)) if !major_minor(&run.tool_version).is_some_and(|v| vs.contains(&v)) => {
             return Err(err("unsupported_version", &run.tool_version));
         }
         _ => {}

@@ -75,7 +75,7 @@ understands:
 
 | Tool | Version | Reads |
 | --- | --- | --- |
-| rv-hashinv | 0.4 | `reports/items/*/technical.json` (`/case/intake_utc`), audit `evidence_registered`, `item_started` |
+| rv-hashinv | 0.4, 0.5 | `reports/items/*/technical.json` (`/case/intake_utc`), audit `evidence_registered`, `item_started` |
 | rv-pdfauth | 0.4 | `objects.json` (Info dictionaries, signature `/M` per revision), `technical.json` (CMS signing time, XMP save dates) |
 | rv-imgauth | 0.3 | `metadata.json` (EXIF tags with OffsetTime* / SubSecTime*, GPS, XMP, XMP history, PNG) |
 | rv-rsmf | 0.3 | `rsmf/trace.json` (one row per chat event: kind, `source_time`, `utc`, conversation, RSMF file) |

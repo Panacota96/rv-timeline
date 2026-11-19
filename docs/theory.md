@@ -276,7 +276,7 @@ refused (`unreadable`). A reader error
 also excludes the run. HTML and PDF renderings are not read and not checked here; `verify-log` and `verify-case` re-hash them
 ([forensic-audit.md](forensic-audit.md)).
 
-Supported versions (the reader table): rv-hashinv **0.4.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
+Supported versions (the reader table): rv-hashinv **0.4.x** and **0.5.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
 **0.3.x**, rv-mailauth **0.2.x**, rv-certcheck **0.2.x**. A new minor version of a tool is excluded
 (`unsupported_version`, low severity) until a reader is added for it ([development.md](development.md#adding-or-updating-a-reader)).
 
@@ -344,7 +344,7 @@ log, once per item and run.
 
 | Tool (version) | Kinds (source file) | Sub-item |
 | --- | --- | --- |
-| rv-hashinv (0.4.x) | `intake.registered` (`technical.json` `/case/intake_utc`, only items this run registered); `fs.modified` | none |
+| rv-hashinv (0.4.x, 0.5.x) | `intake.registered` (`technical.json` `/case/intake_utc`, only items this run registered); `fs.modified` | none |
 | rv-imgauth (0.3.x) | `exif.original`, `exif.digitized`, `exif.modify` (EXIF DateTimeOriginal / DateTimeDigitized / IFD0 DateTime with OffsetTime* and SubSecTime*), `gps.time`, `xmp.create`, `xmp.modify`, `xmp.metadata`, `xmp.photoshop_created`, `xmp.exif_original`, `xmp.history`, `png.time`, `png.creation_time` (`metadata.json`); `fs.modified` | none |
 | rv-pdfauth (0.4.x) | `pdf.info.created`, `pdf.info.modified` (Info dictionary of each revision, `objects.json`); `pdf.signature.claimed` (a signature dictionary's `/M`); `pdf.revision.signed` (CMS signingTime, `technical.json`); `pdf.xmp.saved`; `pdf.info.saved` (only without `objects.json`); `fs.modified` | `r<n>`, revision from 1 |
 | rv-rsmf (0.3.x) | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` (one per `rsmf/trace.json` row, by its RSMF kind); `fs.modified` | `<conversation>/<day>` |
