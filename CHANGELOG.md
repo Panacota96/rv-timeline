@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries are generated from
 [Conventional Commits](https://www.conventionalcommits.org/) by release-please and reviewed by a human.
 
+## [0.2.3](https://github.com/Panacota96/rv-timeline/compare/v0.2.2...v0.2.3) (2026-11-19)
+
+
+### Bug Fixes
+
+* **readers:** read rv-hashinv 0.5 runs (they were excluded as unsupported_version) ([#12](https://github.com/Panacota96/rv-timeline/issues/12)) ([22be488](https://github.com/Panacota96/rv-timeline/commit/22be488e61c95088dc98f251e5560096382dd05c))
+
 ## [0.2.2](https://github.com/Panacota96/rv-timeline/compare/v0.2.1...v0.2.2) (2026-11-19)
 
 
