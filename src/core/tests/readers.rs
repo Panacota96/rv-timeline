@@ -654,3 +654,28 @@ fn every_kind_has_a_label_in_every_language() {
         }
     }
 }
+
+/// QA 2026-11-19, D3: rv-hashinv 0.5 (released with the RV Triage collection link) keeps its 0.4 output formats
+/// and must be read; versions outside the table stay refused.
+#[test]
+fn hashinv_0_4_and_0_5_are_read_other_versions_are_not() {
+    let all = readers::all();
+    let hashinv = all.iter().find(|r| r.tool() == "rv-hashinv").unwrap();
+    for (v, ok) in [
+        ("0.4.1", true),
+        ("0.4.2", true),
+        ("0.5.0", true),
+        ("0.5.1", true),
+        ("0.3.1", false),
+        ("0.6.0", false),
+        ("1.5.0", false),
+        ("0.5", false),
+    ] {
+        assert_eq!(hashinv.supports(v), ok, "{v}");
+    }
+    let listed = readers::supported_versions();
+    assert!(
+        listed.contains(&("rv-hashinv".to_string(), "0.4.x, 0.5.x".to_string())),
+        "{listed:?}"
+    );
+}
