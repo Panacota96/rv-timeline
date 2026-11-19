@@ -50,12 +50,13 @@ pub const MAX_WARNINGS: usize = 100;
 
 type ReadFn = fn(&Path, &RunRef) -> Result<ReadOutcome, ReadError>;
 
-/// (tool, supported major.minor versions, reader function). A minor release of a source tool that keeps its
-/// output formats is added here (rv-hashinv 0.5 only added the `collection_linked` audit entry and two finding
-/// codes; its hashes.csv, registry rows and reports are unchanged).
 /// `major.minor` versions a reader supports.
 type Versions = &'static [(u64, u64)];
 
+/// (tool, supported major.minor versions, reader function). A minor release of a source tool that keeps its
+/// output formats is added here (rv-hashinv 0.5 only added the `collection_linked` audit entry and two finding
+/// codes; its hashes.csv, registry rows and reports are unchanged). The `source-versions` workflow fails when
+/// the latest release of a source tool is not listed.
 const TABLE: [(&str, Versions, ReadFn); 6] = [
     ("rv-hashinv", &[(0, 4), (0, 5)], hashinv::read),
     ("rv-pdfauth", &[(0, 4)], pdfauth::read),
