@@ -15,7 +15,7 @@
 //! time read as UTC.
 
 use crate::model::{Precision, ZoneInfo};
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use jiff::civil::DateTime;
 
 /// A parsed instant (seconds + nanoseconds since the Unix epoch, UTC).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -68,14 +68,26 @@ fn build(
     offset_min: Option<i32>,
     precision: Precision,
 ) -> Option<Parsed> {
-    // Leap seconds (:60) are rejected: chrono would fold them and the instant would be invented.
-    let date = NaiveDate::from_ymd_opt(y, mo, d)?;
-    let time = NaiveTime::from_hms_nano_opt(h, mi, s, ns)?;
-    if s > 59 || ns > 999_999_999 {
+    // A valid calendar date and time of day. Leap seconds (:60) are rejected: folding them would invent the
+    // instant. Callers pass years of at most 4 digits, all within jiff's civil range.
+    let small = |v: u32| i8::try_from(v).ok();
+    let wall = DateTime::new(
+        i16::try_from(y).ok()?,
+        small(mo)?,
+        small(d)?,
+        small(h)?,
+        small(mi)?,
+        small(s)?,
+        0,
+    )
+    .ok()?;
+    if ns > 999_999_999 {
         return None;
     }
-    let naive = NaiveDateTime::new(date, time);
-    let local_s = naive.and_utc().timestamp();
+    // Whole seconds of the wall clock read as UTC (exact: both ends are midnight-aligned civil times).
+    let local_s = wall
+        .duration_since(DateTime::constant(1970, 1, 1, 0, 0, 0, 0))
+        .as_secs();
     let (zone, utc_s) = match offset_min {
         Some(o) if o.abs() <= MAX_OFFSET_MIN => {
             (ZoneInfo::Explicit, local_s.checked_sub(i64::from(o) * 60)?)
@@ -519,7 +531,7 @@ mod tests {
     use ZoneInfo::*;
 
     fn at(s: &str) -> i64 {
-        chrono::DateTime::parse_from_rfc3339(s).unwrap().timestamp()
+        crate::time::rfc3339_unix(s).unwrap()
     }
 
     #[test]

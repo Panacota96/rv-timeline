@@ -24,7 +24,8 @@ digest = "0.11"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 minijinja = { version = "3", features = ["serde"] }
-chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+# Dates and times (UTC formatting, RFC 3339 parsing; tzdb bundled on Windows). Replaces chrono (RUSTSEC-2026-0543).
+jiff = "1"
 walkdir = "2.5"
 clap = { version = "4.6", features = ["derive", "wrap_help", "env"] }
 indicatif = "0.18"

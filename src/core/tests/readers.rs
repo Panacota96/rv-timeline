@@ -38,7 +38,7 @@ fn run(case: &Path, run_dir: &str) -> RunRef {
 }
 
 fn utc(s: &str) -> i64 {
-    chrono::DateTime::parse_from_rfc3339(s).unwrap().timestamp()
+    rv_timeline_core::time::rfc3339_unix(s).unwrap()
 }
 
 fn events(run_dir: &str) -> Vec<TimeEvent> {
