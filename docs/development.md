@@ -71,7 +71,8 @@ Architecture overview: [architecture.md](architecture.md).
 
 One reader per tool, each a function `read(case_dir, run) -> Result<ReadOutcome, ReadError>` registered in the
 table of [readers/mod.rs](../src/core/src/readers/mod.rs) with the **major.minor** of the tool's output it
-understands:
+understands (a minor release that keeps the formats is added to the list; CI checks the latest releases, see
+[Continuous integration](#continuous-integration)):
 
 | Tool | Version | Reads |
 | --- | --- | --- |
@@ -203,6 +204,13 @@ flowchart LR
 `cargo test --release -p rv-timeline-core --test large_case -- --ignored` (a synthetic case of 200 000 events,
 small sort threshold so the external sort spills, ordered output, bounded peak memory; `RV_LARGE_EVENTS` changes
 the size) and `--test hostile` with `RV_FUZZ_ITERS=3000`, and writes both summaries to the job page.
+
+`source-versions.yml` runs daily, on demand, and on pull requests that change the readers. It reads the latest
+release tag of each source tool (public repositories, read-only token) into `RV_SOURCE_RELEASES` and runs
+`cargo test -p rv-timeline-core --test source_versions -- --ignored`. The run fails when a latest release would be
+excluded as `unsupported_version`, or when a built-in reader has no release in the list. When it fails, check that
+the new minor kept the output formats the reader parses, then add its `major.minor` to the table (see
+[Readers](#readers)). The QA rerun of 2026-11-19 (D3) is why this check exists.
 
 ## Releasing
 
