@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries are generated from
 [Conventional Commits](https://www.conventionalcommits.org/) by release-please and reviewed by a human.
 
+## [0.3.0](https://github.com/Panacota96/rv-timeline/compare/v0.2.3...v0.3.0) (2026-11-20)
+
+
+### Features
+
+* **readers:** read rv-avauth runs and skip rv-report runs (they made every build exit 3) ([#15](https://github.com/Panacota96/rv-timeline/issues/15)) ([2b8692f](https://github.com/Panacota96/rv-timeline/commit/2b8692fa94fff72058cdae14d8e50e6a5ede8fbd))
+
 ## [0.2.3](https://github.com/Panacota96/rv-timeline/compare/v0.2.2...v0.2.3) (2026-11-19)
 
 
