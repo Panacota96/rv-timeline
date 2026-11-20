@@ -42,7 +42,7 @@ pub struct SkippedRow {
     pub version: String,
     pub run_id: String,
     pub run_dir: String,
-    /// `self` | `verification` | `tool_filter` | `max_events`
+    /// `self` | `verification` | `report` | `tool_filter` | `max_events`
     pub reason: String,
 }
 

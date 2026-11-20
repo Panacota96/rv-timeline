@@ -122,6 +122,7 @@
     "run_status_excluded": "Écartée",
     "skip_self": "exécution de chronologie (pas une source)",
     "skip_verification": "exécution de vérification du dossier (RV Hub, pas une source)",
+    "skip_report": "exécution de rapport d'expertise (RV Report, pas une source)",
     "skip_tool_filter": "non retenue par le filtre d'outils",
     "window": "Fenêtre de temps (UTC)",
     "all_tools": "tous les outils pris en charge",
@@ -434,6 +435,13 @@
     "cert.not_before": "Certificat valide à partir du (notBefore)",
     "cert.not_after": "Certificat valide jusqu'au (notAfter)",
     "cert.revoked": "Certificat révoqué (CRL ou OCSP)",
-    "tsa.gen_time": "Horodatage émis (RFC 3161 genTime)"
+    "tsa.gen_time": "Horodatage émis (RFC 3161 genTime)",
+    "media.header.created": "Fichier média créé (boîte MP4/MOV)",
+    "media.header.modified": "Fichier média modifié (boîte MP4/MOV)",
+    "media.tag.created": "Enregistrement créé (balise média)",
+    "media.tag.encoded": "Audio encodé (ID3 TDEN)",
+    "media.tag.tagged": "Balises écrites (ID3 TDTG)",
+    "media.tag.released": "Publication d'origine (ID3 TDOR)",
+    "media.tag.date": "Balise de date du fichier média"
   }
 }

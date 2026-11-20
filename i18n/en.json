@@ -122,6 +122,7 @@
     "run_status_excluded": "Excluded",
     "skip_self": "timeline run (not a source)",
     "skip_verification": "case verification run (RV Hub, not a source)",
+    "skip_report": "expert report run (RV Report, not a source)",
     "skip_tool_filter": "not selected by the tool filter",
     "window": "Time window (UTC)",
     "all_tools": "all supported tools",
@@ -434,6 +435,13 @@
     "cert.not_before": "Certificate valid from (notBefore)",
     "cert.not_after": "Certificate valid until (notAfter)",
     "cert.revoked": "Certificate revoked (CRL or OCSP)",
-    "tsa.gen_time": "Trusted timestamp issued (RFC 3161 genTime)"
+    "tsa.gen_time": "Trusted timestamp issued (RFC 3161 genTime)",
+    "media.header.created": "Media file created (MP4/MOV box)",
+    "media.header.modified": "Media file modified (MP4/MOV box)",
+    "media.tag.created": "Recording created (media tag)",
+    "media.tag.encoded": "Audio encoded (ID3 TDEN)",
+    "media.tag.tagged": "Tags written (ID3 TDTG)",
+    "media.tag.released": "Original release (ID3 TDOR)",
+    "media.tag.date": "Date tag in the media file"
   }
 }

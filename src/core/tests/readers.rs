@@ -112,6 +112,8 @@ fn discovery_lists_announced_runs_in_log_order() {
             "runs/rv-mailauth/20261111T120000Z-dddddd",
             "runs/rv-rsmf/20261111T130000Z-eeeeee",
             "runs/rv-certcheck/20261111T140000Z-ffffff",
+            "runs/rv-avauth/20261111T150000Z-gggggg",
+            "runs/rv-report/20261111T160000Z-hhhhhh",
             "runs/rv-imgauth/20261112T090000Z-111111",
             "runs/rv-triage/20261112T100000Z-222222",
             "runs/rv-hashinv/20261112T110000Z-333333",
@@ -145,7 +147,9 @@ fn verification_reasons() {
         .map(|r| (r.run_dir, r.exclusion.map(|e| e.reason)))
         .collect();
     let want = |d: &str| reasons.iter().find(|(x, _)| x == d).unwrap().1.clone();
-    for ok in ["aaaaaa", "bbbbbb", "cccccc", "dddddd", "eeeeee", "ffffff"] {
+    for ok in [
+        "aaaaaa", "bbbbbb", "cccccc", "dddddd", "eeeeee", "ffffff", "gggggg",
+    ] {
         let d = reasons.iter().find(|(x, _)| x.ends_with(ok)).unwrap();
         assert_eq!(d.1, None, "{}", d.0);
     }
@@ -678,4 +682,123 @@ fn hashinv_0_4_and_0_5_are_read_other_versions_are_not() {
         listed.contains(&("rv-hashinv".to_string(), "0.4.x, 0.5.x".to_string())),
         "{listed:?}"
     );
+}
+
+/// QA 2026-11-20, D4: rv-avauth runs are read (box times, zoned and zone-less date tags); rv-avauth's own `utc` is
+/// not used, an unset box time (0) is no event, a year-only ID3 tag is skipped and counted.
+#[test]
+fn avauth_events() {
+    let run_dir = "runs/rv-avauth/20261111T150000Z-gggggg";
+    let ev = events(run_dir);
+    let p = "rv-avauth:20261111T150000Z-gggggg";
+    expect(
+        &ev,
+        &[
+            (
+                &format!("{p}:E0008:media.header.created:0"),
+                "media.header.created",
+                "2026-03-01T10:00:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
+                &format!("{p}:E0008:media.header.modified:0"),
+                "media.header.modified",
+                "2026-03-04T10:00:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
+                &format!("{p}:E0008:media.header.created:1"),
+                "media.header.created",
+                "2026-03-01T10:00:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
+                &format!("{p}:E0008:media.tag.created:0"),
+                "media.tag.created",
+                "2026-03-01T10:00:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
+                &format!("{p}:E0009:media.tag.created:0"),
+                "media.tag.created",
+                "2026-03-01T00:00:00Z",
+                ZoneInfo::Unknown,
+            ),
+            (
+                &format!("{p}:E0009:media.tag.created:1"),
+                "media.tag.created",
+                "2026-03-01T10:00:00Z",
+                ZoneInfo::Unknown,
+            ),
+            (
+                &format!("{p}:E0010:media.tag.created:0"),
+                "media.tag.created",
+                "2026-02-28T09:15:00Z",
+                ZoneInfo::Explicit,
+            ),
+            (
+                &format!("{p}:E0010:media.tag.encoded:0"),
+                "media.tag.encoded",
+                "2026-02-28T09:20:00Z",
+                ZoneInfo::Unknown,
+            ),
+        ],
+    );
+    let media: Vec<&TimeEvent> = ev.iter().filter(|e| e.kind.starts_with("media.")).collect();
+    assert_eq!(media.len(), 8, "{media:#?}");
+    // The box value is the original; the box and source are cited.
+    let h = find(&ev, &format!("{p}:E0008:media.header.created:0"));
+    assert_eq!(h.original, "3855204000");
+    assert_eq!(h.source.pointer, "/times/0/raw");
+    assert_eq!(h.details["box"], "mvhd");
+    assert_eq!(h.details["source"], "mvhd.creation");
+    assert_eq!(h.details["model"], "Example Recorder 1");
+    assert_eq!(
+        find(&ev, &format!("{p}:E0008:media.header.created:1")).details["box"],
+        "tkhd[1]"
+    );
+    // The unset mdhd time (0) is not an event.
+    assert!(
+        !ev.iter()
+            .any(|e| e.details.get("box").is_some_and(|b| b.starts_with("mdhd")))
+    );
+    let t = find(&ev, &format!("{p}:E0008:media.tag.created:0"));
+    assert_eq!(
+        (t.original.as_str(), t.offset_min),
+        ("2026-03-01T11:00:00+0100", Some(60))
+    );
+    // A zone-less tag stays zone-unknown (rv-avauth's utc reads it as UTC).
+    let b = find(&ev, &format!("{p}:E0009:media.tag.created:1"));
+    assert_eq!(
+        (
+            b.details["origin"].as_str(),
+            b.details["zone"].as_str(),
+            b.offset_min
+        ),
+        ("tag_local", "unknown", None)
+    );
+    assert_eq!(
+        find(&ev, &format!("{p}:E0009:media.tag.created:0")).precision,
+        Precision::Day
+    );
+    // TYER "2026" places no instant: skipped and counted, never invented.
+    let case = fixture();
+    let out = read_run_outcome(&case, &run(&case, run_dir)).unwrap();
+    assert_eq!(out.skipped, 1);
+    assert!(out.warnings[0].contains("\"2026\""), "{:?}", out.warnings);
+}
+
+/// rv-avauth 0.2.x is read; other versions are not.
+#[test]
+fn avauth_0_2_is_read_other_versions_are_not() {
+    let all = readers::all();
+    let av = all.iter().find(|r| r.tool() == "rv-avauth").unwrap();
+    for (v, ok) in [
+        ("0.2.0", true),
+        ("0.2.7", true),
+        ("0.1.0", false),
+        ("0.3.0", false),
+    ] {
+        assert_eq!(av.supports(v), ok, "{v}");
+    }
 }

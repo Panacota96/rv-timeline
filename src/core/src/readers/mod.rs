@@ -13,6 +13,7 @@
 //! Exclusion reasons: `unreadable`, `chain_broken`, `not_finished`, `unsupported_tool`, `unsupported_version`,
 //! `digest_mismatch` (i18n `exclusion.<reason>`).
 
+pub mod avauth;
 pub mod certcheck;
 pub mod hashinv;
 pub mod imgauth;
@@ -57,13 +58,14 @@ type Versions = &'static [(u64, u64)];
 /// output formats is added here (rv-hashinv 0.5 only added the `collection_linked` audit entry and two finding
 /// codes; its hashes.csv, registry rows and reports are unchanged). The `source-versions` workflow fails when
 /// the latest release of a source tool is not listed.
-const TABLE: [(&str, Versions, ReadFn); 6] = [
+const TABLE: [(&str, Versions, ReadFn); 7] = [
     ("rv-hashinv", &[(0, 4), (0, 5)], hashinv::read),
     ("rv-pdfauth", &[(0, 4)], pdfauth::read),
     ("rv-imgauth", &[(0, 3)], imgauth::read),
     ("rv-rsmf", &[(0, 3)], rsmf::read),
     ("rv-mailauth", &[(0, 2)], mailauth::read),
     ("rv-certcheck", &[(0, 2)], certcheck::read),
+    ("rv-avauth", &[(0, 2)], avauth::read),
 ];
 
 /// `major.minor` of a semver string (`0.4.1`, `0.4.1-rc.1`).
@@ -940,8 +942,12 @@ mod tests {
                 && !img.supports("0.3")
                 && !img.supports("")
         );
-        assert_eq!(r.len(), 6);
-        assert!(reader_for(&r, "rv-timeline").is_none());
+        assert_eq!(r.len(), 7);
+        assert!(reader_for(&r, "rv-avauth").is_some());
+        // Runs that are not sources: skipped by the build (run.rs), never read.
+        for t in ["rv-timeline", "rv-hub", "rv-report"] {
+            assert!(reader_for(&r, t).is_none(), "{t}");
+        }
     }
 
     #[test]

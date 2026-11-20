@@ -1,0 +1,22 @@
+{
+  "device_claims": [],
+  "encoders": [],
+  "tags": [],
+  "tags_truncated": false,
+  "times": [
+    {
+      "origin": "tag_local",
+      "raw": "2026-03-01",
+      "source": "INFO ICRD",
+      "unix": null,
+      "utc": "2026-03-01T00:00:00Z"
+    },
+    {
+      "origin": "tag_local",
+      "raw": "2026-03-01 10:00:00",
+      "source": "bext OriginationDate",
+      "unix": null,
+      "utc": "2026-03-01T10:00:00Z"
+    }
+  ]
+}

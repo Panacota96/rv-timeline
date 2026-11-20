@@ -31,7 +31,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for t in rv-hashinv rv-pdfauth rv-imgauth rv-rsmf rv-mailauth rv-certcheck; do
+          for t in rv-hashinv rv-pdfauth rv-imgauth rv-rsmf rv-mailauth rv-certcheck rv-avauth; do
             echo "$t $(gh release view -R "Panacota96/$t" --json tagName --jq .tagName)"
           done | tee releases.txt
           {

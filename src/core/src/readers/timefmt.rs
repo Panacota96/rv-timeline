@@ -139,6 +139,11 @@ pub fn rfc3339(raw: &str) -> Option<Parsed> {
 /// ISO 8601 as XMP writes it: `YYYY`, `YYYY-MM`, `YYYY-MM-DD`, `YYYY-MM-DDTHH:MM[:SS[.f]][TZD]`. Without a TZD the
 /// zone is unknown. Date-only values are `Day` precision (a year or month alone is placed on its first day).
 pub fn iso8601(raw: &str) -> Option<Parsed> {
+    iso8601_at(raw, false)
+}
+
+/// [`iso8601`]; `loose` also accepts the basic offsets `+HHMM` and `+HH` (ISO 8601 allows both).
+fn iso8601_at(raw: &str, loose: bool) -> Option<Parsed> {
     let s = raw.as_bytes();
     let y = digits(s, 0, 4)? as i32;
     if s.len() == 4 {
@@ -184,9 +189,50 @@ pub fn iso8601(raw: &str) -> Option<Parsed> {
     let off = if pos == s.len() {
         None
     } else {
-        Some(offset(&s[pos..], false)?)
+        Some(offset(&s[pos..], loose)?)
     };
     build(y, mo, d, h, mi, sec, ns, off, prec)
+}
+
+/// Date tags of audio and video files as rv-avauth reports them (QuickTime `com.apple.quicktime.creationdate` and
+/// `©day`, Vorbis `DATE`, RIFF `ICRD`, BWF `bext` origination, ID3 `TDRC`…). Either ISO 8601 with a full date
+/// (`YYYY-MM-DD`, optionally `T` or a space and `HH:MM[:SS[.f]]`, then `Z`, `±HH:MM`, `±HHMM` or `±HH`) or the EXIF
+/// form `YYYY:MM:DD[ HH:MM:SS]`. Without an offset the zone is unknown. A year or a month alone (ID3 `TYER`
+/// `2026`) does not place an instant and is rejected.
+pub fn media_tag(raw: &str) -> Option<Parsed> {
+    let r = raw.trim();
+    if r.len() < 10 {
+        return None;
+    }
+    iso8601_at(r, true).or_else(|| exif(r, None, None))
+}
+
+/// Seconds between 1904-01-01T00:00:00Z and the Unix epoch.
+const MP4_EPOCH_OFFSET: i64 = 2_082_844_800;
+
+/// `creation_time` / `modification_time` of the ISO base media file format boxes (`mvhd`, `tkhd`, `mdhd`), as the
+/// decimal integer rv-avauth reports: seconds since 1904-01-01T00:00:00Z (ISO/IEC 14496-12: "in seconds since
+/// midnight, Jan. 1, 1904, in UTC time"). Decimal digits only; 0 (the field not set) and values after
+/// 9999-12-31 are rejected.
+pub fn mp4_seconds(raw: &str) -> Option<Parsed> {
+    if raw.is_empty() || raw.len() > 20 || !raw.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    let v: i64 = raw.parse().ok()?;
+    if v == 0 {
+        return None;
+    }
+    let utc_s = v.checked_sub(MP4_EPOCH_OFFSET)?;
+    if utc_s > 253_402_300_799 {
+        return None;
+    }
+    Some(Parsed {
+        utc_s,
+        utc_ns: 0,
+        zone: ZoneInfo::Explicit,
+        offset_min: Some(0),
+        precision: Precision::Second,
+    })
 }
 
 const MONTHS: [&str; 12] = [
@@ -532,6 +578,112 @@ mod tests {
 
     fn at(s: &str) -> i64 {
         crate::time::rfc3339_unix(s).unwrap()
+    }
+
+    #[test]
+    fn media_tags_and_mp4_seconds() {
+        // (input, utc, zone, offset, precision) — the forms rv-avauth 0.2 reports (sample files and its parsers).
+        let ok = [
+            (
+                "2026-03-01T11:00:00+0100",
+                "2026-03-01T10:00:00Z",
+                Explicit,
+                Some(60),
+                Second,
+            ),
+            (
+                "2026-02-19T10:00:00Z",
+                "2026-02-19T10:00:00Z",
+                Explicit,
+                Some(0),
+                Second,
+            ),
+            (
+                "2026-03-01T11:00:00+01:00",
+                "2026-03-01T10:00:00Z",
+                Explicit,
+                Some(60),
+                Second,
+            ),
+            (
+                "2026-03-01T11:00:00-05",
+                "2026-03-01T16:00:00Z",
+                Explicit,
+                Some(-300),
+                Second,
+            ),
+            (
+                "2026-03-01 10:00:00",
+                "2026-03-01T10:00:00Z",
+                Unknown,
+                None,
+                Second,
+            ),
+            ("2026-03-01", "2026-03-01T00:00:00Z", Unknown, None, Day),
+            (
+                "2026:03:01 10:00:00",
+                "2026-03-01T10:00:00Z",
+                Unknown,
+                None,
+                Second,
+            ),
+            (
+                " 2026-03-01T10:00:00.250Z ",
+                "2026-03-01T10:00:00Z",
+                Explicit,
+                Some(0),
+                Millisecond,
+            ),
+        ];
+        for (raw, utc, zone, off, prec) in ok {
+            let p = media_tag(raw).unwrap_or_else(|| panic!("{raw:?}"));
+            assert_eq!(
+                (p.utc_s, p.zone, p.offset_min, p.precision),
+                (at(utc), zone, off, prec),
+                "{raw:?}"
+            );
+        }
+        assert_eq!(
+            media_tag(" 2026-03-01T10:00:00.250Z ").unwrap().utc_ns,
+            250_000_000
+        );
+        for raw in [
+            "2026",
+            "2026-03",
+            "",
+            "not a date",
+            "2026-13-01",
+            "2026-03-01T25:00:00Z",
+            "2026-03-01T10:00:00+2500",
+            "2026/03/01",
+        ] {
+            assert_eq!(media_tag(raw), None, "{raw:?}");
+        }
+        // The XMP parser stays strict about basic offsets.
+        assert_eq!(iso8601("2026-03-01T11:00:00+0100"), None);
+
+        // 3855204000 s after 1904-01-01Z = 2026-03-01T10:00:00Z (rv-avauth's sample camera-original.mov).
+        let p = mp4_seconds("3855204000").unwrap();
+        assert_eq!(
+            (p.utc_s, p.utc_ns, p.zone, p.offset_min, p.precision),
+            (at("2026-03-01T10:00:00Z"), 0, Explicit, Some(0), Second)
+        );
+        assert_eq!(mp4_seconds("1").unwrap().utc_s, at("1904-01-01T00:00:01Z"));
+        assert_eq!(
+            mp4_seconds("255485145599").unwrap().utc_s,
+            at("9999-12-31T23:59:59Z")
+        );
+        for raw in [
+            "0",
+            "",
+            "-1",
+            "+5",
+            "12a",
+            "255485145600",
+            "99999999999999999999999",
+        ] {
+            assert_eq!(mp4_seconds(raw), None, "{raw:?}");
+        }
     }
 
     #[test]
