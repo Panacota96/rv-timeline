@@ -24,7 +24,7 @@ flowchart LR
     C[("Case folder<br/>case.json · case-log.jsonl<br/>evidence/registry.json")] --> D["Discover runs<br/>runs/&lt;tool&gt;/&lt;RUN-ID&gt;"]
     D --> V{"Verify each run<br/>audit chain · finished ·<br/>case-log anchor · output digests"}
     V -- "fails" --> X["excluded<br/>RUN_NOT_VERIFIED"]
-    V -- "ok" --> R["Reader per tool<br/>rv-hashinv · rv-pdfauth · rv-imgauth<br/>rv-rsmf · rv-mailauth · rv-certcheck"]
+    V -- "ok" --> R["Reader per tool<br/>rv-hashinv · rv-pdfauth · rv-imgauth<br/>rv-rsmf · rv-mailauth · rv-certcheck · rv-avauth"]
     R --> E["Events in UTC<br/>original wording + citation"]
     E --> S["Order (utc, id)<br/>cross-source signals"]
     S --> O[["timeline.jsonl (Timesketch)<br/>reports per item + statistics"]]
@@ -46,7 +46,7 @@ flowchart LR
 
 | | |
 | --- | --- |
-| **One timeline per case** | Reads the runs of rv-hashinv (intake, file-system times), rv-pdfauth (Info dates, signatures, revisions), rv-imgauth (EXIF, XMP, PNG, GPS times), rv-rsmf (chat events), rv-mailauth (Date, Received hops, attachments, mbox lines) and rv-certcheck (validity, revocation, RFC 3161 genTime). Its own input is the case folder, not evidence files. |
+| **One timeline per case** | Reads the runs of rv-hashinv (intake, file-system times), rv-pdfauth (Info dates, signatures, revisions), rv-imgauth (EXIF, XMP, PNG, GPS times), rv-rsmf (chat events), rv-mailauth (Date, Received hops, attachments, mbox lines), rv-certcheck (validity, revocation, RFC 3161 genTime) and rv-avauth (MP4/MOV box times, audio and video date tags). RV Hub and RV Report runs are skipped (they verify or quote the other runs). Its own input is the case folder, not evidence files. |
 | **Verified before read** | A run is read only if its hash-chained audit log is intact, it finished, the case log anchors its final entry, a reader exists for its tool version, and every machine-readable output still has the digest its audit log recorded. Any other run is **excluded** with its reason (`RUN_NOT_VERIFIED`), never partly read. |
 | **Times as written, placed in UTC** | Each event keeps the original string (`Tue, 10 Nov 2026 11:00:00 +0100`, `2026:11:10 10:00:00`) and its offset. A time with no zone (EXIF without OffsetTime, an mbox `From ` line) is **never converted with a guessed zone**: it is placed as if UTC, flagged and counted (`ZONE_UNKNOWN_EVENTS`). Reports add a display zone: UTC, a fixed offset, `America/Bogota` or `Europe/Paris` (CET/CEST built in). |
 | **Cross-source signals** | `EXIF_AFTER_INTAKE`, `FILE_MODIFIED_AFTER_INTAKE`, `MAIL_DATE_AFTER_FIRST_HOP`, `PDF_REVISION_BEFORE_PREVIOUS`, `EVENT_IN_FUTURE`, `CLOCK_SKEW_SUSPECTED` (two tools a constant offset apart, or relays out of order in one message), `RUN_NOT_VERIFIED`, `ZONE_UNKNOWN_EVENTS`, all with a clock-skew tolerance (`--clock-skew`, 300 s). |
@@ -140,7 +140,7 @@ Every signal, its severity and wording: [docs/reports.md](docs/reports.md#signal
 - **Clocks and zones.** Every source depends on the clock and zone setting of the device that wrote it. Times
   without a zone may be off by up to 14 hours from where they are placed; they are never guessed.
 - **Reader versions.** Each reader supports the released output versions of its tool (`rv-hashinv 0.4.x` and `0.5.x`,
-  `rv-pdfauth 0.4.x`, `rv-imgauth 0.3.x`, `rv-rsmf 0.3.x`, `rv-mailauth 0.2.x`, `rv-certcheck 0.2.x`); runs of other
+  `rv-pdfauth 0.4.x`, `rv-imgauth 0.3.x`, `rv-rsmf 0.3.x`, `rv-mailauth 0.2.x`, `rv-certcheck 0.2.x`, `rv-avauth 0.2.x`); runs of other
   versions are excluded and listed, never guessed.
 - **Derived analysis.** The timeline is only as reliable as each tool's own validation; it re-checks their records,
   not their analysis.

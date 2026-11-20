@@ -273,6 +273,10 @@ fn csv_field(s: &str) -> String {
 /// counted as excluded (an exclusion means a source run could not be used and makes the build exit 3).
 pub const VERIFICATION_TOOLS: [&str; 1] = ["rv-hub"];
 
+/// Tools whose runs assemble a report from the other runs of the case (no time values of their own): skipped with
+/// reason `report`, never counted as excluded.
+pub const REPORT_TOOLS: [&str; 1] = ["rv-report"];
+
 /// Runs the whole pipeline. Events go to `sink`; set `cancel` to stop after the current chunk
 /// (partial reports are still written and the cancellation is audited).
 pub fn run(
@@ -1359,6 +1363,9 @@ fn timeline_pipeline(
         } else if VERIFICATION_TOOLS.contains(&r.tool.as_str()) {
             // RV Hub's runs verify the case; they hold no events, so they are not a source (and not "excluded").
             Some("verification")
+        } else if REPORT_TOOLS.contains(&r.tool.as_str()) {
+            // RV Report's runs quote the other runs' findings; their times are already those runs' events.
+            Some("report")
         } else if !opts.tools.is_empty() && !opts.tools.contains(&r.tool) {
             Some("tool_filter")
         } else if cap_reached {
@@ -2371,6 +2378,43 @@ mod tests {
         assert_eq!(tl["runs_excluded"].as_u64(), Some(0), "{tl}");
         assert_eq!(tl["runs_verified"].as_u64(), Some(1));
         assert_eq!(tl["skipped"][0]["reason"], "verification");
+        assert!(actions(&s.log_dir).iter().all(|a| a != "run_excluded"));
+    }
+
+    /// QA report 2026-11-20, D4: an RV Report run (it quotes the other runs) is skipped, not excluded.
+    #[test]
+    fn report_runs_are_skipped_not_excluded() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (case, intake) = timeline_case(tmp.path());
+        let img = src_run("rv-imgauth", "20991231T000000Z-aaaaaa");
+        let report = src_run("rv-report", "20991231T000000Z-ffffff");
+        let fake = Fake {
+            runs: vec![report, img.clone()],
+            excluded: BTreeMap::new(),
+            events: [(
+                img.run_id.clone(),
+                Ok(vec![tev(&img, "E0001", "fs.modified", intake - 86_400, 1)]),
+            )]
+            .into_iter()
+            .collect(),
+        };
+        let s = run_timeline_with(
+            &tl_cfg(),
+            &tl_opts(&case),
+            &fake,
+            engine::DEFAULT_SORT_THRESHOLD,
+            &mut |_| {},
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        let stats: Value = serde_json::from_str(
+            &std::fs::read_to_string(s.report_dir.join("statistics.json")).unwrap(),
+        )
+        .unwrap();
+        let tl = &stats["timeline"];
+        assert_eq!(tl["runs_excluded"].as_u64(), Some(0), "{tl}");
+        assert_eq!(tl["runs_verified"].as_u64(), Some(1));
+        assert_eq!(tl["skipped"][0]["reason"], "report");
         assert!(actions(&s.log_dir).iter().all(|a| a != "run_excluded"));
     }
 

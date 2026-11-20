@@ -220,7 +220,7 @@ sequenceDiagram
     R->>L: runs_discovered
     loop every run, sorted by (tool, run id)
         alt own tool, --tool filter, or cap reached
-            R->>L: run_skipped {reason self | verification | tool_filter | max_events}
+            R->>L: run_skipped {reason self | verification | report | tool_filter | max_events}
         else
             R->>RD: verify_run
             alt verified
@@ -277,7 +277,7 @@ also excludes the run. HTML and PDF renderings are not read and not checked here
 ([forensic-audit.md](forensic-audit.md)).
 
 Supported versions (the reader table): rv-hashinv **0.4.x** and **0.5.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
-**0.3.x**, rv-mailauth **0.2.x**, rv-certcheck **0.2.x**. A new minor version of a tool is excluded
+**0.3.x**, rv-mailauth **0.2.x**, rv-certcheck **0.2.x**, rv-avauth **0.2.x**. A new minor version of a tool is excluded
 (`unsupported_version`, low severity) until a reader is added for it ([development.md](development.md#adding-or-updating-a-reader)).
 
 What verification proves: the run's record is internally consistent, anchored in the case log, and its
@@ -350,6 +350,7 @@ log, once per item and run.
 | rv-rsmf (0.3.x) | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` (one per `rsmf/trace.json` row, by its RSMF kind); `fs.modified` | `<conversation>/<day>` |
 | rv-mailauth (0.2.x) | `mail.date`, `mail.hop` (`headers.json`), `mail.attachment.created`, `mail.attachment.modified`, `mail.msg.submitted`, `mail.msg.delivered`, `mail.mbox_from` (`mbox_index.json`, the mbox `From ` line); `fs.modified` (once per container) | `#<n>` in an mbox |
 | rv-certcheck (0.2.x) | `cert.not_before`, `cert.not_after`, `cert.revoked`, `tsa.gen_time` (`chain.json`) | `c<n>` when the file holds several certificates |
+| rv-avauth (0.2.x) | `media.header.created`, `media.header.modified` (MP4/MOV/M4A `mvhd`, `tkhd`, `mdhd` times: seconds since 1904, UTC; 0 = not set, no event); `media.tag.created`, `media.tag.encoded`, `media.tag.tagged`, `media.tag.released`, `media.tag.date` (QuickTime, Vorbis, RIFF `ICRD`, BWF `bext`, ID3 date tags; without an offset the zone is unknown) (`metadata.json` `/times`); `fs.modified` | none |
 
 The parsers in [timefmt.rs](../src/core/src/readers/timefmt.rs) are strict: each accepts exactly its format and
 returns nothing otherwise; the value is then skipped (never invented) and counted: `times_skipped` (with up to 100

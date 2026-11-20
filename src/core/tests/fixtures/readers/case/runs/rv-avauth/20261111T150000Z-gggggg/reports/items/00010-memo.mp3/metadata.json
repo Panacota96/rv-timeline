@@ -1,0 +1,29 @@
+{
+  "device_claims": [],
+  "encoders": [],
+  "tags": [],
+  "tags_truncated": false,
+  "times": [
+    {
+      "origin": "tag",
+      "raw": "2026-02-28T09:15:00Z",
+      "source": "ID3v2.4 TDRC",
+      "unix": null,
+      "utc": "2026-02-28T09:15:00Z"
+    },
+    {
+      "origin": "tag_local",
+      "raw": "2026",
+      "source": "ID3v2.3 TYER",
+      "unix": null,
+      "utc": null
+    },
+    {
+      "origin": "tag_local",
+      "raw": "2026-02-28 09:20:00",
+      "source": "ID3v2.4 TDEN",
+      "unix": null,
+      "utc": "2026-02-28T09:20:00Z"
+    }
+  ]
+}

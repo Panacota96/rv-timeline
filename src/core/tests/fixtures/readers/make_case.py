@@ -64,6 +64,13 @@ EVIDENCE = {
     6: ("E0006", "D:\\evidence\\cert.pem", "a6" * 32),
     7: ("E0007", "D:\\evidence\\screen.png", "a7" * 32),
 }
+# Media files examined by rv-avauth (not part of the intake run, so its counts stay those of EVIDENCE).
+MEDIA = {
+    8: ("E0008", "D:\\evidence\\clip.mov", "a8" * 32),
+    9: ("E0009", "D:\\evidence\\memo.wav", "a9" * 32),
+    10: ("E0010", "D:\\evidence\\memo.mp3", "aa" * 32),
+}
+ALL = {**EVIDENCE, **MEDIA}
 
 
 def name_of(path):
@@ -96,7 +103,7 @@ class Run:
         return {"sha256": sha256(data), "md5": md5(data)}
 
     def item(self, index, ts, modified, case_action):
-        eid, path, digest = EVIDENCE[index]
+        eid, path, digest = ALL[index]
         self.audit.add("item_started", ts, {"index": index, "size": 1000 + index, "modified_utc": modified},
                        item=path)
         self.audit.add("item_hashed", ts, {"index": index, "bytes_read": 1000 + index,
@@ -115,7 +122,7 @@ class Run:
         data = pretty(obj)
         h = self.file(f"reports/items/{folder}/{name}", data)
         self.audit.add("output_written", ts, {"index": index, "kind": kind, "file": f"items/{folder}/{name}",
-                                              "bytes": len(data), "hashes": h}, item=item or EVIDENCE[index][1])
+                                              "bytes": len(data), "hashes": h}, item=item or ALL[index][1])
 
     def reports(self, index, folder, technical, ts):
         data = pretty(technical)
@@ -283,6 +290,41 @@ def main():
                                     "serial_hex": "0a", "accuracy": "1s"}, "imprint_file": "contract.pdf"}}
     r.output(6, folder, "chain.json", "chain", chain, "2026-11-11T14:00:02.000Z")
     r.finish("2026-11-11T14:00:03.000Z")
+
+    # rv-avauth: the metadata.json shapes of rv-avauth 0.2.0 (box times, zoned and zone-less tags, an unset box
+    # time, a year-only ID3 tag). `unix`/`utc` are what rv-avauth writes: for tag_local it reads the wall clock as UTC.
+    r = Run("rv-avauth", "0.2.0", "20261111T150000Z-gggggg", "2026-11-11T15:00:00.000Z")
+
+    def t(source, origin, raw, utc):
+        return {"origin": origin, "raw": raw, "source": source, "unix": None, "utc": utc}
+    media = [
+        (8, {"device_claims": [{"key": "com.apple.quicktime.make", "source": "keys", "value": "ExampleCam"},
+                               {"key": "com.apple.quicktime.model", "source": "keys", "value": "Example Recorder 1"}],
+             "encoders": [], "tags": [], "tags_truncated": False,
+             "times": [t("mvhd.creation", "header", "3855204000", "2026-03-01T10:00:00Z"),
+                       t("mvhd.modification", "header", "3855463200", "2026-03-04T10:00:00Z"),
+                       t("tkhd[1].creation", "header", "3855204000", "2026-03-01T10:00:00Z"),
+                       t("mdhd[1].creation", "header", "0", None),
+                       t("keys com.apple.quicktime.creationdate", "tag", "2026-03-01T11:00:00+0100",
+                         "2026-03-01T10:00:00Z")]}),
+        (9, {"device_claims": [], "encoders": [], "tags": [], "tags_truncated": False,
+             "times": [t("INFO ICRD", "tag_local", "2026-03-01", "2026-03-01T00:00:00Z"),
+                       t("bext OriginationDate", "tag_local", "2026-03-01 10:00:00", "2026-03-01T10:00:00Z")]}),
+        (10, {"device_claims": [], "encoders": [], "tags": [], "tags_truncated": False,
+              "times": [t("ID3v2.4 TDRC", "tag", "2026-02-28T09:15:00Z", "2026-02-28T09:15:00Z"),
+                        t("ID3v2.3 TYER", "tag_local", "2026", None),
+                        t("ID3v2.4 TDEN", "tag_local", "2026-02-28 09:20:00", "2026-02-28T09:20:00Z")]}),
+    ]
+    for n, (i, meta) in enumerate(media):
+        ts = f"2026-11-11T15:00:0{n + 1}.000Z"
+        folder = r.item(i, ts, f"2026-03-0{n + 1}T12:00:00Z", "verified")
+        r.output(i, folder, "metadata.json", "metadata", meta, ts)
+        r.output(i, folder, "structure.json", "structure", {"container": "test"}, ts)
+    r.finish("2026-11-11T15:00:05.000Z")
+
+    # An RV Report run (assembles a report from the other runs: skipped by the build, reason `report`).
+    r = Run("rv-report", "0.2.0", "20261111T160000Z-hhhhhh", "2026-11-11T16:00:00.000Z")
+    r.finish("2026-11-11T16:00:01.000Z")
 
     # Excluded runs: not finished, unsupported tool, unsupported version.
     r = Run("rv-imgauth", "0.3.1", "20261112T090000Z-111111", "2026-11-12T09:00:00.000Z")

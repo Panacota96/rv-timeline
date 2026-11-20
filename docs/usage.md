@@ -44,7 +44,7 @@ sequenceDiagram
 | --- | --- |
 | The installed tool is the genuine release and works | [installation.md](installation.md) steps 2–6: `SHA256SUMS`, provenance, Authenticode, `rv-timeline self-test`, the sample case |
 | The case folder exists and is intact | Created by rv-hashinv at intake; `rv-timeline verify-case <CASE>` exits 0 |
-| The analysis runs are finished and of supported versions | rv-hashinv 0.4.x and 0.5.x, rv-pdfauth 0.4.x, rv-imgauth 0.3.x, rv-rsmf 0.3.x, rv-mailauth 0.2.x, rv-certcheck 0.2.x ([theory.md B3](theory.md#b3-run-discovery-and-verification)); other versions are excluded, never guessed |
+| The analysis runs are finished and of supported versions | rv-hashinv 0.4.x and 0.5.x, rv-pdfauth 0.4.x, rv-imgauth 0.3.x, rv-rsmf 0.3.x, rv-mailauth 0.2.x, rv-certcheck 0.2.x, rv-avauth 0.2.x; RV Hub and RV Report runs are skipped, not excluded ([theory.md B3](theory.md#b3-run-discovery-and-verification)); other versions are excluded, never guessed |
 | The zone of each source is documented | Device settings noted at collection (camera menu, phone settings, mail server zone); for chat exports, the zone you give rv-rsmf `--timezone`. A source without a zone stays "zone unknown" ([theory.md A5](theory.md#a5-times-without-a-time-zone)) |
 | The workstation clock | Synchronised (time source noted); the build's audit log and `EVENT_IN_FUTURE` references use run times |
 | Legal basis | Mandate and data-protection basis ([admissibility.md](admissibility.md#55-personal-data)) |

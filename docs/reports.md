@@ -138,6 +138,7 @@ flowchart LR
     R["rv-rsmf"] --> K4["chat.message · chat.join · chat.leave<br/>chat.history · chat.disclaimer · chat.unknown"]
     M["rv-mailauth"] --> K5["mail.date · mail.hop · mail.attachment.*<br/>mail.msg.* · mail.mbox_from"]
     C["rv-certcheck"] --> K6["cert.not_before · cert.not_after<br/>cert.revoked · tsa.gen_time"]
+    A["rv-avauth"] --> K8["media.header.created · media.header.modified<br/>media.tag.*"]
     ALL["every tool"] --> K7["run.started · run.finished<br/>run.timestamped · fs.modified"]
 ```
 
@@ -171,6 +172,13 @@ flowchart LR
 | `mail.mbox_from` | Mailbox separator line (mbox From) |
 | `mail.msg.delivered` | Outlook message delivered |
 | `mail.msg.submitted` | Outlook message submitted |
+| `media.header.created` | Media file created (MP4/MOV box) |
+| `media.header.modified` | Media file modified (MP4/MOV box) |
+| `media.tag.created` | Recording created (media tag) |
+| `media.tag.date` | Date tag in the media file |
+| `media.tag.encoded` | Audio encoded (ID3 TDEN) |
+| `media.tag.released` | Original release (ID3 TDOR) |
+| `media.tag.tagged` | Tags written (ID3 TDTG) |
 | `pdf.info.created` | PDF created (Info CreationDate) |
 | `pdf.info.modified` | PDF modified (Info ModDate) |
 | `pdf.info.saved` | PDF revision saved (Info date) |

@@ -82,6 +82,7 @@ understands (a minor release that keeps the formats is added to the list; CI che
 | rv-rsmf | 0.3 | `rsmf/trace.json` (one row per chat event: kind, `source_time`, `utc`, conversation, RSMF file) |
 | rv-mailauth | 0.2 | `headers.json` (Date, Received hops with positions, attachments, `.msg` times), `mbox_index.json` |
 | rv-certcheck | 0.2 | `chain.json` (validity, revocation, RFC 3161 genTime) |
+| rv-avauth | 0.2 | `metadata.json` `/times` (MP4/MOV box times parsed from the raw seconds since 1904; date tags parsed from `raw`, never from rv-avauth's `utc`) |
 
 Every reader starts with `RunData::load` (audit chain checked, recorded digests collected), emits the run-level
 events with `Emitter::audit_events` (`run.started`, `run.finished`, `run.timestamped`, `fs.modified`), then reads
