@@ -215,6 +215,34 @@ impl HashInvApp {
     }
 
     fn header(&mut self, ui: &mut egui::Ui) {
+        self.brand_header(ui);
+        Self::update_banner(ui, &self.state.ui_lang);
+    }
+
+    /// The start-up release check (rv_timeline_core::update): a line with the release page when a newer release is
+    /// published; nothing while it runs, when it is turned off or when it could not be made.
+    fn update_banner(ui: &mut egui::Ui, lang: &str) {
+        use rv_timeline_core::update;
+        match update::gui_check() {
+            Some(None) => ui
+                .ctx()
+                .request_repaint_after(std::time::Duration::from_millis(500)),
+            Some(Some(c)) => {
+                if let (Some(text), update::Check::Available { url, .. }) =
+                    (update::banner(&c, "RV Timeline", lang), &c)
+                {
+                    ui.add_space(4.0);
+                    ui.horizontal_wrapped(|ui| {
+                        ui.colored_label(egui::Color32::from_rgb(0xF5, 0xB0, 0x41), text);
+                        ui.hyperlink_to(url.as_str(), url.as_str());
+                    });
+                }
+            }
+            None => {}
+        }
+    }
+
+    fn brand_header(&mut self, ui: &mut egui::Ui) {
         ui.horizontal(|ui| {
             let (rect, _) = ui.allocate_exact_size(egui::vec2(38.0, 38.0), egui::Sense::hover());
             ui.painter().rect(

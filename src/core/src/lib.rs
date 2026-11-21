@@ -25,6 +25,7 @@ pub mod review;
 pub mod run;
 pub mod time;
 pub mod trust;
+pub mod update;
 pub mod verify;
 
 pub use case::CaseRole;
