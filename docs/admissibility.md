@@ -511,3 +511,11 @@ US and UK
   [to verify citations]
 - UK Civil Procedure Rules Part 35 and Practice Direction 35 [to verify]; UK FSR Code of Practice v2 [V]:
   <https://www.gov.uk/government/publications/forensic-science-activities-statutory-code-of-practice-version-2/forensic-science-activities-statutory-code-of-practice-version-2-accessible>
+
+### Release check (network)
+
+The optional release check ([installation.md](installation.md#release-check)) is the only network access besides the
+trusted timestamp. It sends one HTTPS GET of the public release page with `User-Agent: rv-timeline/<version>`: no case
+data, no evidence, no hash and no personal data. Where this page says that only a hash leaves the machine, that
+statement is about case data and still holds. In an air-gapped lab the check fails silently, and `RV_NO_UPDATE_CHECK=1`
+turns it off (to be verified with the data-protection officer for each deployment).
