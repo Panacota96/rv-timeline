@@ -192,10 +192,24 @@ pub fn compare(current: &str, latest: &str, tool: &str) -> Check {
     }
 }
 
+/// True for a Rakvor tool name (`rv-` then lowercase letters, digits and inner hyphens: `rv-hub`, `rv-whatsapp-rsmf`),
+/// the only names put into the release-page URL.
+pub fn is_tool_name(tool: &str) -> bool {
+    tool.strip_prefix("rv-").is_some_and(|rest| {
+        !rest.is_empty()
+            && !rest.starts_with('-')
+            && !rest.ends_with('-')
+            && !rest.contains("--")
+            && rest
+                .bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    })
+}
+
 /// The latest released version of `tool`, from its latest-release redirect. `agent` is the User-Agent (`rv-<tool>/
 /// <version>` of the tool that asks).
 pub fn latest_version(tool: &str, agent: &str) -> Result<String, String> {
-    if !tool.starts_with("rv-") || !tool[3..].bytes().all(|b| b.is_ascii_lowercase()) {
+    if !is_tool_name(tool) {
         return Err(format!("not a Rakvor tool name: {tool:?}"));
     }
     let http: ureq::Agent = ureq::Agent::config_builder()
@@ -469,6 +483,21 @@ mod tests {
         assert!(off_file().is_none_or(|f| f.ends_with(OFF_FILE)));
         assert!(latest_version("../etc", "x").is_err());
         assert!(latest_version("rv-Hub", "x").is_err());
+        for ok in ["rv-hub", "rv-whatsapp-rsmf", "rv-jpegcarve", "rv-mp4"] {
+            assert!(is_tool_name(ok), "{ok}");
+        }
+        for bad in [
+            "rv-",
+            "rv--x",
+            "rv-x-",
+            "rv-x/../y",
+            "rv-X",
+            "hub",
+            "rv-a b",
+            "rv-é",
+        ] {
+            assert!(!is_tool_name(bad), "{bad}");
+        }
     }
 
     /// The real check against github.com (network): `cargo test -- --ignored update::tests::live`.
