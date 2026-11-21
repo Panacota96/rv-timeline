@@ -347,6 +347,13 @@ pub fn start_gui_check() {
     }
 }
 
+/// Starts the desktop app's check again (RV Hub, when its setting turns the check back on).
+pub fn restart_gui_check() {
+    if let Ok(mut g) = GUI_CHECK.lock() {
+        *g = Some(Background::start());
+    }
+}
+
 /// The desktop app's check: None when it was never started; `Some(None)` while it runs; `Some(Some(check))` once
 /// it finished.
 pub fn gui_check() -> Option<Option<Check>> {
