@@ -139,8 +139,9 @@ Every signal, its severity and wording: [docs/reports.md](docs/reports.md#signal
   tool extracted (operating-system logs, other devices, file-system creation times) is not in the timeline.
 - **Clocks and zones.** Every source depends on the clock and zone setting of the device that wrote it. Times
   without a zone may be off by up to 14 hours from where they are placed; they are never guessed.
-- **Reader versions.** Each reader supports the released output versions of its tool (`rv-hashinv 0.4.x` and `0.5.x`,
-  `rv-pdfauth 0.4.x`, `rv-imgauth 0.3.x`, `rv-rsmf 0.3.x`, `rv-mailauth 0.2.x`, `rv-certcheck 0.2.x`, `rv-avauth 0.2.x`); runs of other
+- **Reader versions.** Each reader supports the released output versions of its tool (`rv-hashinv 0.4.x`–`0.6.x`,
+  `rv-pdfauth 0.4.x`–`0.5.x`, `rv-imgauth 0.3.x`–`0.4.x`, `rv-rsmf 0.3.x`–`0.4.x`, `rv-mailauth 0.2.x`–`0.3.x`,
+  `rv-certcheck 0.2.x`–`0.3.x`, `rv-avauth 0.2.x`–`0.3.x`); runs of other
   versions are excluded and listed, never guessed.
 - **Derived analysis.** The timeline is only as reliable as each tool's own validation; it re-checks their records,
   not their analysis.
