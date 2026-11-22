@@ -671,7 +671,8 @@ fn hashinv_0_4_and_0_5_are_read_other_versions_are_not() {
         ("0.5.0", true),
         ("0.5.1", true),
         ("0.3.1", false),
-        ("0.6.0", false),
+        ("0.6.0", true),
+        ("0.7.0", false),
         ("1.5.0", false),
         ("0.5", false),
     ] {
@@ -679,7 +680,7 @@ fn hashinv_0_4_and_0_5_are_read_other_versions_are_not() {
     }
     let listed = readers::supported_versions();
     assert!(
-        listed.contains(&("rv-hashinv".to_string(), "0.4.x, 0.5.x".to_string())),
+        listed.contains(&("rv-hashinv".to_string(), "0.4.x, 0.5.x, 0.6.x".to_string())),
         "{listed:?}"
     );
 }
@@ -788,7 +789,7 @@ fn avauth_events() {
     assert!(out.warnings[0].contains("\"2026\""), "{:?}", out.warnings);
 }
 
-/// rv-avauth 0.2.x is read; other versions are not.
+/// rv-avauth 0.2.x and 0.3.x are read; other versions are not.
 #[test]
 fn avauth_0_2_is_read_other_versions_are_not() {
     let all = readers::all();
@@ -796,8 +797,9 @@ fn avauth_0_2_is_read_other_versions_are_not() {
     for (v, ok) in [
         ("0.2.0", true),
         ("0.2.7", true),
+        ("0.3.0", true),
         ("0.1.0", false),
-        ("0.3.0", false),
+        ("0.4.0", false),
     ] {
         assert_eq!(av.supports(v), ok, "{v}");
     }

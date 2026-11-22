@@ -1,4 +1,4 @@
-//! rv-avauth 0.2.x (audio and video). Reads each item's `metadata.json`: `/times/<i>` = {source, origin, raw,
+//! rv-avauth 0.2.x and 0.3.x (audio and video). Reads each item's `metadata.json`: `/times/<i>` = {source, origin, raw,
 //! unix, utc}, every time value the tool read from the file (`origin` `header` for container boxes, `tag` for a
 //! tag with a zone, `tag_local` for a tag without one). Events:
 //!

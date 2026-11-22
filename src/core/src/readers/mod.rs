@@ -56,16 +56,18 @@ type Versions = &'static [(u64, u64)];
 
 /// (tool, supported major.minor versions, reader function). A minor release of a source tool that keeps its
 /// output formats is added here (rv-hashinv 0.5 only added the `collection_linked` audit entry and two finding
-/// codes; its hashes.csv, registry rows and reports are unchanged). The `source-versions` workflow fails when
+/// codes; its hashes.csv, registry rows and reports are unchanged. The release-check minors of 2026-11-22 —
+/// rv-hashinv 0.6, rv-pdfauth 0.5, rv-imgauth 0.4, rv-rsmf 0.4, rv-mailauth 0.3, rv-certcheck 0.3, rv-avauth 0.3 —
+/// only added `update-check` and the GUI's start-up banner). The `source-versions` workflow fails when
 /// the latest release of a source tool is not listed.
 const TABLE: [(&str, Versions, ReadFn); 7] = [
-    ("rv-hashinv", &[(0, 4), (0, 5)], hashinv::read),
-    ("rv-pdfauth", &[(0, 4)], pdfauth::read),
-    ("rv-imgauth", &[(0, 3)], imgauth::read),
-    ("rv-rsmf", &[(0, 3)], rsmf::read),
-    ("rv-mailauth", &[(0, 2)], mailauth::read),
-    ("rv-certcheck", &[(0, 2)], certcheck::read),
-    ("rv-avauth", &[(0, 2)], avauth::read),
+    ("rv-hashinv", &[(0, 4), (0, 5), (0, 6)], hashinv::read),
+    ("rv-pdfauth", &[(0, 4), (0, 5)], pdfauth::read),
+    ("rv-imgauth", &[(0, 3), (0, 4)], imgauth::read),
+    ("rv-rsmf", &[(0, 3), (0, 4)], rsmf::read),
+    ("rv-mailauth", &[(0, 2), (0, 3)], mailauth::read),
+    ("rv-certcheck", &[(0, 2), (0, 3)], certcheck::read),
+    ("rv-avauth", &[(0, 2), (0, 3)], avauth::read),
 ];
 
 /// `major.minor` of a semver string (`0.4.1`, `0.4.1-rc.1`).
@@ -936,8 +938,9 @@ mod tests {
         let r = all();
         let img = reader_for(&r, "rv-imgauth").unwrap();
         assert!(img.supports("0.3.0") && img.supports("0.3.1") && img.supports("0.3.12-rc.1"));
+        assert!(img.supports("0.4.0"));
         assert!(
-            !img.supports("0.4.0")
+            !img.supports("0.5.0")
                 && !img.supports("0.2.9")
                 && !img.supports("0.3")
                 && !img.supports("")

@@ -76,13 +76,13 @@ understands (a minor release that keeps the formats is added to the list; CI che
 
 | Tool | Version | Reads |
 | --- | --- | --- |
-| rv-hashinv | 0.4, 0.5 | `reports/items/*/technical.json` (`/case/intake_utc`), audit `evidence_registered`, `item_started` |
-| rv-pdfauth | 0.4 | `objects.json` (Info dictionaries, signature `/M` per revision), `technical.json` (CMS signing time, XMP save dates) |
-| rv-imgauth | 0.3 | `metadata.json` (EXIF tags with OffsetTime* / SubSecTime*, GPS, XMP, XMP history, PNG) |
-| rv-rsmf | 0.3 | `rsmf/trace.json` (one row per chat event: kind, `source_time`, `utc`, conversation, RSMF file) |
-| rv-mailauth | 0.2 | `headers.json` (Date, Received hops with positions, attachments, `.msg` times), `mbox_index.json` |
-| rv-certcheck | 0.2 | `chain.json` (validity, revocation, RFC 3161 genTime) |
-| rv-avauth | 0.2 | `metadata.json` `/times` (MP4/MOV box times parsed from the raw seconds since 1904; date tags parsed from `raw`, never from rv-avauth's `utc`) |
+| rv-hashinv | 0.4, 0.5, 0.6 | `reports/items/*/technical.json` (`/case/intake_utc`), audit `evidence_registered`, `item_started` |
+| rv-pdfauth | 0.4, 0.5 | `objects.json` (Info dictionaries, signature `/M` per revision), `technical.json` (CMS signing time, XMP save dates) |
+| rv-imgauth | 0.3, 0.4 | `metadata.json` (EXIF tags with OffsetTime* / SubSecTime*, GPS, XMP, XMP history, PNG) |
+| rv-rsmf | 0.3, 0.4 | `rsmf/trace.json` (one row per chat event: kind, `source_time`, `utc`, conversation, RSMF file) |
+| rv-mailauth | 0.2, 0.3 | `headers.json` (Date, Received hops with positions, attachments, `.msg` times), `mbox_index.json` |
+| rv-certcheck | 0.2, 0.3 | `chain.json` (validity, revocation, RFC 3161 genTime) |
+| rv-avauth | 0.2, 0.3 | `metadata.json` `/times` (MP4/MOV box times parsed from the raw seconds since 1904; date tags parsed from `raw`, never from rv-avauth's `utc`) |
 
 Every reader starts with `RunData::load` (audit chain checked, recorded digests collected), emits the run-level
 events with `Emitter::audit_events` (`run.started`, `run.finished`, `run.timestamped`, `fs.modified`), then reads

@@ -276,8 +276,8 @@ refused (`unreadable`). A reader error
 also excludes the run. HTML and PDF renderings are not read and not checked here; `verify-log` and `verify-case` re-hash them
 ([forensic-audit.md](forensic-audit.md)).
 
-Supported versions (the reader table): rv-hashinv **0.4.x** and **0.5.x**, rv-pdfauth **0.4.x**, rv-imgauth **0.3.x**, rv-rsmf
-**0.3.x**, rv-mailauth **0.2.x**, rv-certcheck **0.2.x**, rv-avauth **0.2.x**. A new minor version of a tool is excluded
+Supported versions (the reader table): rv-hashinv **0.4.x–0.6.x**, rv-pdfauth **0.4.x–0.5.x**, rv-imgauth **0.3.x–0.4.x**,
+rv-rsmf **0.3.x–0.4.x**, rv-mailauth **0.2.x–0.3.x**, rv-certcheck **0.2.x–0.3.x**, rv-avauth **0.2.x–0.3.x**. A new minor version of a tool is excluded
 (`unsupported_version`, low severity) until a reader is added for it ([development.md](development.md#adding-or-updating-a-reader)).
 
 What verification proves: the run's record is internally consistent, anchored in the case log, and its
@@ -344,13 +344,13 @@ log, once per item and run.
 
 | Tool (version) | Kinds (source file) | Sub-item |
 | --- | --- | --- |
-| rv-hashinv (0.4.x, 0.5.x) | `intake.registered` (`technical.json` `/case/intake_utc`, only items this run registered); `fs.modified` | none |
-| rv-imgauth (0.3.x) | `exif.original`, `exif.digitized`, `exif.modify` (EXIF DateTimeOriginal / DateTimeDigitized / IFD0 DateTime with OffsetTime* and SubSecTime*), `gps.time`, `xmp.create`, `xmp.modify`, `xmp.metadata`, `xmp.photoshop_created`, `xmp.exif_original`, `xmp.history`, `png.time`, `png.creation_time` (`metadata.json`); `fs.modified` | none |
-| rv-pdfauth (0.4.x) | `pdf.info.created`, `pdf.info.modified` (Info dictionary of each revision, `objects.json`); `pdf.signature.claimed` (a signature dictionary's `/M`); `pdf.revision.signed` (CMS signingTime, `technical.json`); `pdf.xmp.saved`; `pdf.info.saved` (only without `objects.json`); `fs.modified` | `r<n>`, revision from 1 |
-| rv-rsmf (0.3.x) | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` (one per `rsmf/trace.json` row, by its RSMF kind); `fs.modified` | `<conversation>/<day>` |
-| rv-mailauth (0.2.x) | `mail.date`, `mail.hop` (`headers.json`), `mail.attachment.created`, `mail.attachment.modified`, `mail.msg.submitted`, `mail.msg.delivered`, `mail.mbox_from` (`mbox_index.json`, the mbox `From ` line); `fs.modified` (once per container) | `#<n>` in an mbox |
-| rv-certcheck (0.2.x) | `cert.not_before`, `cert.not_after`, `cert.revoked`, `tsa.gen_time` (`chain.json`) | `c<n>` when the file holds several certificates |
-| rv-avauth (0.2.x) | `media.header.created`, `media.header.modified` (MP4/MOV/M4A `mvhd`, `tkhd`, `mdhd` times: seconds since 1904, UTC; 0 = not set, no event); `media.tag.created`, `media.tag.encoded`, `media.tag.tagged`, `media.tag.released`, `media.tag.date` (QuickTime, Vorbis, RIFF `ICRD`, BWF `bext`, ID3 date tags; without an offset the zone is unknown) (`metadata.json` `/times`); `fs.modified` | none |
+| rv-hashinv (0.4.x–0.6.x) | `intake.registered` (`technical.json` `/case/intake_utc`, only items this run registered); `fs.modified` | none |
+| rv-imgauth (0.3.x–0.4.x) | `exif.original`, `exif.digitized`, `exif.modify` (EXIF DateTimeOriginal / DateTimeDigitized / IFD0 DateTime with OffsetTime* and SubSecTime*), `gps.time`, `xmp.create`, `xmp.modify`, `xmp.metadata`, `xmp.photoshop_created`, `xmp.exif_original`, `xmp.history`, `png.time`, `png.creation_time` (`metadata.json`); `fs.modified` | none |
+| rv-pdfauth (0.4.x–0.5.x) | `pdf.info.created`, `pdf.info.modified` (Info dictionary of each revision, `objects.json`); `pdf.signature.claimed` (a signature dictionary's `/M`); `pdf.revision.signed` (CMS signingTime, `technical.json`); `pdf.xmp.saved`; `pdf.info.saved` (only without `objects.json`); `fs.modified` | `r<n>`, revision from 1 |
+| rv-rsmf (0.3.x–0.4.x) | `chat.message`, `chat.join`, `chat.leave`, `chat.history`, `chat.disclaimer`, `chat.unknown` (one per `rsmf/trace.json` row, by its RSMF kind); `fs.modified` | `<conversation>/<day>` |
+| rv-mailauth (0.2.x–0.3.x) | `mail.date`, `mail.hop` (`headers.json`), `mail.attachment.created`, `mail.attachment.modified`, `mail.msg.submitted`, `mail.msg.delivered`, `mail.mbox_from` (`mbox_index.json`, the mbox `From ` line); `fs.modified` (once per container) | `#<n>` in an mbox |
+| rv-certcheck (0.2.x–0.3.x) | `cert.not_before`, `cert.not_after`, `cert.revoked`, `tsa.gen_time` (`chain.json`) | `c<n>` when the file holds several certificates |
+| rv-avauth (0.2.x–0.3.x) | `media.header.created`, `media.header.modified` (MP4/MOV/M4A `mvhd`, `tkhd`, `mdhd` times: seconds since 1904, UTC; 0 = not set, no event); `media.tag.created`, `media.tag.encoded`, `media.tag.tagged`, `media.tag.released`, `media.tag.date` (QuickTime, Vorbis, RIFF `ICRD`, BWF `bext`, ID3 date tags; without an offset the zone is unknown) (`metadata.json` `/times`); `fs.modified` | none |
 
 The parsers in [timefmt.rs](../src/core/src/readers/timefmt.rs) are strict: each accepts exactly its format and
 returns nothing otherwise; the value is then skipped (never invented) and counted: `times_skipped` (with up to 100

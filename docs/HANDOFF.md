@@ -26,7 +26,7 @@ flowchart LR
 | Version | 0.1.0 in `version.txt`; nothing released yet (release-please starts after the first merge to `main`) |
 | Branches | `timeline-core`: core, CLI and GUI code-complete (draft PR #3); `timeline-docs`: documentation written from that code. Merging needs the owner's approval |
 | Toolchain | Rust pinned in `rust-toolchain.toml` (1.97.0); `rust-version` = 1.88 ([development.md](development.md#toolchain-pin)) |
-| Readers | rv-hashinv 0.4.x and 0.5.x, rv-pdfauth 0.4.x, rv-imgauth 0.3.x, rv-rsmf 0.3.x, rv-mailauth 0.2.x, rv-certcheck 0.2.x, rv-avauth 0.2.x |
+| Readers | rv-hashinv 0.4.x–0.6.x, rv-pdfauth 0.4.x–0.5.x, rv-imgauth 0.3.x–0.4.x, rv-rsmf 0.3.x–0.4.x, rv-mailauth 0.2.x–0.3.x, rv-certcheck 0.2.x–0.3.x, rv-avauth 0.2.x–0.3.x |
 | Skipped, never excluded | rv-hub (`verification`), rv-report (`report`), the timeline's own runs (`self`) |
 | CI | `ci.yml`: lint (fmt, cargo-deny, clippy `-D warnings`, actionlint) on Linux; tests on Linux and Windows (with Windows clippy), ground truth, determinism, self-test, sample build (exit 3), Python verifiers, sample scripts, golden case from the Python profile, real-TSA smoke test; `large` job (200 000 events, 3 000 hostile mutations, release build with overflow checks) |
 | Releases | signed with the internal Rakvor code-signing certificate once released; the chain ends at "Rakvor Internal Code Signing Root CA", SHA-256 `DC:9B:A1:A2:FC:D4:F0:63:3C:52:14:B7:CC:EB:25:BE:D8:F3:F7:D9:EB:AF:11:15:90:25:0C:BC:AA:83:DF:60` |
