@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries are generated from
 [Conventional Commits](https://www.conventionalcommits.org/) by release-please and reviewed by a human.
 
+## [0.4.0](https://github.com/Panacota96/rv-timeline/compare/v0.3.0...v0.4.0) (2026-11-21)
+
+
+### Features
+
+* **update:** check for a newer release (update-check, start-up banner) ([#17](https://github.com/Panacota96/rv-timeline/issues/17)) ([db74529](https://github.com/Panacota96/rv-timeline/commit/db74529982197ea445625e6c49813ad5580cc32d))
+
 ## [0.3.0](https://github.com/Panacota96/rv-timeline/compare/v0.2.3...v0.3.0) (2026-11-20)
 
 
