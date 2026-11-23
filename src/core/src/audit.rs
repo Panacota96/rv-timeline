@@ -178,10 +178,14 @@ fn summarize(v: &Value) -> String {
 
 /// seq -> entry_hash, to check what a timestamp covers.
 pub fn heads(path: &Path) -> std::collections::BTreeMap<u64, String> {
-    std::fs::read_to_string(path)
-        .unwrap_or_default()
+    // Line by line (QA F2): a log of hundreds of thousands of entries is never read into memory at once.
+    let Ok(f) = File::open(path) else {
+        return Default::default();
+    };
+    BufReader::new(f)
         .lines()
-        .filter_map(|l| serde_json::from_str::<Value>(l).ok())
+        .map_while(Result::ok)
+        .filter_map(|l| serde_json::from_str::<Value>(&l).ok())
         .map(|e| {
             (
                 e["seq"].as_u64().unwrap_or(0),

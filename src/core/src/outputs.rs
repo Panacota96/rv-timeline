@@ -4,7 +4,8 @@
 //!
 //! Shared by every Rakvor tool, byte-identical (like `trust.rs`); it depends only on `crate::hash` (itself
 //! identical in every tool) and `serde_json`. Callers pass the entries of an audit log whose chain they have
-//! already verified.
+//! already verified, or let [`scan_audit`] read the log in one streaming pass ([`RecordedIndex`]: one entry at a
+//! time, so verifying a log of hundreds of thousands of entries does not hold them all in memory).
 //!
 //! ```text
 //! audit.jsonl entries ──► recorded files (run-relative path → {algorithm: hex}; the latest entry wins)
@@ -264,60 +265,167 @@ pub fn verify_recorded_outputs(log_dir: &Path, audit: &[Value]) -> OutputsCheck 
 
 /// Like [`verify_recorded_outputs`], with the run's folders given explicitly.
 pub fn verify_with_layout(layout: &RunLayout, audit: &[Value]) -> OutputsCheck {
-    let mut c = OutputsCheck::default();
-    // Path → (seq of the latest entry, what it records).
-    let mut latest: BTreeMap<String, (u64, Rec)> = BTreeMap::new();
-    let mut finished = false;
+    let mut index = RecordedIndex::default();
     for e in audit {
+        index.add(e);
+    }
+    index.verify(layout)
+}
+
+/// The outputs an audit log records, built one entry at a time ([`RecordedIndex::add`]) so a caller never has to
+/// hold every parsed entry: for each path only the latest record is kept (seq, digests), as [`verify_with_layout`]
+/// keeps it.
+#[derive(Default)]
+pub struct RecordedIndex {
+    /// Path → (seq of the latest entry, what it records).
+    latest: BTreeMap<String, (u64, Kept)>,
+    finished: bool,
+    unrecognised: Vec<String>,
+    skipped: Vec<Skipped>,
+}
+
+/// What the index keeps for one path (the path itself is the key): its digests as a compact list of (algorithm,
+/// lowercase hex) in algorithm order, or why it is not re-hashed. A run records hundreds of thousands of outputs, so
+/// a per-file map would cost far more than the digests (QA F2).
+enum Kept {
+    Check(Box<[(String, String)]>),
+    Skip(String),
+}
+
+impl From<Rec> for Kept {
+    fn from(r: Rec) -> Kept {
+        match r {
+            Rec::Check(_, d) => Kept::Check(d.into_iter().collect()),
+            Rec::Skip(_, reason) => Kept::Skip(reason),
+        }
+    }
+}
+
+impl RecordedIndex {
+    /// Indexes one entry (entries in log order).
+    pub fn add(&mut self, e: &Value) {
         let seq = e["seq"].as_u64().unwrap_or(0);
         let action = e["action"].as_str().unwrap_or_default();
         let Some(recs) = recorded_files(e) else {
             if action.ends_with("_written") {
-                c.unrecognised.push(format!("#{} {}", seq, action));
+                self.unrecognised.push(format!("#{} {}", seq, action));
             }
             if action == "run_finished" {
-                finished = true;
+                self.finished = true;
             }
-            continue;
+            return;
         };
         for r in recs {
             let path = match &r {
                 Rec::Check(p, _) | Rec::Skip(p, _) => p.clone(),
             };
-            if finished {
+            if self.finished {
                 // Nothing a tool writes is recorded after run_finished. A late entry never replaces what the run
                 // recorded before it (else appending one could hide an edited report); it is only noted.
                 let reason =
                     "recorded after run_finished, outside the run's anchored log".to_string();
-                match latest.entry(path) {
-                    std::collections::btree_map::Entry::Occupied(o) => c.skipped.push(Skipped {
+                match self.latest.entry(path) {
+                    std::collections::btree_map::Entry::Occupied(o) => self.skipped.push(Skipped {
                         file: o.key().clone(),
                         seq,
                         reason: format!("{reason}: the earlier record is the one checked"),
                     }),
                     std::collections::btree_map::Entry::Vacant(v) => {
                         // An entry that is not re-hashed anyway (an RFC 3161 token) keeps its own reason.
-                        let r = match r {
-                            Rec::Check(..) => Rec::Skip(v.key().clone(), reason),
-                            skip => skip,
+                        let k = match r {
+                            Rec::Check(..) => Kept::Skip(reason),
+                            skip => skip.into(),
                         };
-                        v.insert((seq, r));
+                        v.insert((seq, k));
                     }
                 }
                 continue;
             }
-            latest.insert(path, (seq, r));
+            self.latest.insert(path, (seq, r.into()));
         }
     }
+
+    /// Re-hashes every indexed output against the run's folders.
+    pub fn verify(self, layout: &RunLayout) -> OutputsCheck {
+        verify_index(layout, self)
+    }
+}
+
+/// One audit entry reduced to what verification keeps once the entry is indexed.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EntryHead {
+    pub seq: u64,
+    pub action: String,
+    pub entry_hash: String,
+    pub run_id: String,
+}
+
+/// What [`scan_audit`] read from one audit log.
+#[derive(Default)]
+pub struct AuditScan {
+    /// Every entry's head, in log order.
+    pub heads: Vec<EntryHead>,
+    /// The outputs the entries record.
+    pub index: RecordedIndex,
+    /// The full entries whose action was asked for (e.g. `case_linked`), in log order.
+    pub kept: Vec<Value>,
+}
+
+/// Reads `path` (an audit.jsonl whose chain the caller verified) in one streaming pass: memory holds the entry heads,
+/// the outputs index and the `keep` entries, never the whole log. Blank and unparsable lines are skipped, as the
+/// in-memory readers did. A file that cannot be read gives an empty scan.
+pub fn scan_audit(path: &Path, keep: &[&str]) -> AuditScan {
+    use std::io::BufRead;
+    let mut scan = AuditScan::default();
+    let Ok(f) = std::fs::File::open(path) else {
+        return scan;
+    };
+    for line in std::io::BufReader::new(f).lines() {
+        let Ok(line) = line else {
+            break;
+        };
+        if line.trim().is_empty() {
+            continue;
+        }
+        let Ok(e) = serde_json::from_str::<Value>(&line) else {
+            continue;
+        };
+        let text = |k: &str| e[k].as_str().unwrap_or_default().to_string();
+        scan.heads.push(EntryHead {
+            seq: e["seq"].as_u64().unwrap_or(0),
+            action: text("action"),
+            entry_hash: text("entry_hash"),
+            run_id: text("run_id"),
+        });
+        scan.index.add(&e);
+        if keep.contains(&e["action"].as_str().unwrap_or_default()) {
+            scan.kept.push(e);
+        }
+    }
+    scan
+}
+
+fn verify_index(layout: &RunLayout, index: RecordedIndex) -> OutputsCheck {
+    let RecordedIndex {
+        latest,
+        unrecognised,
+        skipped,
+        ..
+    } = index;
+    let mut c = OutputsCheck {
+        unrecognised,
+        skipped,
+        ..Default::default()
+    };
     c.recorded = latest.len();
     let mut roots: BTreeMap<String, Option<PathBuf>> = BTreeMap::new();
     for (file, (seq, rec)) in latest {
         let digests = match rec {
-            Rec::Skip(_, reason) => {
+            Kept::Skip(reason) => {
                 c.skipped.push(Skipped { file, seq, reason });
                 continue;
             }
-            Rec::Check(_, d) => d,
+            Kept::Check(d) => d,
         };
         let problem = |kind, detail: String| OutputProblem {
             file: file.clone(),
@@ -685,6 +793,54 @@ mod tests {
                 .join("\n")
                 .contains("the earlier record is the one checked")
         );
+    }
+
+    /// QA 2026-11-23, F2: the streaming pass ([`scan_audit`]) gives exactly the verdict of the in-memory one, for a
+    /// clean run, an edited output, a late entry after run_finished and an unknown `*_written` shape, and keeps only
+    /// the entry heads plus the entries asked for.
+    #[test]
+    fn the_streaming_pass_gives_the_same_verdict() {
+        let (_d, run, base) = run();
+        let mut late = base.clone();
+        late.push(json!({"seq": 6, "action": "statistics_report_written",
+                         "details": {"files": {"statistics.json": {"sha256": sha(b"edited")}}}}));
+        let mut odd = base.clone();
+        odd.insert(
+            4,
+            json!({"seq": 5, "action": "lab_set_written", "details": {}}),
+        );
+        let log = run.join("logs").join("audit.jsonl");
+        let layout = RunLayout::of_log_dir(&run.join("logs"));
+        for (name, audit, edit) in [
+            ("clean", &base, false),
+            ("edited", &base, true),
+            ("late", &late, true),
+            ("unknown shape", &odd, false),
+        ] {
+            std::fs::write(
+                run.join("reports/statistics.json"),
+                if edit { "edited" } else { "s" },
+            )
+            .unwrap();
+            // A blank and an unparsable line are skipped, as the in-memory readers skip them.
+            let text: Vec<String> = audit.iter().map(|e| e.to_string()).collect();
+            std::fs::write(&log, format!("{}\n\nnot json\n", text.join("\n"))).unwrap();
+            let in_memory = verify_with_layout(&layout, audit);
+            let scan = scan_audit(&log, &["item_reports_written"]);
+            assert_eq!(
+                scan.heads.iter().map(|h| h.seq).collect::<Vec<_>>(),
+                audit
+                    .iter()
+                    .map(|e| e["seq"].as_u64().unwrap())
+                    .collect::<Vec<_>>(),
+                "{name}"
+            );
+            assert_eq!(scan.kept.len(), 1, "{name}");
+            assert_eq!(scan.index.verify(&layout), in_memory, "{name}");
+        }
+        // An unreadable log gives an empty scan (the chain check already reported it).
+        let none = scan_audit(&run.join("missing.jsonl"), &[]);
+        assert!(none.heads.is_empty() && none.kept.is_empty());
     }
 
     /// Replaces `link` (an existing folder) by a link to `target`: a junction on Windows, a symlink elsewhere.
