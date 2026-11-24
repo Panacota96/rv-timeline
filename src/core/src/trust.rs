@@ -303,11 +303,16 @@ pub fn verify_timestamps_with(
         .map(Path::to_path_buf)
         .unwrap_or_default();
     let heads = crate::audit::heads(audit_path);
-    let entries: Vec<Value> = std::fs::read_to_string(audit_path)
-        .unwrap_or_default()
-        .lines()
-        .filter_map(|l| serde_json::from_str(l).ok())
-        .collect();
+    // Only the timestamp_obtained entries are used: one streaming pass keeps those, never the whole log (QA F2).
+    let entries: Vec<Value> = std::fs::File::open(audit_path)
+        .map(|f| {
+            std::io::BufRead::lines(std::io::BufReader::new(f))
+                .map_while(Result::ok)
+                .filter_map(|l| serde_json::from_str::<Value>(&l).ok())
+                .filter(|e| e["action"] == "timestamp_obtained")
+                .collect()
+        })
+        .unwrap_or_default();
     let mut out = TimestampVerification::default();
     let mut named: Vec<String> = Vec::new();
     // What a token claims: listed, and (when its covered entry is in the log) a truncation anchor. Returns the

@@ -911,8 +911,10 @@ pub fn verify_case(dir: &Path) -> CaseVerification {
             }
             continue;
         }
-        let entries = read_entries(&audit_path);
-        match entries.iter().find(|e| e["action"] == "case_linked") {
+        // One streaming pass: entry heads, the outputs index and case_linked, never every parsed entry (QA F2).
+        let crate::outputs::AuditScan { heads, index, kept } =
+            crate::outputs::scan_audit(&audit_path, &["case_linked"]);
+        match kept.first() {
             Some(l) => {
                 if l["details"]["case_id"].as_str() != Some(v.case_id.as_str()) {
                     v.problems
@@ -932,7 +934,7 @@ pub fn verify_case(dir: &Path) -> CaseVerification {
         for p in crate::trust::verify_timestamps(&audit_path) {
             v.problems.push(format!("run {}: {}", rid, p));
         }
-        let outputs = crate::outputs::verify_recorded_outputs(&log_dir, &entries);
+        let outputs = index.verify(&crate::outputs::RunLayout::of_log_dir(&log_dir));
         v.outputs_recorded += outputs.recorded;
         v.outputs_verified += outputs.verified;
         for p in &outputs.problems {
@@ -956,25 +958,18 @@ pub fn verify_case(dir: &Path) -> CaseVerification {
         if recorded_entries == 0 {
             continue;
         }
-        let at = entries
-            .iter()
-            .find(|e| e["seq"].as_u64() == Some(recorded_entries));
-        if at.and_then(|e| e["entry_hash"].as_str()) != fin["audit_head"].as_str() {
+        let at = heads.iter().find(|e| e.seq == recorded_entries);
+        if at.map(|e| e.entry_hash.as_str()) != fin["audit_head"].as_str() {
             v.problems.push(format!(
                 "run {}: the audit head recorded in the case log is not entry #{} of the run's audit.jsonl",
                 rid, recorded_entries
             ));
         }
-        for later in entries
-            .iter()
-            .filter(|e| e["seq"].as_u64().unwrap_or(0) > recorded_entries)
-        {
-            if later["action"] != "timestamp_obtained" {
+        for later in heads.iter().filter(|e| e.seq > recorded_entries) {
+            if later.action != "timestamp_obtained" {
                 v.problems.push(format!(
                     "run {}: audit entry #{} ({}) was appended after run_finished",
-                    rid,
-                    later["seq"],
-                    later["action"].as_str().unwrap_or("?")
+                    rid, later.seq, later.action
                 ));
             }
         }

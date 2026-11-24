@@ -99,7 +99,8 @@ pub fn verify_log_with(
             return Ok(v);
         }
     }
-    let entries = read_entries(path);
+    // One streaming pass: entry heads and the outputs index, never every parsed entry (QA F2).
+    let crate::outputs::AuditScan { heads, index, .. } = crate::outputs::scan_audit(path, &[]);
     let n = v.entries;
     let tokens = crate::trust::verify_timestamps_with(path, tsa_anchors);
     v.problems.extend(tokens.problems);
@@ -126,9 +127,9 @@ pub fn verify_log_with(
     };
 
     if let Some(case) = case_of_log_dir(&dir) {
-        case_anchor(&case, &entries, n, &mut v, &mut anchors);
+        case_anchor(&case, &heads, n, &mut v, &mut anchors);
     }
-    let outputs = crate::outputs::verify_recorded_outputs(&dir, &entries);
+    let outputs = index.verify(&crate::outputs::RunLayout::of_log_dir(&dir));
     v.problems
         .extend(outputs.problems.iter().map(ToString::to_string));
     v.outputs = Some(outputs);
@@ -147,10 +148,10 @@ pub fn verify_log_with(
             format!("truncation: the final entry #{} is anchored by {}", n, by)
         }
         Some((s, by)) => {
-            let later: Vec<&str> = entries
+            let later: Vec<&str> = heads
                 .iter()
-                .filter(|e| e["seq"].as_u64().unwrap_or(0) > *s)
-                .map(|e| e["action"].as_str().unwrap_or("?"))
+                .filter(|e| e.seq > *s)
+                .map(|e| e.action.as_str())
                 .collect();
             format!(
                 "truncation: entries up to #{} are anchored by {}; {} after it ({}) cannot be proven complete",
@@ -167,7 +168,7 @@ pub fn verify_log_with(
 /// Compares the end of the run's log with run_finished in the case log.
 fn case_anchor(
     case: &Path,
-    entries: &[Value],
+    heads: &[crate::outputs::EntryHead],
     n: u64,
     v: &mut LogVerification,
     anchors: &mut Vec<(u64, String)>,
@@ -180,11 +181,7 @@ fn case_anchor(
         ));
         return;
     }
-    let run_id = entries
-        .first()
-        .and_then(|e| e["run_id"].as_str())
-        .unwrap_or_default()
-        .to_string();
+    let run_id = heads.first().map(|e| e.run_id.clone()).unwrap_or_default();
     let case_entries = read_entries(&case_log);
     let mine = |action: &str| {
         case_entries
@@ -213,23 +210,19 @@ fn case_anchor(
         ));
         return;
     }
-    let at = entries.iter().find(|e| e["seq"].as_u64() == Some(recorded));
-    if at.and_then(|e| e["entry_hash"].as_str()) != fin["details"]["audit_head"].as_str() {
+    let at = heads.iter().find(|e| e.seq == recorded);
+    if at.map(|e| e.entry_hash.as_str()) != fin["details"]["audit_head"].as_str() {
         v.problems.push(format!(
             "entry #{} is not the audit head recorded in the case log at run_finished",
             recorded
         ));
         return;
     }
-    for later in entries
-        .iter()
-        .filter(|e| e["seq"].as_u64().unwrap_or(0) > recorded)
-    {
-        if later["action"] != "timestamp_obtained" {
+    for later in heads.iter().filter(|e| e.seq > recorded) {
+        if later.action != "timestamp_obtained" {
             v.problems.push(format!(
                 "entry #{} ({}) was appended after run_finished",
-                later["seq"],
-                later["action"].as_str().unwrap_or("?")
+                later.seq, later.action
             ));
         }
     }
