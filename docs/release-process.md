@@ -79,7 +79,7 @@ files on that release (`gh release upload --clobber`). The tag and changelog sta
 | Sign executables | `signtool sign /f sign.pfx /p *** /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 rv-timeline.exe rv-timeline-gui.exe` | bad certificate or password |
 | Verify signatures | root imported on the runner, `signtool verify /pa /tw` | signature does not chain to the Rakvor root |
 | Self-test | `rv-timeline.exe self-test` + `examples\sample\run.ps1` | wrong hashes or sample results |
-| Portable zip | executables + README, LICENSE, NOTICE, CHANGELOG, docs, examples | — |
+| Portable zip | executables + README, LICENSE, COMMERCIAL.md, NOTICE, CHANGELOG, docs, examples | — |
 | Installer | `ISCC.exe /DAppVersion=X.Y.Z /DSourceDir=. /Odist packaging\windows\installer.iss` | Inno Setup script error |
 | Sign + verify installer | same signtool commands on `dist\*-setup.exe` | as above |
 | SBOM | `cargo cyclonedx --format json` → `sbom.cdx.json` | — |

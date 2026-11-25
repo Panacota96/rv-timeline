@@ -43,7 +43,7 @@ Release assets on the GitHub Releases page of the repository (`Panacota96/rv-tim
 
 | Asset | What it is |
 | --- | --- |
-| `rv-timeline-X.Y.Z-windows-x64.zip` | Portable: `rv-timeline.exe`, `rv-timeline-gui.exe`, README, LICENSE, NOTICE, CHANGELOG, `docs/`, `examples/` |
+| `rv-timeline-X.Y.Z-windows-x64.zip` | Portable: `rv-timeline.exe`, `rv-timeline-gui.exe`, README, LICENSE, COMMERCIAL.md, NOTICE, CHANGELOG, `docs/`, `examples/` |
 | `rv-timeline-X.Y.Z-windows-x64-setup.exe` | Inno Setup installer, per-user |
 | `SHA256SUMS` | SHA-256 of the zip, the installer and the SBOM (`sha256sum` format: `<hash>  ./<file>`) |
 | `sbom.cdx.json` | CycloneDX software bill of materials (every Rust dependency and version) |
@@ -154,7 +154,7 @@ Unattended:
 .\rv-timeline-0.1.0-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS="addtopath"
 ```
 
-The installer copies the executables, README, LICENSE, NOTICE, CHANGELOG, `docs\` and the sample case
+The installer copies the executables, README, LICENSE, COMMERCIAL.md, NOTICE, CHANGELOG, `docs\` and the sample case
 (`examples\sample\case\` with its README); the sample scripts, the tampered copies and `expected_timeline.json` are
 in the zip and the source tree.
 

@@ -26,8 +26,12 @@
 
 ## 1. Purpose and how to read this page
 
-RV Timeline is used **locally** by Rakvor; it is not distributed. Clients, courts and opposing experts may audit
-its source ([LICENSE](../LICENSE), itself a draft pending legal review). Its results are **signals for an
+RV Timeline is source-available under the PolyForm Noncommercial License 1.0.0 ([LICENSE](../LICENSE)): anyone,
+including a court, an opposing party or its expert, may inspect, build and run the exact version named in a
+report for non-commercial purposes. Commercial use needs a licence from Rakvor ([COMMERCIAL.md](../COMMERCIAL.md)).
+Rakvor's licensing texts are drafts pending legal review; whether a given use (for example a paid expert's
+review) counts as non-commercial is to be verified by counsel.
+Its results are **signals for an
 examiner, never a verdict** ([theory.md](theory.md#a1-what-the-tool-is-and-is-not)). Admissibility and weight are
 decided by a court about the **examiner's evidence**, of which the timeline is one part — and a part that rests on
 the outputs of other tools.
@@ -71,7 +75,7 @@ source was read for this page: every citation that does not appear in the sister
 | F14 | CI on Windows and Linux | `.github/workflows/ci.yml` |
 | F15 | SBOM and build provenance | `.github/workflows/release.yml` |
 | F16 | Versioned releases with `SHA256SUMS`, signed with the internal Rakvor certificate | [installation.md](installation.md) |
-| F17 | Source auditable by customers and opposing experts; local use only | [LICENSE](../LICENSE) (draft) |
+| F17 | Source available to anyone, including courts and opposing experts, to inspect, build and run for non-commercial purposes (PolyForm Noncommercial 1.0.0) | [LICENSE](../LICENSE); [COMMERCIAL.md](../COMMERCIAL.md) (draft, to be verified by counsel); [NOTICE](../NOTICE) |
 | F18 | Case folder: the build's run anchored in the case log; `verify-case` re-checks every run | [case-folder.md](case-folder.md) |
 | F19 | Every build parameter recorded: display zone, clock skew, tools, UTC window, event cap, sort threshold, Timesketch output (`run_started.details.timeline`); every run discovered, skipped (with reason), verified, read (events read / kept / outside the filters) or excluded (reason, detail) | `audit.jsonl`; `statistics.json` |
 | F20 | Review log: what the examiner viewed in the GUI after the build, hash-chained and anchored to `run_finished`; checked by `verify-log` and `verify-case` | [review.rs](../src/core/src/review.rs); `review.jsonl` |
@@ -425,7 +429,7 @@ Owners: **Eng.** = engineering, **Counsel**, **Examiner**, **Firm** = Rakvor man
 | G12 | Host clock of the workstation; only the chain head is stamped | CO-J4 | Check time sync before the build | Record clock source and offset | Eng. |
 | G13 | Personal data gathered from every source in one file; no encryption at rest or retention tooling | CO-D3, EU-D2 | Encrypted case volume; narrow with `--tool`, `--from`/`--to`; control access to the Timesketch server | Retention and secure-deletion tooling | Firm + Eng. |
 | G14 | CPP renumbering on 1 Jan. 2029 | FR section | Cite with the version date | Concordance table | Counsel |
-| G17 | Source access without a defined protocol; LICENSE is a draft pending legal review | CO-P13, FR-P7 | Provide the tagged source on request | NDA / inspection protocol | Firm + Counsel |
+| G17 | Source access without a defined protocol; the licence wording (PolyForm Noncommercial 1.0.0 with Rakvor's Required Notice, and COMMERCIAL.md) is a draft pending legal review | CO-P13, FR-P7 | Provide the tagged source on request | NDA / inspection protocol | Firm + Counsel |
 | G18 | `verify-log` does not check TSA revocation, policy OID or accuracy | EU-2 | `openssl ts -verify` as a second check; revocation from CRL/OCSP evidence covering genTime | Revocation and policy checks | Eng. |
 | G19 | Re-verification of the run's outputs against the digests in the audit log — **closed**: `verify-log` and `verify-case` re-hash every file the audit log records (`timeline.jsonl`, reports, `hashes.csv`, `environment.json`) with every recorded algorithm; an edited, deleted or replaced output, or a recorded path leading outside the run folder, is a problem (exit 3) named in the output ([src/core/src/outputs.rs](../src/core/src/outputs.rs)). Files the run never recorded are not checked; kept for numbering | — | — | — | — |
 | G22 | Release binaries not bit-for-bit reproducible | ISO-3 | Provenance attestation + functional equivalence | Path remapping, deterministic packaging | Eng. |

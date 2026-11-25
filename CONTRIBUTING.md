@@ -56,7 +56,7 @@ python ../rakvor-tool-forge/scripts/validate_project.py .              # the Rak
 | Shared code | Never edit `src/core/src/trust.rs`, the AppId table in `src/cli/tests/packaging.rs` or `deny.toml` here alone: they are shared by every Rakvor tool. |
 | Reports | Adding a field to a JSON report: update `schemas/` and `docs/reports.md`. Removing one is a breaking change. |
 | Docs | Each page under `docs/` keeps at least one Mermaid diagram that renders on GitHub. |
-| Dependencies | New crates need a reason in the PR and a permissive licence (MIT, Apache-2.0, BSD, ISC, Zlib) — no GPL/AGPL, because the tool is proprietary. |
+| Dependencies | New crates need a reason in the PR and a permissive licence (MIT, Apache-2.0, BSD, ISC, Zlib) — no GPL/AGPL, because Rakvor keeps the commercial rights to the tool (PolyForm Noncommercial 1.0.0 plus commercial licences, see COMMERCIAL.md). |
 
 ## Adding a signal or a reader
 

@@ -234,7 +234,7 @@ sequenceDiagram
 
 | Artifact | Built by |
 | --- | --- |
-| `rv-timeline-X.Y.Z-windows-x64.zip` | portable: both exes + README + LICENSE + NOTICE + CHANGELOG + `docs/` + `examples/` |
+| `rv-timeline-X.Y.Z-windows-x64.zip` | portable: both exes + README + LICENSE + COMMERCIAL.md + NOTICE + CHANGELOG + `docs/` + `examples/` |
 | `rv-timeline-X.Y.Z-windows-x64-setup.exe` | Inno Setup (`packaging/windows/installer.iss`), per-user install, adds the CLI to PATH |
 | `SHA256SUMS` | `sha256sum` over the assets |
 | `sbom.cdx.json` | `cargo cyclonedx` |
