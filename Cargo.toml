@@ -7,7 +7,7 @@ members = ["src/core", "src/cli", "src/gui"]
 # does not change on release and `--locked` builds keep working.
 version = "0.1.0"
 edition = "2024"
-license = "LicenseRef-Rakvor-Audit"
+license = "PolyForm-Noncommercial-1.0.0"
 publish = false
 rust-version = "1.88"
 authors = ["Rakvor"]

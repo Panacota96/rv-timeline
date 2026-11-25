@@ -42,6 +42,7 @@ Source: "{#SourceDir}\target\release\rv-timeline.exe"; DestDir: "{app}"; Flags: 
 Source: "{#SourceDir}\target\release\rv-timeline-gui.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\README.md"; DestDir: "{app}"
 Source: "{#SourceDir}\LICENSE"; DestDir: "{app}"
+Source: "{#SourceDir}\COMMERCIAL.md"; DestDir: "{app}"
 Source: "{#SourceDir}\NOTICE"; DestDir: "{app}"
 Source: "{#SourceDir}\CHANGELOG.md"; DestDir: "{app}"
 Source: "{#SourceDir}\docs\*"; DestDir: "{app}\docs"; Flags: recursesubdirs

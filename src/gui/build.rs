@@ -13,7 +13,7 @@ fn main() {
         .set("CompanyName", "Rakvor")
         .set(
             "LegalCopyright",
-            "Rakvor. Source-auditable licence, see LICENSE.",
+            "Copyright 2026 Rakvor. PolyForm Noncommercial 1.0.0, see LICENSE.",
         )
         .set("FileDescription", "RV Timeline desktop interface")
         .set("ProductVersion", version.trim());

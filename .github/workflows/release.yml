@@ -96,6 +96,8 @@ jobs:
           $name = "rv-timeline-${{ steps.v.outputs.version }}-windows-x64"
           New-Item -ItemType Directory -Force dist\$name | Out-Null
           Copy-Item target\release\rv-timeline.exe, target\release\rv-timeline-gui.exe, README.md, LICENSE, NOTICE, CHANGELOG.md dist\$name
+          # COMMERCIAL.md exists from the PolyForm licence on; a dispatch for an older tag has none.
+          if (Test-Path COMMERCIAL.md) { Copy-Item COMMERCIAL.md dist\$name }
           Copy-Item -Recurse docs, examples dist\$name
           Remove-Item -Recurse -Force dist\$name\examples\sample\out -ErrorAction SilentlyContinue
           Compress-Archive -Path dist\$name\* -DestinationPath dist\$name.zip

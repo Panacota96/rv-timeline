@@ -103,8 +103,10 @@ logged; no GPL/AGPL/LGPL components; tools report signals, not verdicts.
 
 ## 6. Open work
 
-- The licence (`LICENSE`) and the admissibility analysis ([admissibility.md](admissibility.md)) are drafts pending a
-  lawyer's review (Colombia and France); every citation marked [to verify] must be checked first.
+- Licence: PolyForm Noncommercial 1.0.0 (`LICENSE`, owner decision 2026-11-24; commercial use needs a licence from
+  Rakvor, `COMMERCIAL.md`). Rakvor's licensing texts (`COMMERCIAL.md`, `NOTICE`) and the admissibility analysis
+  ([admissibility.md](admissibility.md)) are drafts pending a lawyer's review (Colombia and France); every citation
+  marked [to verify] must be checked first.
 - **Skipped time values** are counted per run (`run_read`), in `statistics.json` and as `TL_TIMES_SKIPPED`, but
   not listed per item in the technical review (G-TL4).
 - **Template leftovers.** `examples/sample/evidence` and `expected_hashes.csv` are still used by the template

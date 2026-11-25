@@ -1,5 +1,6 @@
-# cargo-deny: licence allow-list and source policy (no GPL/AGPL/LGPL components: the tool is proprietary and
-# source-auditable). Run `cargo deny check`; CI runs it on every push (advisories, licences, bans, sources).
+# cargo-deny: licence allow-list and source policy (no GPL/AGPL/LGPL components: Rakvor keeps the commercial
+# rights to the tool, licensed under PolyForm Noncommercial 1.0.0). Run `cargo deny check`; CI runs it on every push
+# (advisories, licences, bans, sources).
 [graph]
 all-features = true
 
@@ -25,7 +26,7 @@ allow = [
     # jpeg-encoder (re-encoding for ELA and JPEG ghosts): permissive; requires the IJG acknowledgement in NOTICE.
     "IJG",
 ]
-# The workspace's own crates carry the proprietary licence (LICENSE).
+# The workspace's own crates carry PolyForm-Noncommercial-1.0.0 (LICENSE); they are private (publish = false).
 [licenses.private]
 ignore = true
 

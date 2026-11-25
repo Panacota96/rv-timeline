@@ -56,3 +56,37 @@ fn installer_app_id_is_this_tools_own() {
     ids.dedup();
     assert_eq!(ids.len(), RAKVOR_APP_IDS.len(), "AppIds are unique");
 }
+
+/// The installer's licence page is LICENSE: Rakvor's Required Notice, then the PolyForm Noncommercial 1.0.0 text.
+/// COMMERCIAL.md (how to get a commercial licence) ships next to it.
+#[test]
+fn installer_shows_the_polyform_noncommercial_licence() {
+    let iss = installer();
+    assert!(
+        iss.lines()
+            .any(|l| l == r"LicenseFile={#SourceDir}\LICENSE"),
+        "the installer's licence page is LICENSE"
+    );
+    assert!(
+        iss.lines()
+            .any(|l| l.starts_with(r#"Source: "{#SourceDir}\COMMERCIAL.md""#)),
+        "the installer ships COMMERCIAL.md"
+    );
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let licence = std::fs::read_to_string(root.join("LICENSE")).expect("LICENSE");
+    let mut lines = licence.lines().filter(|l| !l.trim().is_empty());
+    let notice = lines.next().unwrap_or_default();
+    assert!(
+        notice.starts_with("Required Notice: Copyright ") && notice.contains("Rakvor"),
+        "LICENSE starts with Rakvor's Required Notice: {notice}"
+    );
+    assert_eq!(lines.next(), Some("# PolyForm Noncommercial License 1.0.0"));
+    for section in [
+        "## Acceptance",
+        "## Noncommercial Purposes",
+        "## Definitions",
+    ] {
+        assert!(licence.contains(section), "LICENSE lacks {section}");
+    }
+    assert!(root.join("COMMERCIAL.md").is_file(), "COMMERCIAL.md exists");
+}
