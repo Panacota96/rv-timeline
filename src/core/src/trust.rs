@@ -57,12 +57,16 @@ fn sha256_alg() -> spki::AlgorithmIdentifier<Any> {
     }
 }
 
-fn nonce() -> Vec<u8> {
-    let seed = format!("{:?}-{}", std::time::SystemTime::now(), std::process::id());
-    let mut n = crate::hash::hex_decode(&hash_bytes(seed.as_bytes(), HashAlgo::Sha256)[..16])
-        .unwrap_or_default();
-    n[0] &= 0x7f; // positive INTEGER
-    n
+/// 16 bytes from the operating system's random number generator (SEC-HI-02: never derived from the clock or the
+/// process id). The first byte is 0x01..=0x7f, so the INTEGER is positive and its DER encoding is these bytes.
+fn nonce() -> Result<Vec<u8>, String> {
+    use rsa::rand_core::RngCore;
+    let mut n = vec![0u8; 16];
+    rsa::rand_core::OsRng
+        .try_fill_bytes(&mut n)
+        .map_err(|e| format!("no OS randomness for the timestamp nonce: {}", e))?;
+    n[0] = (n[0] & 0x7f) | 0x01;
+    Ok(n)
 }
 
 pub fn build_request(digest: &[u8], nonce: &[u8]) -> Result<Vec<u8>, String> {
@@ -80,7 +84,9 @@ pub fn build_request(digest: &[u8], nonce: &[u8]) -> Result<Vec<u8>, String> {
     req.to_der().map_err(|e| e.to_string())
 }
 
-/// Checks a TSA response; returns gen_time (UTC, ISO 8601).
+/// Checks a TSA response; returns gen_time (UTC, ISO 8601). With `nonce` (the request carried one), the response
+/// must carry the same nonce: a missing or different one is an error (RFC 3161 §2.4.2). Malformed input is an
+/// error, never a panic.
 pub fn parse_response(der: &[u8], digest: &[u8], nonce: Option<&[u8]>) -> Result<String, String> {
     let resp =
         TimeStampResp::from_der(der).map_err(|e| format!("not a time-stamp response: {}", e))?;
@@ -104,10 +110,14 @@ pub fn parse_response(der: &[u8], digest: &[u8], nonce: Option<&[u8]>) -> Result
     if info.imprint != digest {
         return Err("the token does not cover the requested digest".into());
     }
-    if let (Some(want), Some(got)) = (nonce, info.nonce.as_ref()) {
+    if let Some(want) = nonce {
         let want = Int::new(want).map_err(|e| e.to_string())?;
-        if got.as_slice() != want.as_bytes() {
-            return Err("nonce mismatch (possible replay)".into());
+        match info.nonce.as_ref() {
+            None => return Err("nonce missing (possible replay)".into()),
+            Some(got) if got.as_slice() != want.as_bytes() => {
+                return Err("nonce mismatch (possible replay)".into());
+            }
+            Some(_) => {}
         }
     }
     Ok(info.gen_time)
@@ -156,6 +166,10 @@ fn parse_tst_info(der: &[u8]) -> Result<TstFields, String> {
     let mut pos = start;
     while pos < end {
         let (t, s, e) = tlv(der, pos)?;
+        // A field never extends past the TSTInfo SEQUENCE that holds it.
+        if e > end {
+            return Err("bad DER encoding".into());
+        }
         fields.push((t, s, e));
         pos = e;
     }
@@ -164,6 +178,9 @@ fn parse_tst_info(der: &[u8]) -> Result<TstFields, String> {
         return Err("bad messageImprint".into());
     }
     let (_, _, alg_end) = tlv(der, s)?;
+    if alg_end > e {
+        return Err("bad messageImprint".into());
+    }
     let (ot, os, oe) = tlv(der, alg_end)?;
     if ot != 0x04 || oe > e {
         return Err("bad messageImprint".into());
@@ -173,19 +190,7 @@ fn parse_tst_info(der: &[u8]) -> Result<TstFields, String> {
     if gt != 0x18 {
         return Err("bad genTime".into());
     }
-    let raw = std::str::from_utf8(&der[gs..ge]).map_err(|_| "bad genTime")?;
-    if raw.len() < 14 || !raw[..14].chars().all(|c| c.is_ascii_digit()) {
-        return Err("bad genTime".into());
-    }
-    let gen_time = format!(
-        "{}-{}-{}T{}:{}:{}Z",
-        &raw[0..4],
-        &raw[4..6],
-        &raw[6..8],
-        &raw[8..10],
-        &raw[10..12],
-        &raw[12..14]
-    );
+    let gen_time = gen_time_of(&der[gs..ge])?;
     let nonce = fields
         .iter()
         .skip(5)
@@ -198,11 +203,56 @@ fn parse_tst_info(der: &[u8]) -> Result<TstFields, String> {
     })
 }
 
+/// genTime of a TSTInfo as ISO 8601 UTC. RFC 3161 §2.4.2: a GeneralizedTime `YYYYMMDDhhmmss[.f…]Z` (seconds
+/// present, optional fraction, UTC). Checked on the bytes before any text is made of them (SEC-HI-01: a slice of a
+/// non-ASCII value used to panic); anything else is an error. Trailing zeros in the fraction are tolerated. The date
+/// must exist in the proleptic Gregorian calendar: year 0001 or later, and a day that the month has (29 February
+/// only in a leap year), so `20260230…` or year `0000` is an error.
+fn gen_time_of(raw: &[u8]) -> Result<String, String> {
+    let bad = || "bad genTime (not a GeneralizedTime YYYYMMDDhhmmss[.fff]Z)".to_string();
+    let (Some(digits), Some(rest)) = (raw.get(..14), raw.get(14..)) else {
+        return Err(bad());
+    };
+    if !digits.iter().all(u8::is_ascii_digit) {
+        return Err(bad());
+    }
+    match rest {
+        [b'Z'] => {}
+        [b'.', frac @ .., b'Z'] if !frac.is_empty() && frac.iter().all(u8::is_ascii_digit) => {}
+        _ => return Err(bad()),
+    }
+    let n = |i: usize| u32::from(digits[i] - b'0') * 10 + u32::from(digits[i + 1] - b'0');
+    let (year, month, day, hour, minute, second) =
+        (n(0) * 100 + n(2), n(4), n(6), n(8), n(10), n(12));
+    let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+    let days_in_month = match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if leap => 29,
+        2 => 28,
+        _ => 0, // no such month: no day is valid
+    };
+    if year == 0 || !(1..=days_in_month).contains(&day) || hour > 23 || minute > 59 || second > 60 {
+        return Err(bad());
+    }
+    // Only ASCII digits from here on: every byte index below is a character boundary.
+    let d = std::str::from_utf8(digits).map_err(|_| bad())?;
+    Ok(format!(
+        "{}-{}-{}T{}:{}:{}Z",
+        &d[0..4],
+        &d[4..6],
+        &d[6..8],
+        &d[8..10],
+        &d[10..12],
+        &d[12..14]
+    ))
+}
+
 pub fn request_timestamp(digest: &[u8], url: &str) -> Result<(String, Vec<u8>), String> {
     if !(url.starts_with("http://") || url.starts_with("https://")) {
         return Err(format!("unsupported TSA URL scheme: {}", url));
     }
-    let n = nonce();
+    let n = nonce()?;
     let body = build_request(digest, &n)?;
     let agent: ureq::Agent = ureq::Agent::config_builder()
         .timeout_global(Some(std::time::Duration::from_secs(15)))
@@ -1458,6 +1508,194 @@ mod tests {
         assert!(load_ca_bundle(&dir.path().join("empty.pem")).is_err());
         assert_eq!(md_of(&oid(OID_SHA256)), Some(Md::Sha256));
         assert!(sig_md(&oid("1.2.840.10045.4.3.2"), Some(Md::Sha256)).is_err());
+    }
+
+    /// DER TLV (definite length) for the synthetic responses below.
+    fn tlv(tag: u8, content: &[u8]) -> Vec<u8> {
+        let n = content.len();
+        let mut out = vec![tag];
+        if n < 0x80 {
+            out.push(n as u8);
+        } else if n < 0x100 {
+            out.extend([0x81, n as u8]);
+        } else {
+            out.extend([0x82, (n >> 8) as u8, n as u8]);
+        }
+        out.extend_from_slice(content);
+        out
+    }
+
+    /// A TSTInfo with the raw genTime bytes and nonce given (synthetic data).
+    fn crafted_tst_info(digest: &[u8], gen_time: &[u8], nonce: Option<&[u8]>) -> Vec<u8> {
+        let o = |s: &str| tlv(0x06, oid(s).as_bytes());
+        let alg = tlv(0x30, &[o(OID_SHA256), vec![0x05, 0x00]].concat());
+        let imprint = tlv(0x30, &[alg, tlv(0x04, digest)].concat());
+        let mut fields = [
+            tlv(0x02, &[1]),
+            o("1.2.3.4"),
+            imprint,
+            tlv(0x02, &[0x2a]),
+            tlv(0x18, gen_time),
+        ]
+        .concat();
+        if let Some(n) = nonce {
+            fields.extend(tlv(0x02, n));
+        }
+        tlv(0x30, &fields)
+    }
+
+    /// A synthetic TimeStampResp (status granted, SignedData with no signer) around `crafted_tst_info`: enough for
+    /// `parse_response`, never a token whose signature verifies.
+    fn crafted_response(digest: &[u8], gen_time: &[u8], nonce: Option<&[u8]>) -> Vec<u8> {
+        let o = |s: &str| tlv(0x06, oid(s).as_bytes());
+        let tst = crafted_tst_info(digest, gen_time, nonce);
+        let encap = tlv(
+            0x30,
+            &[o(OID_CT_TSTINFO), tlv(0xa0, &tlv(0x04, &tst))].concat(),
+        );
+        let sd = tlv(
+            0x30,
+            &[tlv(0x02, &[3]), vec![0x31, 0x00], encap, vec![0x31, 0x00]].concat(),
+        );
+        let ci = tlv(0x30, &[o("1.2.840.113549.1.7.2"), tlv(0xa0, &sd)].concat());
+        tlv(0x30, &[tlv(0x30, &tlv(0x02, &[0])), ci].concat())
+    }
+
+    /// SEC-HI-01: genTime is checked on its bytes; a malformed one is an error, never a panic.
+    #[test]
+    fn malformed_gen_time_is_an_error_not_a_panic() {
+        let d = [7u8; 32];
+        let ok = |g: &[u8]| parse_response(&crafted_response(&d, g, None), &d, None);
+        assert_eq!(
+            ok(b"20261124120000Z"),
+            Ok("2026-11-24T12:00:00Z".to_string())
+        );
+        assert_eq!(
+            ok(b"20261020182422.123Z"),
+            Ok("2026-10-20T18:24:22Z".to_string())
+        );
+        assert_eq!(
+            ok(b"20161231235960Z"),
+            Ok("2016-12-31T23:59:60Z".to_string())
+        );
+        let mut long_fraction = b"20261124120000.".to_vec();
+        long_fraction.extend([b'5'; 300]);
+        long_fraction.push(b'Z');
+        assert!(ok(&long_fraction).is_ok());
+        // Non-ASCII: a multi-byte character across byte 14 (the reviewer's input), inside the digits, after them.
+        let mut oversized = b"20261124120000".to_vec();
+        oversized.extend("é".repeat(150).as_bytes());
+        for bad in [
+            "1234567890123éZ".as_bytes(),
+            "2026112412000éZ".as_bytes(),
+            "20261124120000éZ".as_bytes(),
+            "20261124120000Zé".as_bytes(),
+            "２０２６1124120000Z".as_bytes(),
+            &[
+                0x32, 0x30, 0xff, 0xfe, 0x31, 0x31, 0x32, 0x34, 0x31, 0x32, 0x30, 0x30, 0x30, 0x30,
+                b'Z',
+            ],
+            &oversized,
+        ] {
+            let r = ok(bad);
+            assert!(
+                r.as_ref().is_err_and(|e| e.starts_with("bad genTime")),
+                "{bad:?}: {r:?}"
+            );
+            assert!(verify_token(&crafted_response(&d, bad, None), &d, None).is_err());
+        }
+        // Truncated, missing Z, wrong separators, offsets or fields out of range.
+        for bad in [
+            "",
+            "2026",
+            "2026112412000Z",
+            "20261124120000",
+            "20261124120000.Z",
+            "20261124120000,5Z",
+            "20261124120000.5",
+            "20261124120000+0100",
+            "20261124120000Zx",
+            "2026-11-24T12:0Z",
+            "20261324120000Z",
+            "20261100120000Z",
+            "20261124240000Z",
+            "20261124126000Z",
+            "20261124120061Z",
+            // Dates that do not exist (Codex on rakvor-tool-forge#24): 30 February, 29 February of a common year
+            // (2025, and 1900: a century that is not a multiple of 400), 31 April, year 0000.
+            "20260230120000Z",
+            "20250229120000Z",
+            "19000229120000Z",
+            "20260431120000Z",
+            "00001124120000Z",
+            "00000101000000Z",
+        ] {
+            let r = ok(bad.as_bytes());
+            assert!(
+                r.as_ref().is_err_and(|e| e.starts_with("bad genTime")),
+                "{bad:?}: {r:?}"
+            );
+        }
+        // Leap days that exist (2024; 2000 is a multiple of 400), month ends, and the first possible year.
+        for (good, iso) in [
+            ("20240229120000Z", "2024-02-29T12:00:00Z"),
+            ("20000229000000Z", "2000-02-29T00:00:00Z"),
+            ("20260228235959Z", "2026-02-28T23:59:59Z"),
+            ("20260430120000Z", "2026-04-30T12:00:00Z"),
+            ("20261231120000Z", "2026-12-31T12:00:00Z"),
+            ("00010101000000Z", "0001-01-01T00:00:00Z"),
+        ] {
+            assert_eq!(ok(good.as_bytes()), Ok(iso.to_string()), "{good}");
+        }
+        // A genTime whose DER length runs past the end of the TSTInfo (or of the input) is a DER error.
+        let mut tst = crafted_tst_info(&d, b"20261124120000Z", None);
+        let at = tst.len() - 15 - 1; // the genTime's length byte
+        assert_eq!(tst[at - 1], 0x18);
+        tst[at] = 0x7f;
+        assert!(parse_tst_info(&tst).is_err());
+        let mut tst = crafted_tst_info(&d, b"20261124120000Z", Some(&[0x12]));
+        assert_eq!(usize::from(tst[1]) + 2, tst.len(), "short-form length");
+        tst[1] -= 2; // the SEQUENCE ends inside the nonce (its last field)
+        assert!(parse_tst_info(&tst).is_err());
+        let full = crafted_response(&d, b"20261124120000Z", None);
+        for cut in 0..full.len() {
+            assert!(parse_response(&full[..cut], &d, None).is_err(), "cut {cut}");
+        }
+    }
+
+    /// SEC-HI-02: the nonce comes from the OS RNG, and a request's nonce must come back (RFC 3161 §2.4.2).
+    #[test]
+    fn nonce_is_random_and_required_in_the_response() {
+        let d = [9u8; 32];
+        let g = b"20261124120000Z";
+        let sent = [0x12, 0x34, 0x56];
+        let without = crafted_response(&d, g, None);
+        assert_eq!(
+            parse_response(&without, &d, Some(&sent)),
+            Err("nonce missing (possible replay)".to_string())
+        );
+        assert!(parse_response(&without, &d, None).is_ok());
+        let matching = crafted_response(&d, g, Some(&sent));
+        assert_eq!(
+            parse_response(&matching, &d, Some(&sent)),
+            Ok("2026-11-24T12:00:00Z".to_string())
+        );
+        let other = crafted_response(&d, g, Some(&[0x12, 0x34, 0x57]));
+        assert_eq!(
+            parse_response(&other, &d, Some(&sent)),
+            Err("nonce mismatch (possible replay)".to_string())
+        );
+        assert!(parse_response(&matching, &[0u8; 32], Some(&sent)).is_err());
+        let (a, b) = (nonce().unwrap(), nonce().unwrap());
+        assert_eq!((a.len(), b.len()), (16, 16));
+        assert_ne!(a, b);
+        for n in [&a, &b] {
+            assert!((0x01..=0x7f).contains(&n[0]), "{n:?}");
+            assert_eq!(Int::new(n).unwrap().as_bytes(), n.as_slice());
+            // A random nonce round-trips through a request and a response that echoes it.
+            assert!(TimeStampReq::from_der(&build_request(&d, n).unwrap()).is_ok());
+            assert!(parse_response(&crafted_response(&d, g, Some(n)), &d, Some(n)).is_ok());
+        }
     }
 
     /// Review (sidecar bypass): the tokens are driven by the audit log's timestamp_obtained entries, so deleting
