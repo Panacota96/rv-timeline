@@ -58,15 +58,23 @@ fn sha256_alg() -> spki::AlgorithmIdentifier<Any> {
 }
 
 /// 16 bytes from the operating system's random number generator (SEC-HI-02: never derived from the clock or the
-/// process id). The first byte is 0x01..=0x7f, so the INTEGER is positive and its DER encoding is these bytes.
+/// process id), made positive by `positive_nonce`.
 fn nonce() -> Result<Vec<u8>, String> {
     use rsa::rand_core::RngCore;
     let mut n = vec![0u8; 16];
     rsa::rand_core::OsRng
         .try_fill_bytes(&mut n)
         .map_err(|e| format!("no OS randomness for the timestamp nonce: {}", e))?;
-    n[0] = (n[0] & 0x7f) | 0x01;
-    Ok(n)
+    Ok(positive_nonce(n))
+}
+
+/// Sets the first byte to 0x01..=0x7f (high bit cleared, low bit set): the INTEGER is positive, and its minimal DER
+/// encoding is exactly these bytes (no leading 0x00 or 0xff to strip). 126 bits stay random.
+fn positive_nonce(mut n: Vec<u8>) -> Vec<u8> {
+    if let Some(first) = n.first_mut() {
+        *first = (*first & 0x7f) | 0x01;
+    }
+    n
 }
 
 pub fn build_request(digest: &[u8], nonce: &[u8]) -> Result<Vec<u8>, String> {
@@ -207,7 +215,8 @@ fn parse_tst_info(der: &[u8]) -> Result<TstFields, String> {
 /// present, optional fraction, UTC). Checked on the bytes before any text is made of them (SEC-HI-01: a slice of a
 /// non-ASCII value used to panic); anything else is an error. Trailing zeros in the fraction are tolerated. The date
 /// must exist in the proleptic Gregorian calendar: year 0001 or later, and a day that the month has (29 February
-/// only in a leap year), so `20260230…` or year `0000` is an error.
+/// only in a leap year), so `20260230…` or year `0000` is an error. A leap second (`:60`) exists only at 23:59 UTC,
+/// so `…235960Z` is accepted and `…120060Z` is an error.
 fn gen_time_of(raw: &[u8]) -> Result<String, String> {
     let bad = || "bad genTime (not a GeneralizedTime YYYYMMDDhhmmss[.fff]Z)".to_string();
     let (Some(digits), Some(rest)) = (raw.get(..14), raw.get(14..)) else {
@@ -232,7 +241,13 @@ fn gen_time_of(raw: &[u8]) -> Result<String, String> {
         2 => 28,
         _ => 0, // no such month: no day is valid
     };
-    if year == 0 || !(1..=days_in_month).contains(&day) || hour > 23 || minute > 59 || second > 60 {
+    let leap_second = second == 60 && hour == 23 && minute == 59;
+    if year == 0
+        || !(1..=days_in_month).contains(&day)
+        || hour > 23
+        || minute > 59
+        || (second > 59 && !leap_second)
+    {
         return Err(bad());
     }
     // Only ASCII digits from here on: every byte index below is a character boundary.
@@ -1621,6 +1636,10 @@ mod tests {
             "20261124240000Z",
             "20261124126000Z",
             "20261124120061Z",
+            // A leap second only exists at 23:59 UTC (CR-R018-02).
+            "20261124120060Z",
+            "20161231235860Z",
+            "20161231225960Z",
             // Dates that do not exist (Codex on rakvor-tool-forge#24): 30 February, 29 February of a common year
             // (2025, and 1900: a century that is not a multiple of 400), 31 April, year 0000.
             "20260230120000Z",
@@ -1661,6 +1680,56 @@ mod tests {
         for cut in 0..full.len() {
             assert!(parse_response(&full[..cut], &d, None).is_err(), "cut {cut}");
         }
+    }
+
+    /// CR-R018-03: the messageImprint's AlgorithmIdentifier must end inside the messageImprint. Here the
+    /// messageImprint SEQUENCE claims only the AlgorithmIdentifier's header and its OID, so the AlgorithmIdentifier
+    /// (still a valid TLV within the TSTInfo) runs past it and ends where the TSTInfo ends. No OCTET STRING follows:
+    /// without the bound, the next read would start at the end of the input and fail as a DER error instead.
+    #[test]
+    fn imprint_algorithm_past_the_message_imprint_is_rejected() {
+        let o = tlv(0x06, oid(OID_SHA256).as_bytes());
+        let alg_content = [o.clone(), vec![0x05, 0x00]].concat();
+        let alg = tlv(0x30, &alg_content);
+        assert!(alg.len() < 0x80, "short-form lengths");
+        // messageImprint header + the AlgorithmIdentifier's header and OID; its NULL is outside the messageImprint.
+        let imprint_len = 2 + o.len();
+        let fields = [
+            tlv(0x02, &[1]),
+            tlv(0x06, oid("1.2.3.4").as_bytes()),
+            vec![0x30, imprint_len as u8],
+            alg,
+        ]
+        .concat();
+        let tst = tlv(0x30, &fields);
+        assert_eq!(
+            parse_tst_info(&tst).err().as_deref(),
+            Some("bad messageImprint")
+        );
+    }
+
+    /// CR-R018-04: the first-byte fix-up keeps every nonce a positive, minimally encoded INTEGER, whatever the
+    /// random first byte (the old `n[0] &= 0x7f` gave 0x00 for 0x00 and 0x80: a non-minimal INTEGER).
+    #[test]
+    fn nonce_first_byte_is_always_positive_and_minimal() {
+        for first in [0x00u8, 0x7f, 0x80, 0xff] {
+            let mut raw = vec![first];
+            raw.extend([0xa5; 15]);
+            let n = positive_nonce(raw.clone());
+            assert_eq!(n.len(), 16);
+            assert!((0x01..=0x7f).contains(&n[0]), "{first:#04x}: {n:?}");
+            assert_eq!(
+                &n[1..],
+                &raw[1..],
+                "{first:#04x}: only the first byte changes"
+            );
+            assert_eq!(
+                Int::new(&n).unwrap().as_bytes(),
+                n.as_slice(),
+                "{first:#04x}"
+            );
+        }
+        assert!(positive_nonce(Vec::new()).is_empty());
     }
 
     /// SEC-HI-02: the nonce comes from the OS RNG, and a request's nonce must come back (RFC 3161 §2.4.2).
